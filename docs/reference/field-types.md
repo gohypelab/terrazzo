@@ -36,6 +36,7 @@ All field types inherit from `SuperAdmin::Field::Base`.
 | HasMany | `Field::HasMany` | No | Yes | No |
 | HasOne | `Field::HasOne` | No | No | Yes |
 | Polymorphic | `Field::Polymorphic` | No | No | No |
+| Hstore | `Field::Hstore` | No | No | No |
 
 ## Options by Field Type
 
@@ -53,6 +54,18 @@ All field types inherit from `SuperAdmin::Field::Base`.
 ### BelongsTo
 - `scope` — proc to filter available records
 - `include_blank` — whether to allow blank selection
+
+### Hstore
+- `truncate` — max characters for the index preview (default: 80)
+
+Renders PostgreSQL `hstore` columns as interactive key-value pair editors. On the index page, values appear as a truncated comma-separated preview. On the show page, each key-value pair is displayed with the key as a badge. The form provides an add/remove row editor for key-value pairs.
+
+```ruby
+ATTRIBUTE_TYPES = {
+  metadata: Field::Hstore,
+  settings: Field::Hstore.with_options(truncate: 50),
+}
+```
 
 ### HasMany / HasOne
 - `scope` — proc to filter available records

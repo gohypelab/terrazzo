@@ -1,4 +1,4 @@
-import { visit, remote } from "@thoughtbot/superglue"
+import { visit, remote } from "@thoughtbot/superglue/action_creators"
 
 export function buildVisitAndRemote(ref, store, pageToPageMapping) {
   const appVisit = visit(ref, store, pageToPageMapping)

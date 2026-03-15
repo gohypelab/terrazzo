@@ -52,8 +52,22 @@ module SuperAdmin
         end
       end
 
+      ABSTRACT_FIELD_CLASSES = %w[Base Associative Deferred].freeze
+
       class << self
         def field_type
+          # Walk ancestors to find the nearest concrete SuperAdmin::Field class.
+          # This ensures custom subclasses (e.g. HasManyScopedField < HasMany)
+          # resolve to the parent's field_type for FieldRenderer mapping.
+          ancestors.each do |klass|
+            next unless klass.is_a?(Class) && klass < SuperAdmin::Field::Base
+            next if klass == SuperAdmin::Field::Base
+            if klass.name&.start_with?("SuperAdmin::Field::")
+              demod = klass.name.demodulize
+              next if ABSTRACT_FIELD_CLASSES.include?(demod)
+              return demod.underscore
+            end
+          end
           name.demodulize.underscore
         end
 
@@ -79,6 +93,10 @@ module SuperAdmin
 
         def permitted_attribute(attr, _options = {})
           attr.to_sym
+        end
+
+        def transform_param(value)
+          value
         end
 
         def default_options

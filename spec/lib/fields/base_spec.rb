@@ -6,6 +6,19 @@ RSpec.describe SuperAdmin::Field::Base do
       field = described_class.new(:name, "test")
       expect(field.field_type).to eq("base")
     end
+
+    it "resolves custom subclass to nearest known field type" do
+      custom_class = Class.new(SuperAdmin::Field::HasMany)
+      field = custom_class.new(:items, [])
+      expect(field.field_type).to eq("has_many")
+    end
+
+    it "resolves deeply nested subclass to nearest known field type" do
+      custom_class = Class.new(SuperAdmin::Field::BelongsTo)
+      deeper_class = Class.new(custom_class)
+      field = deeper_class.new(:owner, nil)
+      expect(field.field_type).to eq("belongs_to")
+    end
   end
 
   describe "#serialize_value" do

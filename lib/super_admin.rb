@@ -29,6 +29,7 @@ module SuperAdmin
     autoload :Url, "super_admin/field/url"
     autoload :Password, "super_admin/field/password"
     autoload :Select, "super_admin/field/select"
+    autoload :Hstore, "super_admin/field/hstore"
     autoload :RichText, "super_admin/field/rich_text"
     autoload :BelongsTo, "super_admin/field/belongs_to"
     autoload :HasMany, "super_admin/field/has_many"

@@ -6,12 +6,11 @@ import { buildVisitAndRemote } from "./application_visit"
 import { pageToPageMapping } from "./page_to_page_mapping"
 import { flashSlice } from "./slices/flash"
 
-document.addEventListener("DOMContentLoaded", () => {
+function initApp() {
   const appEl = document.getElementById("superglue-app")
-  const pageStateEl = document.getElementById("superglue-initial-page-state")
-  if (!appEl || !pageStateEl) return
+  const initialPage = window.SUPERGLUE_INITIAL_PAGE_STATE
+  if (!appEl || !initialPage) return
 
-  const initialPage = JSON.parse(pageStateEl.textContent)
   const path = window.location.pathname + window.location.search + window.location.hash
 
   const store = configureStore({
@@ -33,4 +32,10 @@ document.addEventListener("DOMContentLoaded", () => {
       buildVisitAndRemote={buildVisitAndRemote}
     />
   )
-})
+}
+
+if (document.readyState === "loading") {
+  document.addEventListener("DOMContentLoaded", initApp)
+} else {
+  initApp()
+}

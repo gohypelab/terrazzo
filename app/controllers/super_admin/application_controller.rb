@@ -16,7 +16,7 @@ module SuperAdmin
     superglue_template "admin/application"
     before_action :use_jsx_rendering_defaults
 
-    helper_method :namespace, :dashboard, :resource_name, :resource_class
+    helper_method :namespace, :dashboard, :resource_name, :resource_class, :application_title
 
     def index
       search = SuperAdmin::Search.new(scoped_resource, dashboard, params[:search])
@@ -97,6 +97,10 @@ module SuperAdmin
 
     protected
 
+    def application_title
+      Rails.application.class.module_parent_name.titleize
+    end
+
     def default_sorting_attribute
       nil
     end
@@ -134,12 +138,19 @@ module SuperAdmin
       permitted = params.require(resource_class.model_name.param_key)
         .permit(dashboard.permitted_attributes(action))
 
-      # Extract has_one virtual _id params since ActiveRecord doesn't
-      # natively support assigning has_one associations by id
+      # Transform and extract special field params
       @has_one_assignments = {}
       dashboard.flatten_attributes(dashboard.form_attributes(action)).each do |attr|
         field_type = dashboard.attribute_type_for(attr)
         klass = field_type.is_a?(SuperAdmin::Field::Deferred) ? field_type.deferred_class : field_type
+
+        # Transform params (e.g., JSON string → Hash for hstore fields)
+        if permitted.key?(attr.to_s) && klass.respond_to?(:transform_param)
+          permitted[attr.to_s] = klass.transform_param(permitted[attr.to_s])
+        end
+
+        # Extract has_one virtual _id params since ActiveRecord doesn't
+        # natively support assigning has_one associations by id
         next unless klass <= SuperAdmin::Field::HasOne
 
         id_key = "#{attr}_id"

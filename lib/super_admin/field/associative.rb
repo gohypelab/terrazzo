@@ -35,6 +35,7 @@ module SuperAdmin
       end
 
       def resource_options
+        return [] unless associated_class
         scope = options[:scope] ? associated_class.public_send(options[:scope]) : associated_class.all
         pk = association_primary_key
         scope.map { |r| [display_name(r), r.public_send(pk)] }

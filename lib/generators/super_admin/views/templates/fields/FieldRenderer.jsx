@@ -44,6 +44,10 @@ import { IndexField as SelectIndex } from "./select/IndexField";
 import { ShowField as SelectShow } from "./select/ShowField";
 import { FormField as SelectForm } from "./select/FormField";
 
+import { IndexField as HstoreIndex } from "./hstore/IndexField";
+import { ShowField as HstoreShow } from "./hstore/ShowField";
+import { FormField as HstoreForm } from "./hstore/FormField";
+
 import { IndexField as RichTextIndex } from "./rich_text/IndexField";
 import { ShowField as RichTextShow } from "./rich_text/ShowField";
 import { FormField as RichTextForm } from "./rich_text/FormField";
@@ -76,6 +80,7 @@ const fieldMap = {
   url: { index: UrlIndex, show: UrlShow, form: UrlForm },
   password: { index: PasswordIndex, show: PasswordShow, form: PasswordForm },
   select: { index: SelectIndex, show: SelectShow, form: SelectForm },
+  hstore: { index: HstoreIndex, show: HstoreShow, form: HstoreForm },
   rich_text: { index: RichTextIndex, show: RichTextShow, form: RichTextForm },
   belongs_to: { index: BelongsToIndex, show: BelongsToShow, form: BelongsToForm },
   has_many: { index: HasManyIndex, show: HasManyShow, form: HasManyForm },

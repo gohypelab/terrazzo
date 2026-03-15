@@ -1,5 +1,7 @@
 module SuperAdmin
   class BaseDashboard
+    Field = SuperAdmin::Field
+
     def attribute_types
       self.class::ATTRIBUTE_TYPES
     end
@@ -61,7 +63,11 @@ module SuperAdmin
     end
 
     def collection_includes
-      attribute_types.select { |_attr, type| type.eager_load? }.keys
+      attribute_types.each_with_object([]) do |(attr, type), includes|
+        next unless type.eager_load?
+        next unless self.class.model.reflect_on_association(attr)
+        includes << attr
+      end
     end
 
     def collection_filters
