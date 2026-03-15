@@ -1,0 +1,8 @@
+import { visit, remote } from "@thoughtbot/superglue"
+
+export function applicationVisit(ref, store, pageToPageMapping) {
+  const appVisit = visit(ref, store, pageToPageMapping)
+  const appRemote = remote(ref, store, pageToPageMapping)
+
+  return { visit: appVisit, remote: appRemote }
+}

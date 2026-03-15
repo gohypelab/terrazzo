@@ -1,0 +1,23 @@
+module SuperAdmin
+  module Field
+    class <%= class_name %> < Base
+      def serialize_value(mode)
+        data
+      end
+
+      def serializable_options
+        {}
+      end
+
+      class << self
+        def searchable?
+          false
+        end
+
+        def sortable?
+          true
+        end
+      end
+    end
+  end
+end

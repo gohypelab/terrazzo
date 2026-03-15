@@ -1,0 +1,17 @@
+json.data(search: request.path) do
+  yield
+end
+
+json.componentIdentifier local_assigns[:virtual_path_of_template]
+json.assets do
+  json.array! []
+end
+
+json.csrfToken form_authenticity_token
+json.restoreStrategy "fromCacheAndRevisitInBackground"
+
+json.flash do
+  flash.each do |type, message|
+    json.set!(type, message)
+  end
+end

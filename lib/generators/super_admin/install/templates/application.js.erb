@@ -1,0 +1,34 @@
+import React from "react"
+import { createRoot } from "react-dom/client"
+import { Application, rootReducer, prepareStore } from "@thoughtbot/superglue"
+import { configureStore } from "@reduxjs/toolkit"
+import { pageToPageMapping } from "./<%= namespace_name %>/page_to_page_mapping"
+import { flashSlice } from "./<%= namespace_name %>/slices/flash"
+
+document.addEventListener("DOMContentLoaded", () => {
+  const appEl = document.getElementById("superglue-app")
+  const pageStateEl = document.getElementById("superglue-initial-page-state")
+  if (!appEl || !pageStateEl) return
+
+  const initialPage = JSON.parse(pageStateEl.textContent)
+  const path = window.location.pathname + window.location.search + window.location.hash
+
+  const store = configureStore({
+    reducer: {
+      ...rootReducer,
+      flash: flashSlice.reducer,
+    },
+  })
+  prepareStore(store, initialPage, path)
+
+  const root = createRoot(appEl)
+  root.render(
+    <Application
+      initialPage={initialPage}
+      baseUrl=""
+      path={path}
+      store={store}
+      mapping={pageToPageMapping}
+    />
+  )
+})
