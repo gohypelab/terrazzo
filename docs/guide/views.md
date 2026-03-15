@@ -59,6 +59,83 @@ rails g super_admin:views
 
 This will overwrite your local copies with the latest versions from the gem.
 
+## Custom Pages
+
+You can add pages beyond the standard CRUD views — for example, a dashboard overview or a reports page.
+
+### 1. Add a controller action
+
+```ruby
+# app/controllers/admin/reports_controller.rb
+class Admin::ReportsController < Admin::ApplicationController
+  superglue_template "admin/reports"
+
+  def index
+    @data = # ...
+  end
+end
+```
+
+Setting `superglue_template "admin/reports"` tells Superglue to look for components under `admin/reports/` instead of the shared `admin/application/` templates.
+
+### 2. Create a `.json.props` template
+
+```ruby
+# app/views/admin/reports/index.json.props
+json.pageTitle "Reports"
+json.data @data
+# ... any props your component needs
+
+json.navigation do
+  json.array! SuperAdmin::Namespace.new(namespace).resources_with_index_route do |nav_resource|
+    json.label nav_resource.resource_name.humanize.pluralize
+    json.path url_for(controller: "/#{nav_resource.controller_path}", action: :index, only_path: true)
+    json.active nav_resource.controller_path == controller_path
+  end
+end
+```
+
+### 3. Create a React component
+
+```jsx
+// app/views/admin/reports/index.jsx
+import { useContent } from "@thoughtbot/superglue"
+import { Layout } from "../components/Layout"
+
+export default function ReportsIndex() {
+  const { pageTitle, data, navigation } = useContent()
+  return (
+    <Layout navigation={navigation} title={pageTitle}>
+      {/* your custom page */}
+    </Layout>
+  )
+}
+```
+
+### 4. Add a route
+
+```ruby
+# config/routes.rb
+namespace :admin do
+  resources :reports, only: [:index]
+end
+```
+
+### 5. Register the component (esbuild/Sprockets only)
+
+If you're using **Vite**, the component is auto-discovered via `import.meta.glob` — no extra step needed.
+
+If you're using **esbuild or Sprockets**, add an entry to `page_to_page_mapping.js`:
+
+```javascript
+import ReportsIndex from "../../views/admin/reports/index"
+
+export const pageToPageMapping = {
+  // ... existing entries
+  'admin/reports/index': ReportsIndex,
+}
+```
+
 ## SPA Navigation
 
 SuperAdmin uses [Superglue](https://github.com/thoughtbot/superglue) for client-side navigation:

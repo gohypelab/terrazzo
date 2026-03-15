@@ -13,11 +13,14 @@ rails g super_admin:install
 | Option | Default | Description |
 |--------|---------|-------------|
 | `--namespace` | `admin` | Admin namespace (controller prefix, route scope, JS directory) |
-| `--bundler` | `vite` | JavaScript bundler. `vite` generates `vite_javascript_tag` and `vite_react_refresh_tag`; `sprockets` generates `javascript_include_tag` |
+| `--bundler` | `vite` | JavaScript bundler. `vite` uses Vite asset tags and `import.meta.glob` for auto-discovery of page components; `esbuild` and `sprockets` use explicit imports with `javascript_include_tag` |
 
 ```bash
 # Vite (default)
 rails g super_admin:install
+
+# esbuild
+rails g super_admin:install --bundler=esbuild
 
 # Sprockets
 rails g super_admin:install --bundler=sprockets
@@ -42,10 +45,17 @@ rails g super_admin:dashboard Product
 rails g super_admin:dashboard Blog::Post
 ```
 
+### Options
+
+| Option | Default | Description |
+|--------|---------|-------------|
+| `--namespace` | `admin` | Admin namespace |
+| `--bundler` | `vite` | JavaScript bundler. With `esbuild` or `sprockets`, appends entries to `page_to_page_mapping.js`. With `vite`, skips this (components are auto-discovered via `import.meta.glob`) |
+
 Creates:
 - `app/dashboards/product_dashboard.rb`
 - `app/controllers/admin/products_controller.rb`
-- Appends entries to `page_to_page_mapping.js`
+- Appends entries to `page_to_page_mapping.js` (esbuild/Sprockets only)
 
 The generator inspects your model's columns and associations:
 - String columns → `Field::String`

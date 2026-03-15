@@ -54,17 +54,20 @@ This sets up the core Superglue infrastructure:
 rails g super_admin:install
 ```
 
-By default the generator assumes **Vite**. If your app uses Sprockets instead:
+By default the generator assumes **Vite**. If your app uses esbuild or Sprockets:
 
 ```bash
+rails g super_admin:install --bundler=esbuild
 rails g super_admin:install --bundler=sprockets
 ```
+
+With Vite, the page-to-page mapping uses `import.meta.glob` to auto-discover React components — custom pages are picked up automatically. With esbuild/Sprockets, the mapping is explicit and the dashboard generator maintains it for you.
 
 This creates an isolated admin namespace alongside your existing app — it won't conflict with any existing Superglue pages or controllers:
 
 **Admin Superglue infrastructure** (namespaced under `admin/`):
 - `app/javascript/admin/application.jsx` — separate Superglue entry point for the admin
-- `app/javascript/admin/page_to_page_mapping.js` — maps admin pages to React components
+- `app/javascript/admin/page_to_page_mapping.js` — maps admin pages to React components (auto-discovered with Vite, explicit with esbuild/Sprockets)
 - `app/javascript/admin/application_visit.js` — visit/remote factory
 - `app/javascript/admin/slices/flash.js` — flash message Redux slice
 - `app/views/layouts/admin/superglue.html.erb` — admin HTML layout
@@ -96,7 +99,7 @@ Each generates:
 
 - `app/dashboards/product_dashboard.rb` — field definitions
 - `app/controllers/admin/products_controller.rb` — inherits from your admin `ApplicationController`
-- Updates `page_to_page_mapping.js` with the new resource's pages
+- Updates `page_to_page_mapping.js` with the new resource's pages (esbuild/Sprockets only — Vite auto-discovers them)
 
 ## 7. Start the server
 
