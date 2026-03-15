@@ -1,3 +1,13 @@
+<% if vite? -%>
+const pages = import.meta.glob("../../views/<%= namespace_name %>/**/*.jsx", { eager: true })
+
+export const pageToPageMapping = {}
+
+for (const key in pages) {
+  const identifier = key.replace("../../views/", "").replace(/\.jsx$/, "")
+  pageToPageMapping[identifier] = pages[key].default
+}
+<% else -%>
 import AdminIndex from "../../views/<%= namespace_name %>/application/index"
 import AdminShow from "../../views/<%= namespace_name %>/application/show"
 import AdminNew from "../../views/<%= namespace_name %>/application/new"
@@ -9,3 +19,4 @@ export const pageToPageMapping = {
   '<%= namespace_name %>/application/new': AdminNew,
   '<%= namespace_name %>/application/edit': AdminEdit,
 }
+<% end -%>

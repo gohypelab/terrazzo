@@ -50,7 +50,7 @@ module SuperAdmin
 
       def run_dashboard_generators
         application_models.each do |model|
-          generate "super_admin:dashboard", model.name, "--namespace=#{namespace_name}"
+          generate "super_admin:dashboard", model.name, "--namespace=#{namespace_name}", "--bundler=#{options[:bundler]}"
         end
       end
 

@@ -10,6 +10,8 @@ module SuperAdmin
 
       class_option :namespace, type: :string, default: "admin",
         desc: "Admin namespace"
+      class_option :bundler, type: :string, default: "vite",
+        desc: "JavaScript bundler (vite or sprockets)"
 
       def create_dashboard
         template "dashboard.rb.erb",
@@ -22,6 +24,8 @@ module SuperAdmin
       end
 
       def update_page_to_page_mapping
+        return if options[:bundler] == "vite"
+
         mapping_path = "app/javascript/#{options[:namespace]}/page_to_page_mapping.js"
         return unless File.exist?(mapping_path)
 
