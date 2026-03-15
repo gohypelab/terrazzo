@@ -1,0 +1,28 @@
+en:
+  super_admin:
+    actions:
+      new: "New %{resource_name}"
+      edit: "Edit %{resource_name}"
+      show: "Show %{resource_name}"
+      destroy: "Delete %{resource_name}"
+      confirm_destroy: "Are you sure you want to delete this %{resource_name}?"
+      back: "Back"
+      save: "Save"
+      cancel: "Cancel"
+    controllers:
+      create:
+        success: "%{resource_name} was successfully created."
+      update:
+        success: "%{resource_name} was successfully updated."
+      destroy:
+        success: "%{resource_name} was successfully destroyed."
+    search:
+      placeholder: "Search %{resource_name}..."
+      clear: "Clear search"
+    pagination:
+      previous: "Previous"
+      next: "Next"
+      page_info: "Page %{current} of %{total}"
+      total_count: "%{count} total"
+    navigation:
+      title: "Admin"
