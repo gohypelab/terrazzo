@@ -1,0 +1,60 @@
+json.pageTitle @page.page_title
+
+json.attributeGroups do
+  json.array! do
+    @page.grouped_attributes.each do |group|
+      json.child! do
+        json.name group[:name]
+        json.attributes do
+          json.array! do
+            group[:fields].each do |field|
+              json.child! do
+                json.attribute field.attribute.to_s
+                json.label field.attribute.to_s.humanize
+                json.fieldType field.field_type
+                json.value field.serialize_value(:show)
+                json.options field.serializable_options
+              end
+            end
+          end
+        end
+      end
+    end
+  end
+end
+
+json.attributes do
+  json.array! do
+    @page.attributes.each do |field|
+      json.child! do
+        json.attribute field.attribute.to_s
+        json.label field.attribute.to_s.humanize
+        json.fieldType field.field_type
+        json.value field.serialize_value(:show)
+        json.options field.serializable_options
+      end
+    end
+  end
+end
+
+json.editPath edit_polymorphic_path([namespace, @resource]) rescue nil
+json.deletePath polymorphic_path([namespace, @resource]) rescue nil
+json.indexPath begin
+  url_for(controller: controller_path, action: :index, only_path: true)
+rescue ActionController::UrlGenerationError
+  nil
+end
+json.resourceName resource_name
+json.pluralResourceName resource_name.pluralize
+
+json.navigation do
+  json.array! do
+    SuperAdmin::Namespace.new(namespace).resources_with_index_route.each do |nav_resource|
+      json.child! do
+        json.label nav_resource.resource_name.humanize.pluralize
+        json.path url_for(controller: "/#{nav_resource.controller_path}", action: :index, only_path: true)
+        json.active nav_resource.controller_path == controller_path
+      end
+    end
+  end
+end

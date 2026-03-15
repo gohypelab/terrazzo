@@ -1,0 +1,100 @@
+json.searchBar do
+  json.searchTerm @search_term
+  json.searchPath request.path
+end
+
+json.filters do
+  json.available dashboard.collection_filters.keys.map(&:to_s)
+  json.active @active_filter
+  json.value @filter_value
+end
+
+json.table do
+  json.headers do
+    json.array! @page.attribute_names do |attr|
+      field_class = dashboard.attribute_type_for(attr)
+      json.label attr.to_s.humanize
+      json.attribute attr.to_s
+      json.sortable field_class.sortable?
+      json.sortDirection @page.sort_direction_for(attr)
+      json.sortUrl url_for(
+        @page.order_params_for(attr).merge(
+          search: @search_term,
+          filter: @active_filter,
+          filter_value: @filter_value,
+          _page: 1,
+          only_path: true
+        )
+      )
+    end
+  end
+
+  json.rows do
+    json.array! @resources do |resource|
+      json.id resource.id
+      json.showPath polymorphic_path([namespace, resource]) rescue nil
+      json.editPath edit_polymorphic_path([namespace, resource]) rescue nil
+      json.deletePath polymorphic_path([namespace, resource]) rescue nil
+
+      json.cells do
+        json.array! @page.attribute_names do |attr|
+          field = dashboard.attribute_type_for(attr).new(attr, nil, :index, resource: resource)
+          json.attribute attr.to_s
+          json.fieldType field.field_type
+          json.value field.serialize_value(:index)
+          json.options field.serializable_options
+        end
+      end
+    end
+  end
+end
+
+json.pagination do
+  json.currentPage @resources.current_page
+  json.totalPages @resources.total_pages
+  json.totalCount @resources.total_count
+  if @resources.next_page
+    json.nextPagePath url_for(
+      _page: @resources.next_page,
+      search: @search_term,
+      order: params[:order],
+      direction: params[:direction],
+      filter: @active_filter,
+      filter_value: @filter_value,
+      props_at: "data.table+data.pagination",
+      only_path: true
+    )
+  else
+    json.nextPagePath nil
+  end
+  if @resources.prev_page
+    json.prevPagePath url_for(
+      _page: @resources.prev_page,
+      search: @search_term,
+      order: params[:order],
+      direction: params[:direction],
+      filter: @active_filter,
+      filter_value: @filter_value,
+      props_at: "data.table+data.pagination",
+      only_path: true
+    )
+  else
+    json.prevPagePath nil
+  end
+end
+
+json.resourceName resource_name.pluralize
+json.singularResourceName resource_name
+json.newResourcePath new_polymorphic_path([namespace, resource_class]) rescue nil
+
+json.navigation do
+  json.array! do
+    SuperAdmin::Namespace.new(namespace).resources_with_index_route.each do |nav_resource|
+      json.child! do
+        json.label nav_resource.resource_name.humanize.pluralize
+        json.path url_for(controller: "/#{nav_resource.controller_path}", action: :index, only_path: true)
+        json.active nav_resource.controller_path == controller_path
+      end
+    end
+  end
+end
