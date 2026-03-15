@@ -1,0 +1,34 @@
+{
+  "name": "super-admin-example-app",
+  "private": true,
+  "scripts": {
+    "build": "node esbuild.config.mjs && npx @tailwindcss/cli -i app/assets/stylesheets/admin.css -o app/assets/builds/admin.css --minify",
+    "build:css": "npx @tailwindcss/cli -i app/assets/stylesheets/admin.css -o app/assets/builds/admin.css --minify",
+    "build:watch": "node esbuild.config.mjs --watch & npx @tailwindcss/cli -i app/assets/stylesheets/admin.css -o app/assets/builds/admin.css --watch"
+  },
+  "dependencies": {
+    "@radix-ui/react-avatar": "^1.1.11",
+    "@radix-ui/react-dialog": "^1.1.15",
+    "@radix-ui/react-dropdown-menu": "^2.1.16",
+    "@radix-ui/react-label": "^2.1.8",
+    "@radix-ui/react-popover": "^1.1.15",
+    "@radix-ui/react-separator": "^1.1.8",
+    "@radix-ui/react-slot": "^1.2.4",
+    "@radix-ui/react-tooltip": "^1.2.8",
+    "@reduxjs/toolkit": "^2.0.0",
+    "@thoughtbot/superglue": "^1.0.3",
+    "class-variance-authority": "^0.7.1",
+    "clsx": "^2.1.0",
+    "lucide-react": "^0.344.0",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "react-redux": "^9.1.0",
+    "super-admin": "file:../../npm",
+    "tailwind-merge": "^2.2.0"
+  },
+  "devDependencies": {
+    "@tailwindcss/cli": "^4.2.1",
+    "esbuild": "^0.20.0",
+    "tailwindcss": "^4.2.1"
+  }
+}

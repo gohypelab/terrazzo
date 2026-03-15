@@ -1,0 +1,21 @@
+import React from "react";
+
+import { Input } from "../../components/ui/input";
+import { Label } from "../../components/ui/label";
+
+export function FormField({ value, label, attribute, input, required }) {
+  return (
+    <div className="space-y-2">
+      {label &&
+      <Label htmlFor={input?.id}>
+          {label}{required && <span className="text-destructive"> *</span>}
+        </Label>
+      }
+      <Input
+        type="text"
+        defaultValue={String(value ?? "")}
+        {...input} />
+
+    </div>);
+
+}

@@ -1,0 +1,106 @@
+import React from "react";
+import { useContent } from "@thoughtbot/superglue";
+
+import { Layout } from "../components/Layout";
+import { SearchBar } from "../components/SearchBar";
+import { Pagination } from "../components/Pagination";
+import { SortableHeader } from "../components/SortableHeader";
+import { FieldRenderer } from "../fields/FieldRenderer";
+import { Button } from "../components/ui/button";
+import {
+  Table,
+  TableHeader,
+  TableBody,
+  TableRow,
+  TableHead,
+  TableCell,
+} from "../components/ui/table";
+
+export default function AdminIndex() {
+  const {
+    table,
+    searchBar,
+    pagination,
+    navigation,
+    newResourcePath,
+    resourceName,
+    singularResourceName
+  } = useContent();
+
+  return (
+    <Layout
+      navigation={navigation}
+      title={resourceName}
+      actions={
+        <a href={newResourcePath} data-sg-visit>
+          <Button size="sm">New {singularResourceName}</Button>
+        </a>
+      }>
+
+      <div className="flex items-center">
+        <SearchBar {...searchBar} />
+      </div>
+
+      <div className="overflow-x-auto rounded-md border">
+        <Table>
+          <TableHeader>
+            <TableRow>
+              {table.headers.map((header) =>
+                <SortableHeader key={header.attribute} {...header} />
+              )}
+              <TableHead className="w-[120px]">Actions</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {table.rows.map((row) =>
+              <TableRow key={row.id}>
+                {row.cells.map((cell) =>
+                  <TableCell key={cell.attribute}>
+                    <FieldRenderer mode="index" {...cell} />
+                  </TableCell>
+                )}
+                <TableCell>
+                  <div className="flex gap-1">
+                    {row.showPath &&
+                      <a href={row.showPath} data-sg-visit>
+                        <Button variant="ghost" size="sm">Show</Button>
+                      </a>
+                    }
+                    {row.editPath &&
+                      <a href={row.editPath} data-sg-visit>
+                        <Button variant="ghost" size="sm">Edit</Button>
+                      </a>
+                    }
+                    {row.deletePath &&
+                      <form
+                        action={row.deletePath}
+                        method="post"
+                        data-sg-visit
+                        style={{ display: "inline" }}
+                        onSubmit={(e) => {
+                          if (!window.confirm("Are you sure?")) e.preventDefault();
+                        }}>
+
+                        <input type="hidden" name="_method" value="delete" />
+                        <input
+                          type="hidden"
+                          name="authenticity_token"
+                          value={document.querySelector('meta[name="csrf-token"]')?.content ?? ""} />
+
+                        <Button type="submit" variant="ghost" size="sm" className="text-destructive">
+                          Delete
+                        </Button>
+                      </form>
+                    }
+                  </div>
+                </TableCell>
+              </TableRow>
+            )}
+          </TableBody>
+        </Table>
+      </div>
+
+      <Pagination {...pagination} />
+    </Layout>);
+
+}

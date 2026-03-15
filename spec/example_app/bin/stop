@@ -1,0 +1,13 @@
+#!/usr/bin/env ruby
+pid_file = File.expand_path("../../tmp/pids/server.pid", __dir__)
+
+if File.exist?(pid_file)
+  pid = File.read(pid_file).strip.to_i
+  puts "Stopping server (PID #{pid})..."
+  Process.kill("TERM", pid)
+  File.delete(pid_file)
+  puts "Server stopped."
+else
+  puts "No server PID file found at #{pid_file}"
+  exit 1
+end
