@@ -8,6 +8,24 @@ Sets up SuperAdmin in your Rails app.
 rails g super_admin:install
 ```
 
+### Options
+
+| Option | Default | Description |
+|--------|---------|-------------|
+| `--namespace` | `admin` | Admin namespace (controller prefix, route scope, JS directory) |
+| `--bundler` | `vite` | JavaScript bundler. `vite` generates `vite_javascript_tag` and `vite_react_refresh_tag`; `sprockets` generates `javascript_include_tag` |
+
+```bash
+# Vite (default)
+rails g super_admin:install
+
+# Sprockets
+rails g super_admin:install --bundler=sprockets
+
+# Custom namespace
+rails g super_admin:install --namespace=backstage
+```
+
 Creates:
 - Admin Superglue infrastructure (entry point, page mapping, visit handler, flash slice, layouts)
 - Admin application controller

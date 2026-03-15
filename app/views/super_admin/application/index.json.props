@@ -88,13 +88,9 @@ json.singularResourceName resource_name
 json.newResourcePath new_polymorphic_path([namespace, resource_class]) rescue nil
 
 json.navigation do
-  json.array! do
-    SuperAdmin::Namespace.new(namespace).resources_with_index_route.each do |nav_resource|
-      json.child! do
-        json.label nav_resource.resource_name.humanize.pluralize
-        json.path url_for(controller: "/#{nav_resource.controller_path}", action: :index, only_path: true)
-        json.active nav_resource.controller_path == controller_path
-      end
-    end
+  json.array! SuperAdmin::Namespace.new(namespace).resources_with_index_route do |nav_resource|
+    json.label nav_resource.resource_name.humanize.pluralize
+    json.path url_for(controller: "/#{nav_resource.controller_path}", action: :index, only_path: true)
+    json.active nav_resource.controller_path == controller_path
   end
 end

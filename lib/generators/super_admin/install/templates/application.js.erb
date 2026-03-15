@@ -2,8 +2,9 @@ import React from "react"
 import { createRoot } from "react-dom/client"
 import { Application, rootReducer, prepareStore } from "@thoughtbot/superglue"
 import { configureStore } from "@reduxjs/toolkit"
-import { pageToPageMapping } from "./<%= namespace_name %>/page_to_page_mapping"
-import { flashSlice } from "./<%= namespace_name %>/slices/flash"
+import { buildVisitAndRemote } from "./application_visit"
+import { pageToPageMapping } from "./page_to_page_mapping"
+import { flashSlice } from "./slices/flash"
 
 document.addEventListener("DOMContentLoaded", () => {
   const appEl = document.getElementById("superglue-app")
@@ -25,10 +26,11 @@ document.addEventListener("DOMContentLoaded", () => {
   root.render(
     <Application
       initialPage={initialPage}
-      baseUrl=""
+      baseUrl={window.location.origin}
       path={path}
       store={store}
       mapping={pageToPageMapping}
+      buildVisitAndRemote={buildVisitAndRemote}
     />
   )
 })

@@ -7,6 +7,8 @@ module SuperAdmin
 
       class_option :namespace, type: :string, default: "admin",
         desc: "Admin namespace"
+      class_option :bundler, type: :string, default: "vite",
+        desc: "JavaScript bundler (vite or sprockets)"
 
       def create_application_controller
         template "application_controller.rb.erb",
@@ -20,7 +22,7 @@ module SuperAdmin
 
       def create_js_entry_point
         template "application.js.erb",
-          "app/javascript/#{namespace_name}/application.js"
+          "app/javascript/#{namespace_name}/application.jsx"
       end
 
       def create_page_to_page_mapping
@@ -56,6 +58,10 @@ module SuperAdmin
 
       def namespace_name
         options[:namespace]
+      end
+
+      def vite?
+        options[:bundler] == "vite"
       end
 
       def application_models

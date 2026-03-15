@@ -54,10 +54,16 @@ This sets up the core Superglue infrastructure:
 rails g super_admin:install
 ```
 
+By default the generator assumes **Vite**. If your app uses Sprockets instead:
+
+```bash
+rails g super_admin:install --bundler=sprockets
+```
+
 This creates an isolated admin namespace alongside your existing app — it won't conflict with any existing Superglue pages or controllers:
 
 **Admin Superglue infrastructure** (namespaced under `admin/`):
-- `app/javascript/admin/application.js` — separate Superglue entry point for the admin
+- `app/javascript/admin/application.jsx` — separate Superglue entry point for the admin
 - `app/javascript/admin/page_to_page_mapping.js` — maps admin pages to React components
 - `app/javascript/admin/application_visit.js` — visit/remote factory
 - `app/javascript/admin/slices/flash.js` — flash message Redux slice

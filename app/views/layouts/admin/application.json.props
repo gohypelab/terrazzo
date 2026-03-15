@@ -7,7 +7,7 @@ end
 json.componentIdentifier active_template_virtual_path
 json.defers json.deferred!
 json.fragments json.fragments!
-json.assets [javascript_include_tag("application", type: "module")]
+json.assets []
 
 if protect_against_forgery?
   json.csrfToken form_authenticity_token

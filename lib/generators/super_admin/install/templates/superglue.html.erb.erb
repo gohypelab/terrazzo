@@ -6,7 +6,12 @@
   <%%= csrf_meta_tags %>
   <%%= csp_meta_tag %>
   <%%= yield :head %>
+<% if vite? -%>
+  <%%= vite_react_refresh_tag %>
+  <%%= vite_javascript_tag "<%= namespace_name %>/application" %>
+<% else -%>
   <%%= javascript_include_tag "<%= namespace_name %>/application", type: "module" %>
+<% end -%>
   <%%= stylesheet_link_tag "application", "data-turbo-track": "reload" %>
 </head>
 <body>

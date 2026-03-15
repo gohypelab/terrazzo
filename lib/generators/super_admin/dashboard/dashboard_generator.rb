@@ -25,14 +25,22 @@ module SuperAdmin
         mapping_path = "app/javascript/#{options[:namespace]}/page_to_page_mapping.js"
         return unless File.exist?(mapping_path)
 
-        resource_plural = class_name.underscore.pluralize
         namespace_name = options[:namespace]
-        actions = %w[index show new edit]
+        action_to_component = {
+          "index" => "AdminIndex",
+          "show" => "AdminShow",
+          "new" => "AdminNew",
+          "edit" => "AdminEdit"
+        }
 
-        inject_into_file mapping_path, before: "}" do
-          actions.map { |action|
-            "  '#{namespace_name}/#{resource_plural}/#{action}': AdminIndex,\n"
-          }.join
+        action_to_component.each do |action, component|
+          key = "'#{namespace_name}/application/#{action}'"
+          mapping_path_content = File.read(mapping_path)
+          next if mapping_path_content.include?(key)
+
+          inject_into_file mapping_path, before: "}" do
+            "  #{key}: #{component},\n"
+          end
         end
       end
 

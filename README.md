@@ -18,6 +18,7 @@ npm install super-admin
 rails g superglue:install
 
 # Install SuperAdmin — generates admin namespace, UI components, and dashboards
+# Uses Vite by default; for Sprockets pass --bundler=sprockets
 rails g super_admin:install
 
 # Start the server
@@ -35,7 +36,7 @@ Full docs at **[wengzilla.github.io/super-admin](https://wengzilla.github.io/sup
 - Ruby 3.1+
 - Rails 7.1+
 - Node.js 18+
-- A JS bundler (esbuild or Vite)
+- A JS bundler (Vite recommended, Sprockets also supported)
 
 ## License
 

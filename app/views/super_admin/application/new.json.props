@@ -19,9 +19,21 @@ json.form do
     end
   end
   json.fields do
-    json.array! do
-      @page.attributes(action).each do |field|
-        json.child! do
+    json.array! @page.attributes(action) do |field|
+      json.attribute field.attribute.to_s
+      json.label field.attribute.to_s.humanize
+      json.fieldType field.field_type
+      json.value field.serialize_value(:form)
+      json.options field.serializable_options
+      json.required field.required?
+      json.input field.form_input_attributes(param_key)
+    end
+  end
+  json.fieldGroups do
+    json.array! @page.grouped_attributes(action) do |group|
+      json.name group[:name]
+      json.fields do
+        json.array! group[:fields] do |field|
           json.attribute field.attribute.to_s
           json.label field.attribute.to_s.humanize
           json.fieldType field.field_type
@@ -29,30 +41,6 @@ json.form do
           json.options field.serializable_options
           json.required field.required?
           json.input field.form_input_attributes(param_key)
-        end
-      end
-    end
-  end
-  json.fieldGroups do
-    json.array! do
-      @page.grouped_attributes(action).each do |group|
-        json.child! do
-          json.name group[:name]
-          json.fields do
-            json.array! do
-              group[:fields].each do |field|
-                json.child! do
-                  json.attribute field.attribute.to_s
-                  json.label field.attribute.to_s.humanize
-                  json.fieldType field.field_type
-                  json.value field.serialize_value(:form)
-                  json.options field.serializable_options
-                  json.required field.required?
-                  json.input field.form_input_attributes(param_key)
-                end
-              end
-            end
-          end
         end
       end
     end
@@ -69,13 +57,9 @@ end
 json.resourceName resource_name
 
 json.navigation do
-  json.array! do
-    SuperAdmin::Namespace.new(namespace).resources_with_index_route.each do |nav_resource|
-      json.child! do
-        json.label nav_resource.resource_name.humanize.pluralize
-        json.path url_for(controller: "/#{nav_resource.controller_path}", action: :index, only_path: true)
-        json.active nav_resource.controller_path == controller_path
-      end
-    end
+  json.array! SuperAdmin::Namespace.new(namespace).resources_with_index_route do |nav_resource|
+    json.label nav_resource.resource_name.humanize.pluralize
+    json.path url_for(controller: "/#{nav_resource.controller_path}", action: :index, only_path: true)
+    json.active nav_resource.controller_path == controller_path
   end
 end
