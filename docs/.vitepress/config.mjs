@@ -4,10 +4,10 @@ export default defineConfig({
   title: "SuperAdmin",
   description:
     "A Rails admin framework powered by Superglue and React",
-  base: "/super_admin/",
+  base: "/super-admin/",
 
   head: [
-    ["link", { rel: "icon", type: "image/svg+xml", href: "/super_admin/logo.svg" }],
+    ["link", { rel: "icon", type: "image/svg+xml", href: "/super-admin/logo.svg" }],
   ],
 
   themeConfig: {
