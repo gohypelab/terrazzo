@@ -1,12 +1,12 @@
-require "super_admin/base_dashboard"
+require "terrazzo/base_dashboard"
 
-class LogEntryDashboard < SuperAdmin::BaseDashboard
+class LogEntryDashboard < Terrazzo::BaseDashboard
   ATTRIBUTE_TYPES = {
-    id: SuperAdmin::Field::Number,
-    action: SuperAdmin::Field::String,
-    created_at: SuperAdmin::Field::DateTime,
-    updated_at: SuperAdmin::Field::DateTime,
-    loggable: SuperAdmin::Field::Polymorphic.with_options(classes: ["Customer", "Order"]),
+    id: Terrazzo::Field::Number,
+    action: Terrazzo::Field::String,
+    created_at: Terrazzo::Field::DateTime,
+    updated_at: Terrazzo::Field::DateTime,
+    loggable: Terrazzo::Field::Polymorphic.with_options(classes: ["Customer", "Order"]),
   }.freeze
 
   COLLECTION_ATTRIBUTES = %i[

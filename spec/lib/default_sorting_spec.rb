@@ -1,6 +1,6 @@
 require "spec_helper"
 
-RSpec.describe SuperAdmin::Order, "default sorting" do
+RSpec.describe Terrazzo::Order, "default sorting" do
   it "works with nil attribute (no default)" do
     order = described_class.new(attribute: nil, direction: nil)
     expect(order.attribute).to be_nil

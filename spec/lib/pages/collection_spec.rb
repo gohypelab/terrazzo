@@ -1,8 +1,8 @@
 require "spec_helper"
 
-RSpec.describe SuperAdmin::Page::Collection do
+RSpec.describe Terrazzo::Page::Collection do
   let(:dashboard) { CustomerDashboard.new }
-  let(:order) { SuperAdmin::Order.new(attribute: :name, direction: "asc") }
+  let(:order) { Terrazzo::Order.new(attribute: :name, direction: "asc") }
   let(:page) { described_class.new(dashboard, Customer, order: order) }
 
   describe "#attribute_names" do

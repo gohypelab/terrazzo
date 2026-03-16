@@ -1,6 +1,6 @@
 require "spec_helper"
 
-RSpec.describe SuperAdmin::Field::Polymorphic do
+RSpec.describe Terrazzo::Field::Polymorphic do
   describe "#serialize_value" do
     let(:customer) { create_customer(name: "Alice") }
     let(:log_entry) { LogEntry.create!(action: "login", loggable: customer) }

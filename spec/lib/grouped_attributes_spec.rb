@@ -1,12 +1,12 @@
 require "spec_helper"
 
-class GroupedShowDashboard < SuperAdmin::BaseDashboard
+class GroupedShowDashboard < Terrazzo::BaseDashboard
   ATTRIBUTE_TYPES = {
-    id: SuperAdmin::Field::Number,
-    name: SuperAdmin::Field::String,
-    email: SuperAdmin::Field::Email,
-    created_at: SuperAdmin::Field::DateTime,
-    updated_at: SuperAdmin::Field::DateTime,
+    id: Terrazzo::Field::Number,
+    name: Terrazzo::Field::String,
+    email: Terrazzo::Field::Email,
+    created_at: Terrazzo::Field::DateTime,
+    updated_at: Terrazzo::Field::DateTime,
   }.freeze
 
   COLLECTION_ATTRIBUTES = %i[id name email].freeze
@@ -23,11 +23,11 @@ class GroupedShowDashboard < SuperAdmin::BaseDashboard
   }.freeze
 end
 
-class FlatDashboard < SuperAdmin::BaseDashboard
+class FlatDashboard < Terrazzo::BaseDashboard
   ATTRIBUTE_TYPES = {
-    id: SuperAdmin::Field::Number,
-    name: SuperAdmin::Field::String,
-    email: SuperAdmin::Field::Email,
+    id: Terrazzo::Field::Number,
+    name: Terrazzo::Field::String,
+    email: Terrazzo::Field::Email,
   }.freeze
 
   COLLECTION_ATTRIBUTES = %i[id name email].freeze
@@ -36,7 +36,7 @@ class FlatDashboard < SuperAdmin::BaseDashboard
 end
 
 RSpec.describe "Grouped Attributes" do
-  describe SuperAdmin::BaseDashboard do
+  describe Terrazzo::BaseDashboard do
     describe "#flatten_attributes" do
       let(:dashboard) { GroupedShowDashboard.new }
 
@@ -62,7 +62,7 @@ RSpec.describe "Grouped Attributes" do
     end
   end
 
-  describe SuperAdmin::Page::Show do
+  describe Terrazzo::Page::Show do
     let(:customer) { create_customer(name: "Alice") }
 
     context "with grouped show attributes" do
@@ -104,7 +104,7 @@ RSpec.describe "Grouped Attributes" do
     end
   end
 
-  describe SuperAdmin::Page::Form do
+  describe Terrazzo::Page::Form do
     let(:customer) { Customer.new }
 
     context "with grouped form attributes" do

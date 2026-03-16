@@ -1,6 +1,6 @@
 require "spec_helper"
 
-RSpec.describe SuperAdmin::Field::HasMany do
+RSpec.describe Terrazzo::Field::HasMany do
   describe ".associative?" do
     it "returns true" do
       expect(described_class.associative?).to be true

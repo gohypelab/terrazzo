@@ -4,7 +4,7 @@
 
 ```ruby
 # Gemfile
-gem "super_admin"
+gem "terrazzo"
 ```
 
 ```bash
@@ -14,12 +14,12 @@ bundle install
 ## 2. Add the npm package
 
 ```bash
-yarn add super-admin
+yarn add terrazzo
 # or
-npm install super-admin
+npm install terrazzo
 ```
 
-The `super-admin` npm package is a slim runtime that provides utilities (`cn`, `truncate`, `formatDate/DateTime/Time`), hooks (`useIsMobile`), and the field registry API. All React components (UI primitives, pages, fields) are copied into your project by the install generator.
+The `terrazzo` npm package is a slim runtime that provides utilities (`cn`, `truncate`, `formatDate/DateTime/Time`), hooks (`useIsMobile`), and the field registry API. All React components (UI primitives, pages, fields) are copied into your project by the install generator.
 
 ## 3. Install frontend dependencies
 
@@ -33,7 +33,7 @@ yarn add @radix-ui/react-avatar @radix-ui/react-dialog @radix-ui/react-dropdown-
 
 ## 4. Install Superglue (if you haven't already)
 
-SuperAdmin is built on top of [Superglue](https://github.com/thoughtbot/superglue). If your app already uses Superglue, skip to step 5.
+Terrazzo is built on top of [Superglue](https://github.com/thoughtbot/superglue). If your app already uses Superglue, skip to step 5.
 
 ```bash
 rails g superglue:install
@@ -48,17 +48,17 @@ This sets up the core Superglue infrastructure:
 - `config/initializers/superglue.rb`
 - JS dependencies (`react`, `react-dom`, `@reduxjs/toolkit`, `react-redux`, `@thoughtbot/superglue`)
 
-## 5. Run the SuperAdmin install generator
+## 5. Run the Terrazzo install generator
 
 ```bash
-rails g super_admin:install
+rails g terrazzo:install
 ```
 
 By default the generator assumes **Vite**. If your app uses esbuild or Sprockets:
 
 ```bash
-rails g super_admin:install --bundler=esbuild
-rails g super_admin:install --bundler=sprockets
+rails g terrazzo:install --bundler=esbuild
+rails g terrazzo:install --bundler=sprockets
 ```
 
 With Vite, the page-to-page mapping uses `import.meta.glob` to auto-discover React components — custom pages are picked up automatically. With esbuild/Sprockets, the mapping is explicit and the dashboard generator maintains it for you.
@@ -74,7 +74,7 @@ This creates an isolated admin namespace alongside your existing app — it won'
 - `app/views/layouts/admin/application.json.props` — admin JSON props layout
 
 **Admin controllers and routes:**
-- `app/controllers/admin/application_controller.rb` — inherits from `SuperAdmin::ApplicationController`
+- `app/controllers/admin/application_controller.rb` — inherits from `Terrazzo::ApplicationController`
 - `config/routes.rb` — adds an `admin` namespace with a root route
 
 **Admin UI components and views:**
@@ -90,9 +90,9 @@ This creates an isolated admin namespace alongside your existing app — it won'
 The install generator (step 5) automatically creates dashboards for all existing `ApplicationRecord` models. To add dashboards for new models later:
 
 ```bash
-rails g super_admin:dashboard Product
-rails g super_admin:dashboard Customer
-rails g super_admin:dashboard Order
+rails g terrazzo:dashboard Product
+rails g terrazzo:dashboard Customer
+rails g terrazzo:dashboard Order
 ```
 
 Each generates:

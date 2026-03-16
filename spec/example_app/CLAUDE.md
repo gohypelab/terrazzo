@@ -1,6 +1,6 @@
 # Example App
 
-Demo Rails 8 + React SPA showcasing the SuperAdmin gem. An e-commerce admin panel with customers, orders, products, payments, and blog posts.
+Demo Rails 8 + React SPA showcasing the Terrazzo gem. An e-commerce admin panel with customers, orders, products, payments, and blog posts.
 
 ## Quick Start
 
@@ -23,7 +23,7 @@ Visit `http://localhost:3000/admin`.
 
 ## Architecture
 
-- Controllers in `app/controllers/admin/` inherit from `SuperAdmin::ApplicationController`
+- Controllers in `app/controllers/admin/` inherit from `Terrazzo::ApplicationController`
 - Dashboards in `app/dashboards/` define field types and CRUD config
 - No `.erb` view files — JSON props rendered via `.json.props` templates from the gem
 - React page views live in `app/views/admin/application/` following Superglue conventions
@@ -31,7 +31,7 @@ Visit `http://localhost:3000/admin`.
 - Field renderers live in `app/views/admin/fields/`
 - JS entry point: `app/javascript/admin/application.js`
 - Page-to-component mapping: `app/javascript/admin/page_to_page_mapping.js`
-- The `super-admin` npm package provides only utilities (`cn`, `truncate`, `formatDate/DateTime/Time`), hooks (`useIsMobile`), store helpers (`useAppSelector`), and the field registry API — all React components are local
+- The `terrazzo` npm package provides only utilities (`cn`, `truncate`, `formatDate/DateTime/Time`), hooks (`useIsMobile`), store helpers (`useAppSelector`), and the field registry API — all React components are local
 
 ## Key Paths
 
@@ -51,8 +51,8 @@ Visit `http://localhost:3000/admin`.
 ## Dependencies
 
 The gem and npm package are loaded from local paths:
-- **Gem:** `gem "super_admin", path: "../.."` (repo root)
-- **NPM:** `"super-admin": "file:../../npm"` (repo `npm/` dir)
+- **Gem:** `gem "terrazzo", path: "../.."` (repo root)
+- **NPM:** `"terrazzo": "file:../../npm"` (repo `npm/` dir)
 
 The npm package is a slim runtime (utilities + hooks only). UI dependencies (Radix, cva, lucide-react) are direct dependencies of the example app.
 

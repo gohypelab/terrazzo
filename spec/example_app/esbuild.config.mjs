@@ -8,7 +8,7 @@ const npmPkgPath = path.resolve(__dirname, "../../npm")
 
 const watch = process.argv.includes("--watch")
 
-// When super-admin is symlinked via file:../../npm, esbuild follows the
+// When terrazzo is symlinked via file:../../npm, esbuild follows the
 // symlink and resolves peer deps from npm/node_modules/ instead of the app's.
 // This plugin intercepts those resolutions and redirects them to the app's
 // node_modules to ensure a single copy of React, Redux, and Superglue.

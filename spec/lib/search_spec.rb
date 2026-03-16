@@ -1,6 +1,6 @@
 require "spec_helper"
 
-RSpec.describe SuperAdmin::Search do
+RSpec.describe Terrazzo::Search do
   let(:dashboard) { CustomerDashboard.new }
 
   before do

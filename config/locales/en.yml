@@ -1,5 +1,5 @@
 en:
-  super_admin:
+  terrazzo:
     actions:
       new: "New %{resource_name}"
       edit: "Edit %{resource_name}"

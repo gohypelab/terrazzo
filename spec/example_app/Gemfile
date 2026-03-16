@@ -1,6 +1,6 @@
 source "https://rubygems.org"
 
-gem "super_admin", path: "../.."
+gem "terrazzo", path: "../.."
 
 # Bundle edge Rails instead: gem "rails", github: "rails/rails", branch: "main"
 gem "rails", "~> 8.1.2"

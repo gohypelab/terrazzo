@@ -1,6 +1,6 @@
 require "spec_helper"
 
-RSpec.describe SuperAdmin::Field::Number do
+RSpec.describe Terrazzo::Field::Number do
   describe "#serialize_value" do
     it "returns raw number" do
       field = described_class.new(:price, 42.5)

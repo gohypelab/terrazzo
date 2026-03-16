@@ -1,20 +1,20 @@
-require "super_admin/base_dashboard"
+require "terrazzo/base_dashboard"
 
-class ProductDashboard < SuperAdmin::BaseDashboard
+class ProductDashboard < Terrazzo::BaseDashboard
   ATTRIBUTE_TYPES = {
-    id: SuperAdmin::Field::Number,
-    name: SuperAdmin::Field::String,
-    price: SuperAdmin::Field::Number.with_options(prefix: "$", decimals: 2),
-    description: SuperAdmin::Field::Text,
-    image_url: SuperAdmin::Field::Url,
-    created_at: SuperAdmin::Field::DateTime,
-    updated_at: SuperAdmin::Field::DateTime,
-    slug: SuperAdmin::Field::String,
-    release_year: SuperAdmin::Field::Select.with_options(collection: (2000..Date.today.year).to_a.reverse),
-    banner: SuperAdmin::Field::RichText,
-    line_items: SuperAdmin::Field::HasMany,
-    pages: SuperAdmin::Field::HasMany,
-    product_meta_tag: SuperAdmin::Field::HasOne,
+    id: Terrazzo::Field::Number,
+    name: Terrazzo::Field::String,
+    price: Terrazzo::Field::Number.with_options(prefix: "$", decimals: 2),
+    description: Terrazzo::Field::Text,
+    image_url: Terrazzo::Field::Url,
+    created_at: Terrazzo::Field::DateTime,
+    updated_at: Terrazzo::Field::DateTime,
+    slug: Terrazzo::Field::String,
+    release_year: Terrazzo::Field::Select.with_options(collection: (2000..Date.today.year).to_a.reverse),
+    banner: Terrazzo::Field::RichText,
+    line_items: Terrazzo::Field::HasMany,
+    pages: Terrazzo::Field::HasMany,
+    product_meta_tag: Terrazzo::Field::HasOne,
   }.freeze
 
   COLLECTION_ATTRIBUTES = %i[

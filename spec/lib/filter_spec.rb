@@ -1,11 +1,11 @@
 require "spec_helper"
 
 # Dashboard with filters for testing
-class FilterTestDashboard < SuperAdmin::BaseDashboard
+class FilterTestDashboard < Terrazzo::BaseDashboard
   ATTRIBUTE_TYPES = {
-    id: SuperAdmin::Field::Number,
-    name: SuperAdmin::Field::String,
-    email: SuperAdmin::Field::Email,
+    id: Terrazzo::Field::Number,
+    name: Terrazzo::Field::String,
+    email: Terrazzo::Field::Email,
   }.freeze
 
   COLLECTION_ATTRIBUTES = %i[id name email].freeze
@@ -18,10 +18,10 @@ class FilterTestDashboard < SuperAdmin::BaseDashboard
   }.freeze
 end
 
-class NoFilterDashboard < SuperAdmin::BaseDashboard
+class NoFilterDashboard < Terrazzo::BaseDashboard
   ATTRIBUTE_TYPES = {
-    id: SuperAdmin::Field::Number,
-    name: SuperAdmin::Field::String,
+    id: Terrazzo::Field::Number,
+    name: Terrazzo::Field::String,
   }.freeze
 
   COLLECTION_ATTRIBUTES = %i[id name].freeze
@@ -29,7 +29,7 @@ class NoFilterDashboard < SuperAdmin::BaseDashboard
   FORM_ATTRIBUTES = %i[name].freeze
 end
 
-RSpec.describe SuperAdmin::Filter do
+RSpec.describe Terrazzo::Filter do
   let(:dashboard) { FilterTestDashboard.new }
 
   before do
@@ -71,7 +71,7 @@ RSpec.describe SuperAdmin::Filter do
   end
 end
 
-RSpec.describe SuperAdmin::BaseDashboard, "collection_filters" do
+RSpec.describe Terrazzo::BaseDashboard, "collection_filters" do
   it "returns COLLECTION_FILTERS hash when defined" do
     dashboard = FilterTestDashboard.new
     expect(dashboard.collection_filters.keys).to contain_exactly(:recent, :by_name)

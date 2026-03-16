@@ -1,0 +1,24 @@
+module <%= namespace_name.camelize %>
+  class ApplicationController < Terrazzo::ApplicationController
+    layout "<%= namespace_name %>/application"
+    superglue_template "<%= namespace_name %>/application"
+
+    # before_action :authenticate_admin
+
+    # Override to limit which records are visible
+    # def scoped_resource
+    #   resource_class.all
+    # end
+
+    # Override to control access to actions
+    # def authorized_action?(resource, action)
+    #   true
+    # end
+
+    private
+
+    # def authenticate_admin
+    #   redirect_to root_path unless current_user&.admin?
+    # end
+  end
+end

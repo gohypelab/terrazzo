@@ -1,6 +1,6 @@
 require "spec_helper"
 
-RSpec.describe SuperAdmin::Field::HasOne do
+RSpec.describe Terrazzo::Field::HasOne do
   describe "#serialize_value" do
     it "returns { id, display } when present" do
       product = Product.create!(

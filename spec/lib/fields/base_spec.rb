@@ -1,6 +1,6 @@
 require "spec_helper"
 
-RSpec.describe SuperAdmin::Field::Base do
+RSpec.describe Terrazzo::Field::Base do
   describe "#field_type" do
     it "returns underscored class name" do
       field = described_class.new(:name, "test")
@@ -8,13 +8,13 @@ RSpec.describe SuperAdmin::Field::Base do
     end
 
     it "resolves custom subclass to nearest known field type" do
-      custom_class = Class.new(SuperAdmin::Field::HasMany)
+      custom_class = Class.new(Terrazzo::Field::HasMany)
       field = custom_class.new(:items, [])
       expect(field.field_type).to eq("has_many")
     end
 
     it "resolves deeply nested subclass to nearest known field type" do
-      custom_class = Class.new(SuperAdmin::Field::BelongsTo)
+      custom_class = Class.new(Terrazzo::Field::BelongsTo)
       deeper_class = Class.new(custom_class)
       field = deeper_class.new(:owner, nil)
       expect(field.field_type).to eq("belongs_to")
@@ -79,7 +79,7 @@ RSpec.describe SuperAdmin::Field::Base do
   describe ".with_options" do
     it "returns Deferred wrapping the field class" do
       deferred = described_class.with_options(truncate: 10)
-      expect(deferred).to be_a(SuperAdmin::Field::Deferred)
+      expect(deferred).to be_a(Terrazzo::Field::Deferred)
       expect(deferred.deferred_class).to eq(described_class)
       expect(deferred.options).to eq(truncate: 10)
     end

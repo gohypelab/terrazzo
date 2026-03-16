@@ -1,13 +1,13 @@
 import { defineConfig } from "vitepress";
 
 export default defineConfig({
-  title: "SuperAdmin",
+  title: "Terrazzo",
   description:
     "A Rails admin framework powered by Superglue and React",
-  base: "/super-admin/",
+  base: "/terrazzo/",
 
   head: [
-    ["link", { rel: "icon", type: "image/svg+xml", href: "/super-admin/logo.svg" }],
+    ["link", { rel: "icon", type: "image/svg+xml", href: "/terrazzo/logo.svg" }],
   ],
 
   themeConfig: {
@@ -19,7 +19,7 @@ export default defineConfig({
         items: [
           {
             text: "Changelog",
-            link: "https://github.com/super-admin/super_admin/releases",
+            link: "https://github.com/wengzilla/terrazzo/releases",
           },
         ],
       },
@@ -30,7 +30,7 @@ export default defineConfig({
         {
           text: "Introduction",
           items: [
-            { text: "What is SuperAdmin?", link: "/guide/what-is-super-admin" },
+            { text: "What is Terrazzo?", link: "/guide/what-is-terrazzo" },
             { text: "Getting Started", link: "/guide/getting-started" },
           ],
         },
@@ -57,7 +57,7 @@ export default defineConfig({
     },
 
     socialLinks: [
-      { icon: "github", link: "https://github.com/super-admin/super_admin" },
+      { icon: "github", link: "https://github.com/wengzilla/terrazzo" },
     ],
 
     search: {

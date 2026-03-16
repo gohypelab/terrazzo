@@ -1,6 +1,6 @@
 require "spec_helper"
 
-RSpec.describe SuperAdmin::Field::String do
+RSpec.describe Terrazzo::Field::String do
   describe ".searchable?" do
     it "returns true" do
       expect(described_class.searchable?).to be true

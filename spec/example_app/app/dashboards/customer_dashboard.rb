@@ -1,20 +1,20 @@
-require "super_admin/base_dashboard"
+require "terrazzo/base_dashboard"
 
-class CustomerDashboard < SuperAdmin::BaseDashboard
+class CustomerDashboard < Terrazzo::BaseDashboard
   ATTRIBUTE_TYPES = {
-    id: SuperAdmin::Field::Number,
-    name: SuperAdmin::Field::String,
-    email: SuperAdmin::Field::Email,
-    created_at: SuperAdmin::Field::DateTime,
-    updated_at: SuperAdmin::Field::DateTime,
-    email_subscriber: SuperAdmin::Field::Boolean,
-    kind: SuperAdmin::Field::Select.with_options(collection: ["standard", "vip"]),
-    example_time: SuperAdmin::Field::Time,
-    password: SuperAdmin::Field::Password,
-    hidden: SuperAdmin::Field::Boolean,
-    orders: SuperAdmin::Field::HasMany,
-    territory: SuperAdmin::Field::BelongsTo,
-    log_entries: SuperAdmin::Field::HasMany,
+    id: Terrazzo::Field::Number,
+    name: Terrazzo::Field::String,
+    email: Terrazzo::Field::Email,
+    created_at: Terrazzo::Field::DateTime,
+    updated_at: Terrazzo::Field::DateTime,
+    email_subscriber: Terrazzo::Field::Boolean,
+    kind: Terrazzo::Field::Select.with_options(collection: ["standard", "vip"]),
+    example_time: Terrazzo::Field::Time,
+    password: Terrazzo::Field::Password,
+    hidden: Terrazzo::Field::Boolean,
+    orders: Terrazzo::Field::HasMany,
+    territory: Terrazzo::Field::BelongsTo,
+    log_entries: Terrazzo::Field::HasMany,
   }.freeze
 
   COLLECTION_ATTRIBUTES = %i[

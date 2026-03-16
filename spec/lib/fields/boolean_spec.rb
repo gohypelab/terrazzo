@@ -1,6 +1,6 @@
 require "spec_helper"
 
-RSpec.describe SuperAdmin::Field::Boolean do
+RSpec.describe Terrazzo::Field::Boolean do
   describe "#serialize_value" do
     it "returns true" do
       field = described_class.new(:active, true)

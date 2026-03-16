@@ -1,6 +1,6 @@
 require "spec_helper"
 
-RSpec.describe SuperAdmin::Page::Form do
+RSpec.describe Terrazzo::Page::Form do
   let(:customer) { Customer.new }
 
   describe "#attributes" do

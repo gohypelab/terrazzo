@@ -6,19 +6,19 @@ Dashboards define which fields appear on each page of your admin panel. The DSL 
 
 ```ruby
 # app/dashboards/product_dashboard.rb
-class ProductDashboard < SuperAdmin::BaseDashboard
+class ProductDashboard < Terrazzo::BaseDashboard
   ATTRIBUTE_TYPES = {
-    id: SuperAdmin::Field::Number,
-    name: SuperAdmin::Field::String,
-    price: SuperAdmin::Field::Number.with_options(prefix: "$", decimals: 2),
-    description: SuperAdmin::Field::Text,
-    category: SuperAdmin::Field::Select.with_options(
+    id: Terrazzo::Field::Number,
+    name: Terrazzo::Field::String,
+    price: Terrazzo::Field::Number.with_options(prefix: "$", decimals: 2),
+    description: Terrazzo::Field::Text,
+    category: Terrazzo::Field::Select.with_options(
       collection: %w[Electronics Books Clothing]
     ),
-    customer: SuperAdmin::Field::BelongsTo,
-    tags: SuperAdmin::Field::HasMany,
-    created_at: SuperAdmin::Field::DateTime,
-    updated_at: SuperAdmin::Field::DateTime,
+    customer: Terrazzo::Field::BelongsTo,
+    tags: Terrazzo::Field::HasMany,
+    created_at: Terrazzo::Field::DateTime,
+    updated_at: Terrazzo::Field::DateTime,
   }.freeze
 
   COLLECTION_ATTRIBUTES = %i[id name price category].freeze
@@ -67,7 +67,7 @@ The default is `"ClassName #id"`.
 ## Generating Dashboards
 
 ```bash
-rails g super_admin:dashboard Product
+rails g terrazzo:dashboard Product
 ```
 
 The generator inspects your model's columns and associations to produce a reasonable starting dashboard. You can then customize it as needed.

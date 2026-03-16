@@ -2,7 +2,7 @@
 layout: home
 
 hero:
-  name: SuperAdmin
+  name: Terrazzo
   text: Rails admin powered by React
   tagline: Drop-in admin panel using the Administrate dashboard DSL with a Superglue + React SPA frontend.
   actions:
@@ -11,11 +11,11 @@ hero:
       link: /guide/getting-started
     - theme: alt
       text: View on GitHub
-      link: https://github.com/super-admin/super_admin
+      link: https://github.com/terrazzo/terrazzo
 
 features:
   - title: Familiar DSL
-    details: Uses the same ATTRIBUTE_TYPES, COLLECTION_ATTRIBUTES, and FORM_ATTRIBUTES conventions as Administrate. If you know Administrate, you already know SuperAdmin.
+    details: Uses the same ATTRIBUTE_TYPES, COLLECTION_ATTRIBUTES, and FORM_ATTRIBUTES conventions as Administrate. If you know Administrate, you already know Terrazzo.
   - title: React SPA
     details: A full single-page application powered by Superglue — no separate API layer needed. Search, sort, and paginate without full page reloads.
   - title: shadcn/ui Components

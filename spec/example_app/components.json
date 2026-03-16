@@ -12,6 +12,6 @@
   "aliases": {
     "components": "app/views/admin/components",
     "ui": "app/views/admin/components/ui",
-    "utils": "super-admin"
+    "utils": "terrazzo"
   }
 }

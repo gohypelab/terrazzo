@@ -1,12 +1,12 @@
-require "super_admin/base_dashboard"
+require "terrazzo/base_dashboard"
 
-class Blog::TagDashboard < SuperAdmin::BaseDashboard
+class Blog::TagDashboard < Terrazzo::BaseDashboard
   ATTRIBUTE_TYPES = {
-    id: SuperAdmin::Field::Number,
-    name: SuperAdmin::Field::String,
-    created_at: SuperAdmin::Field::DateTime,
-    updated_at: SuperAdmin::Field::DateTime,
-    posts: SuperAdmin::Field::HasMany,
+    id: Terrazzo::Field::Number,
+    name: Terrazzo::Field::String,
+    created_at: Terrazzo::Field::DateTime,
+    updated_at: Terrazzo::Field::DateTime,
+    posts: Terrazzo::Field::HasMany,
   }.freeze
 
   COLLECTION_ATTRIBUTES = %i[

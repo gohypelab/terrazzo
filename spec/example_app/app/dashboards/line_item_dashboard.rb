@@ -1,14 +1,14 @@
-require "super_admin/base_dashboard"
+require "terrazzo/base_dashboard"
 
-class LineItemDashboard < SuperAdmin::BaseDashboard
+class LineItemDashboard < Terrazzo::BaseDashboard
   ATTRIBUTE_TYPES = {
-    id: SuperAdmin::Field::Number,
-    unit_price: SuperAdmin::Field::Number.with_options(prefix: "$", decimals: 2),
-    quantity: SuperAdmin::Field::Number,
-    created_at: SuperAdmin::Field::DateTime,
-    updated_at: SuperAdmin::Field::DateTime,
-    order: SuperAdmin::Field::BelongsTo,
-    product: SuperAdmin::Field::BelongsTo,
+    id: Terrazzo::Field::Number,
+    unit_price: Terrazzo::Field::Number.with_options(prefix: "$", decimals: 2),
+    quantity: Terrazzo::Field::Number,
+    created_at: Terrazzo::Field::DateTime,
+    updated_at: Terrazzo::Field::DateTime,
+    order: Terrazzo::Field::BelongsTo,
+    product: Terrazzo::Field::BelongsTo,
   }.freeze
 
   COLLECTION_ATTRIBUTES = %i[

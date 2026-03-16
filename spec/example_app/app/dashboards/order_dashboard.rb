@@ -1,20 +1,20 @@
-require "super_admin/base_dashboard"
+require "terrazzo/base_dashboard"
 
-class OrderDashboard < SuperAdmin::BaseDashboard
+class OrderDashboard < Terrazzo::BaseDashboard
   ATTRIBUTE_TYPES = {
-    id: SuperAdmin::Field::Number,
-    address_line_one: SuperAdmin::Field::String,
-    address_line_two: SuperAdmin::Field::String,
-    address_city: SuperAdmin::Field::String,
-    address_state: SuperAdmin::Field::String,
-    address_zip: SuperAdmin::Field::String,
-    created_at: SuperAdmin::Field::DateTime,
-    updated_at: SuperAdmin::Field::DateTime,
-    shipped_at: SuperAdmin::Field::DateTime,
-    customer: SuperAdmin::Field::BelongsTo,
-    line_items: SuperAdmin::Field::HasMany,
-    payments: SuperAdmin::Field::HasMany,
-    log_entries: SuperAdmin::Field::HasMany,
+    id: Terrazzo::Field::Number,
+    address_line_one: Terrazzo::Field::String,
+    address_line_two: Terrazzo::Field::String,
+    address_city: Terrazzo::Field::String,
+    address_state: Terrazzo::Field::String,
+    address_zip: Terrazzo::Field::String,
+    created_at: Terrazzo::Field::DateTime,
+    updated_at: Terrazzo::Field::DateTime,
+    shipped_at: Terrazzo::Field::DateTime,
+    customer: Terrazzo::Field::BelongsTo,
+    line_items: Terrazzo::Field::HasMany,
+    payments: Terrazzo::Field::HasMany,
+    log_entries: Terrazzo::Field::HasMany,
   }.freeze
 
   COLLECTION_ATTRIBUTES = %i[

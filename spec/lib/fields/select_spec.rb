@@ -1,6 +1,6 @@
 require "spec_helper"
 
-RSpec.describe SuperAdmin::Field::Select do
+RSpec.describe Terrazzo::Field::Select do
   describe "#serializable_options" do
     it "includes selectableOptions from array collection" do
       field = described_class.new(:kind, "vip", nil, options: {

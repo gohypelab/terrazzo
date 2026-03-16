@@ -1,6 +1,6 @@
 # Field Types Reference
 
-All field types inherit from `SuperAdmin::Field::Base`.
+All field types inherit from `Terrazzo::Field::Base`.
 
 ## Base Field API
 

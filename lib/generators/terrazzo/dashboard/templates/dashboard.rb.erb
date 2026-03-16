@@ -1,0 +1,36 @@
+require "terrazzo/base_dashboard"
+
+class <%= class_name %>Dashboard < Terrazzo::BaseDashboard
+  ATTRIBUTE_TYPES = {
+<% attribute_types.each do |attr, type| -%>
+<% if has_enum?(attr.to_s) -%>
+    <%= attr %>: Terrazzo::<%= type %>.with_options(collection: <%= enum_collection(attr.to_s).inspect %>),
+<% else -%>
+    <%= attr %>: Terrazzo::<%= type %>,
+<% end -%>
+<% end -%>
+  }.freeze
+
+  COLLECTION_ATTRIBUTES = %i[
+<% collection_attributes.each do |attr| -%>
+    <%= attr %>
+<% end -%>
+  ].freeze
+
+  SHOW_PAGE_ATTRIBUTES = %i[
+<% show_page_attributes.each do |attr| -%>
+    <%= attr %>
+<% end -%>
+  ].freeze
+
+  FORM_ATTRIBUTES = %i[
+<% form_attributes.each do |attr| -%>
+    <%= attr %>
+<% end -%>
+  ].freeze
+
+  # COLLECTION_FILTERS = {
+  #   active: ->(resources) { resources.where(active: true) },
+  #   recent: ->(resources) { resources.where("created_at > ?", 30.days.ago) },
+  # }.freeze
+end

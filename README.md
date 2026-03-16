@@ -1,4 +1,4 @@
-# SuperAdmin
+# Terrazzo
 
 A drop-in admin panel for Rails apps. Uses the [Administrate](https://github.com/thoughtbot/administrate) dashboard DSL with a React SPA frontend powered by [Superglue](https://github.com/thoughtbot/superglue).
 
@@ -11,15 +11,15 @@ A drop-in admin panel for Rails apps. Uses the [Administrate](https://github.com
 
 ```bash
 # Add the gem and npm package
-bundle add super_admin
-npm install super-admin
+bundle add terrazzo
+npm install terrazzo
 
 # Install Superglue (if not already set up)
 rails g superglue:install
 
-# Install SuperAdmin — generates admin namespace, UI components, and dashboards
+# Install Terrazzo — generates admin namespace, UI components, and dashboards
 # Uses Vite by default; for Sprockets pass --bundler=sprockets
-rails g super_admin:install
+rails g terrazzo:install
 
 # Start the server
 bin/dev
@@ -29,7 +29,7 @@ Visit `http://localhost:3000/admin` to see your admin panel.
 
 ## Documentation
 
-Full docs at **[wengzilla.github.io/super-admin](https://wengzilla.github.io/super-admin/)** — covers dashboards, fields, controllers, views, generators, and customization.
+Full docs at **[wengzilla.github.io/terrazzo](https://wengzilla.github.io/terrazzo/)** — covers dashboards, fields, controllers, views, generators, and customization.
 
 ## Requirements
 

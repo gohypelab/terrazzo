@@ -1,13 +1,13 @@
 # Fields
 
-SuperAdmin ships with 16 field types. Each field knows how to serialize itself for JSON and has three display modes: **index** (table cell), **show** (detail view), and **form** (input).
+Terrazzo ships with 16 field types. Each field knows how to serialize itself for JSON and has three display modes: **index** (table cell), **show** (detail view), and **form** (input).
 
 ## Basic Fields
 
 ### String
 
 ```ruby
-name: SuperAdmin::Field::String
+name: Terrazzo::Field::String
 ```
 
 - **Index**: Truncated to 50 characters (configurable with `truncate` option)
@@ -18,7 +18,7 @@ name: SuperAdmin::Field::String
 ### Text
 
 ```ruby
-description: SuperAdmin::Field::Text
+description: Terrazzo::Field::Text
 ```
 
 - **Index**: Truncated
@@ -28,7 +28,7 @@ description: SuperAdmin::Field::Text
 ### Number
 
 ```ruby
-price: SuperAdmin::Field::Number.with_options(prefix: "$", decimals: 2)
+price: Terrazzo::Field::Number.with_options(prefix: "$", decimals: 2)
 ```
 
 Options: `prefix`, `suffix`, `decimals`
@@ -36,7 +36,7 @@ Options: `prefix`, `suffix`, `decimals`
 ### Boolean
 
 ```ruby
-active: SuperAdmin::Field::Boolean
+active: Terrazzo::Field::Boolean
 ```
 
 - **Index/Show**: Check or X badge
@@ -45,15 +45,15 @@ active: SuperAdmin::Field::Boolean
 ### Date / DateTime / Time
 
 ```ruby
-published_on: SuperAdmin::Field::Date
-created_at: SuperAdmin::Field::DateTime
-starts_at: SuperAdmin::Field::Time
+published_on: Terrazzo::Field::Date
+created_at: Terrazzo::Field::DateTime
+starts_at: Terrazzo::Field::Time
 ```
 
 ### Email
 
 ```ruby
-email: SuperAdmin::Field::Email
+email: Terrazzo::Field::Email
 ```
 
 Renders as a clickable `mailto:` link on index and show pages.
@@ -61,7 +61,7 @@ Renders as a clickable `mailto:` link on index and show pages.
 ### URL
 
 ```ruby
-website: SuperAdmin::Field::Url
+website: Terrazzo::Field::Url
 ```
 
 Renders as an external link on index and show pages.
@@ -69,7 +69,7 @@ Renders as an external link on index and show pages.
 ### Password
 
 ```ruby
-password: SuperAdmin::Field::Password
+password: Terrazzo::Field::Password
 ```
 
 Renders as `••••••••` on index and show pages. Password input on forms.
@@ -77,7 +77,7 @@ Renders as `••••••••` on index and show pages. Password input on
 ### Select
 
 ```ruby
-status: SuperAdmin::Field::Select.with_options(
+status: Terrazzo::Field::Select.with_options(
   collection: %w[draft published archived]
 )
 ```
@@ -87,7 +87,7 @@ The `collection` option accepts an array, a proc, or an ActiveRecord enum name.
 ### Rich Text
 
 ```ruby
-body: SuperAdmin::Field::RichText
+body: Terrazzo::Field::RichText
 ```
 
 For Action Text fields. Renders HTML on show, textarea on form.
@@ -97,7 +97,7 @@ For Action Text fields. Renders HTML on show, textarea on form.
 ### BelongsTo
 
 ```ruby
-customer: SuperAdmin::Field::BelongsTo
+customer: Terrazzo::Field::BelongsTo
 ```
 
 - **Index/Show**: Link to the associated record
@@ -108,7 +108,7 @@ Options: `scope`, `include_blank`
 ### HasMany
 
 ```ruby
-orders: SuperAdmin::Field::HasMany
+orders: Terrazzo::Field::HasMany
 ```
 
 - **Index**: Count badge
@@ -118,7 +118,7 @@ orders: SuperAdmin::Field::HasMany
 ### HasOne
 
 ```ruby
-profile: SuperAdmin::Field::HasOne
+profile: Terrazzo::Field::HasOne
 ```
 
 - **Index/Show**: Link to the associated record
@@ -127,7 +127,7 @@ profile: SuperAdmin::Field::HasOne
 ### Polymorphic
 
 ```ruby
-commentable: SuperAdmin::Field::Polymorphic
+commentable: Terrazzo::Field::Polymorphic
 ```
 
 - **Form**: Grouped select (by type, then by record)
@@ -138,9 +138,9 @@ Use `.with_options` to configure any field:
 
 ```ruby
 ATTRIBUTE_TYPES = {
-  name: SuperAdmin::Field::String.with_options(truncate: 30),
-  price: SuperAdmin::Field::Number.with_options(prefix: "$", decimals: 2),
-  status: SuperAdmin::Field::Select.with_options(collection: -> { MyModel.statuses.keys }),
-  author: SuperAdmin::Field::BelongsTo.with_options(scope: -> { User.where(role: :author) }),
+  name: Terrazzo::Field::String.with_options(truncate: 30),
+  price: Terrazzo::Field::Number.with_options(prefix: "$", decimals: 2),
+  status: Terrazzo::Field::Select.with_options(collection: -> { MyModel.statuses.keys }),
+  author: Terrazzo::Field::BelongsTo.with_options(scope: -> { User.where(role: :author) }),
 }
 ```

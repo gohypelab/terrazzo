@@ -1,5 +1,5 @@
 {
-  "name": "super-admin-docs",
+  "name": "terrazzo-docs",
   "private": true,
   "scripts": {
     "docs:dev": "vitepress dev",

@@ -54,7 +54,7 @@ export default function ProductsIndex() {
 To reset all generated components to their defaults (e.g., after upgrading the gem):
 
 ```bash
-rails g super_admin:views
+rails g terrazzo:views
 ```
 
 This will overwrite your local copies with the latest versions from the gem.
@@ -87,7 +87,7 @@ json.data @data
 # ... any props your component needs
 
 json.navigation do
-  json.array! SuperAdmin::Namespace.new(namespace).resources_with_index_route do |nav_resource|
+  json.array! Terrazzo::Namespace.new(namespace).resources_with_index_route do |nav_resource|
     json.label nav_resource.resource_name.humanize.pluralize
     json.path url_for(controller: "/#{nav_resource.controller_path}", action: :index, only_path: true)
     json.active nav_resource.controller_path == controller_path
@@ -138,7 +138,7 @@ export const pageToPageMapping = {
 
 ## SPA Navigation
 
-SuperAdmin uses [Superglue](https://github.com/thoughtbot/superglue) for client-side navigation:
+Terrazzo uses [Superglue](https://github.com/thoughtbot/superglue) for client-side navigation:
 
 - **Full navigation** — links with `data-sg-visit` trigger a full page transition (e.g., sidebar links, show/edit links)
 - **Partial updates** — links with `data-sg-remote` update only part of the page (e.g., search, sort, pagination)

@@ -1,11 +1,11 @@
 # Generators Reference
 
-## `super_admin:install`
+## `terrazzo:install`
 
-Sets up SuperAdmin in your Rails app.
+Sets up Terrazzo in your Rails app.
 
 ```bash
-rails g super_admin:install
+rails g terrazzo:install
 ```
 
 ### Options
@@ -17,16 +17,16 @@ rails g super_admin:install
 
 ```bash
 # Vite (default)
-rails g super_admin:install
+rails g terrazzo:install
 
 # esbuild
-rails g super_admin:install --bundler=esbuild
+rails g terrazzo:install --bundler=esbuild
 
 # Sprockets
-rails g super_admin:install --bundler=sprockets
+rails g terrazzo:install --bundler=sprockets
 
 # Custom namespace
-rails g super_admin:install --namespace=backstage
+rails g terrazzo:install --namespace=backstage
 ```
 
 Creates:
@@ -36,13 +36,13 @@ Creates:
 - Dashboards for all existing `ApplicationRecord` models
 - UI components and field renderers
 
-## `super_admin:dashboard`
+## `terrazzo:dashboard`
 
 Generates a dashboard for a specific model.
 
 ```bash
-rails g super_admin:dashboard Product
-rails g super_admin:dashboard Blog::Post
+rails g terrazzo:dashboard Product
+rails g terrazzo:dashboard Blog::Post
 ```
 
 ### Options
@@ -70,22 +70,22 @@ The generator inspects your model's columns and associations:
 
 `FORM_ATTRIBUTES` excludes `id`, `created_at`, and `updated_at`. `COLLECTION_ATTRIBUTES` is limited to 4 attributes.
 
-## `super_admin:views`
+## `terrazzo:views`
 
 Regenerates all view components from the gem's templates.
 
 ```bash
-rails g super_admin:views
+rails g terrazzo:views
 ```
 
 Use this after upgrading the gem to get the latest component versions. **This will overwrite your local customizations.**
 
-## `super_admin:routes`
+## `terrazzo:routes`
 
 Generates the admin namespace routes.
 
 ```bash
-rails g super_admin:routes
+rails g terrazzo:routes
 ```
 
 Inserts a `namespace :admin` block with resource routes and a root route into your `config/routes.rb`.

@@ -1,5 +1,5 @@
 module Admin
-  class ApplicationController < SuperAdmin::ApplicationController
+  class ApplicationController < Terrazzo::ApplicationController
     layout "admin/application"
     superglue_template "admin/application"
 

@@ -1,7 +1,7 @@
 {
-  "name": "super-admin",
+  "name": "terrazzo",
   "version": "0.1.0",
-  "description": "React admin utilities for SuperAdmin Rails gem",
+  "description": "React admin utilities for Terrazzo Rails gem",
   "type": "module",
   "main": "./dist/index.cjs",
   "module": "./dist/index.js",

@@ -1,6 +1,6 @@
 require "spec_helper"
 
-RSpec.describe SuperAdmin::Order do
+RSpec.describe Terrazzo::Order do
   let(:dashboard) { CustomerDashboard.new }
 
   before do

@@ -1,5 +1,5 @@
 {
-  "name": "super-admin-example-app",
+  "name": "terrazzo-example-app",
   "private": true,
   "scripts": {
     "build": "node esbuild.config.mjs && npx @tailwindcss/cli -i app/assets/stylesheets/admin.css -o app/assets/builds/admin.css --minify",
@@ -24,7 +24,7 @@
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-redux": "^9.1.0",
-    "super-admin": "file:../../npm",
+    "terrazzo": "file:../../npm",
     "tailwind-merge": "^2.2.0"
   },
   "devDependencies": {

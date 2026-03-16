@@ -1,6 +1,6 @@
 require "spec_helper"
 
-RSpec.describe SuperAdmin::ResourceResolver do
+RSpec.describe Terrazzo::ResourceResolver do
   describe "admin/customers" do
     let(:resolver) { described_class.new("admin/customers") }
 

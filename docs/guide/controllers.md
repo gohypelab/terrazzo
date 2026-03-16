@@ -1,6 +1,6 @@
 # Controllers
 
-SuperAdmin generates a base `ApplicationController` for your admin namespace. All resource controllers inherit from it.
+Terrazzo generates a base `ApplicationController` for your admin namespace. All resource controllers inherit from it.
 
 ## Authentication
 
@@ -8,7 +8,7 @@ Add a `before_action` to protect your admin:
 
 ```ruby
 # app/controllers/admin/application_controller.rb
-class Admin::ApplicationController < SuperAdmin::ApplicationController
+class Admin::ApplicationController < Terrazzo::ApplicationController
   before_action :authenticate_admin
 
   private
@@ -43,7 +43,7 @@ def authorized_action?(resource, action)
 end
 ```
 
-When this returns `false`, SuperAdmin raises `SuperAdmin::NotAuthorizedError`.
+When this returns `false`, Terrazzo raises `Terrazzo::NotAuthorizedError`.
 
 ## Per-Resource Controllers
 
@@ -74,7 +74,7 @@ end
 
 ## How It Works
 
-`SuperAdmin::ApplicationController` provides standard CRUD actions:
+`Terrazzo::ApplicationController` provides standard CRUD actions:
 
 - **index** — paginated, searchable, sortable list
 - **show** — single record detail

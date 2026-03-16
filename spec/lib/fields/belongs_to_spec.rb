@@ -1,6 +1,6 @@
 require "spec_helper"
 
-RSpec.describe SuperAdmin::Field::BelongsTo do
+RSpec.describe Terrazzo::Field::BelongsTo do
   describe ".eager_load?" do
     it "returns true" do
       expect(described_class.eager_load?).to be true

@@ -1,11 +1,11 @@
-require "super_admin/base_dashboard"
+require "terrazzo/base_dashboard"
 
-class PaymentDashboard < SuperAdmin::BaseDashboard
+class PaymentDashboard < Terrazzo::BaseDashboard
   ATTRIBUTE_TYPES = {
-    id: SuperAdmin::Field::Number,
-    created_at: SuperAdmin::Field::DateTime,
-    updated_at: SuperAdmin::Field::DateTime,
-    order: SuperAdmin::Field::BelongsTo,
+    id: Terrazzo::Field::Number,
+    created_at: Terrazzo::Field::DateTime,
+    updated_at: Terrazzo::Field::DateTime,
+    order: Terrazzo::Field::BelongsTo,
   }.freeze
 
   COLLECTION_ATTRIBUTES = %i[

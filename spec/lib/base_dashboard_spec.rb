@@ -1,21 +1,21 @@
 require "spec_helper"
 
 # Use unique names to avoid collisions with example app dashboards
-class SpecCustomerDashboard < SuperAdmin::BaseDashboard
+class SpecCustomerDashboard < Terrazzo::BaseDashboard
   def self.model
     Customer
   end
 
   ATTRIBUTE_TYPES = {
-    id: SuperAdmin::Field::Number,
-    name: SuperAdmin::Field::String,
-    email: SuperAdmin::Field::Email,
-    email_subscriber: SuperAdmin::Field::Boolean,
-    kind: SuperAdmin::Field::Select.with_options(collection: %w[standard vip]),
-    orders: SuperAdmin::Field::HasMany,
-    territory: SuperAdmin::Field::BelongsTo,
-    created_at: SuperAdmin::Field::DateTime,
-    updated_at: SuperAdmin::Field::DateTime,
+    id: Terrazzo::Field::Number,
+    name: Terrazzo::Field::String,
+    email: Terrazzo::Field::Email,
+    email_subscriber: Terrazzo::Field::Boolean,
+    kind: Terrazzo::Field::Select.with_options(collection: %w[standard vip]),
+    orders: Terrazzo::Field::HasMany,
+    territory: Terrazzo::Field::BelongsTo,
+    created_at: Terrazzo::Field::DateTime,
+    updated_at: Terrazzo::Field::DateTime,
   }.freeze
 
   COLLECTION_ATTRIBUTES = %i[id name email kind].freeze
@@ -23,12 +23,12 @@ class SpecCustomerDashboard < SuperAdmin::BaseDashboard
   FORM_ATTRIBUTES = %i[name email email_subscriber kind territory].freeze
 end
 
-class SpecOrderDashboard < SuperAdmin::BaseDashboard
+class SpecOrderDashboard < Terrazzo::BaseDashboard
   ATTRIBUTE_TYPES = {
-    id: SuperAdmin::Field::Number,
-    customer: SuperAdmin::Field::BelongsTo,
-    address_line_one: SuperAdmin::Field::String,
-    created_at: SuperAdmin::Field::DateTime,
+    id: Terrazzo::Field::Number,
+    customer: Terrazzo::Field::BelongsTo,
+    address_line_one: Terrazzo::Field::String,
+    created_at: Terrazzo::Field::DateTime,
   }.freeze
 
   COLLECTION_ATTRIBUTES = %i[id customer address_line_one].freeze
@@ -38,7 +38,7 @@ class SpecOrderDashboard < SuperAdmin::BaseDashboard
   FORM_ATTRIBUTES_EDIT = %i[address_line_one].freeze
 end
 
-RSpec.describe SuperAdmin::BaseDashboard do
+RSpec.describe Terrazzo::BaseDashboard do
   let(:dashboard) { SpecCustomerDashboard.new }
 
   describe "#attribute_types" do
@@ -49,7 +49,7 @@ RSpec.describe SuperAdmin::BaseDashboard do
 
   describe "#attribute_type_for" do
     it "returns correct field class for known attribute" do
-      expect(dashboard.attribute_type_for(:name)).to eq(SuperAdmin::Field::String)
+      expect(dashboard.attribute_type_for(:name)).to eq(Terrazzo::Field::String)
     end
 
     it "raises error for unknown attribute" do

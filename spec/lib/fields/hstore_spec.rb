@@ -1,6 +1,6 @@
 require "spec_helper"
 
-RSpec.describe SuperAdmin::Field::Hstore do
+RSpec.describe Terrazzo::Field::Hstore do
   describe "#field_type" do
     it "returns hstore" do
       field = described_class.new(:metadata, {})
@@ -103,7 +103,7 @@ RSpec.describe SuperAdmin::Field::Hstore do
   describe ".with_options" do
     it "returns a Deferred with options" do
       deferred = described_class.with_options(truncate: 50)
-      expect(deferred).to be_a(SuperAdmin::Field::Deferred)
+      expect(deferred).to be_a(Terrazzo::Field::Deferred)
       expect(deferred.options).to eq(truncate: 50)
     end
   end

@@ -1,13 +1,13 @@
-# CLAUDE.md — SuperAdmin
+# CLAUDE.md — Terrazzo
 
 ## Project overview
 
-SuperAdmin is a Ruby gem + npm package that provides a drop-in admin panel for Rails apps. It uses the Administrate dashboard DSL with a React SPA frontend powered by Superglue. UI is built with shadcn/ui + Tailwind.
+Terrazzo is a Ruby gem + npm package that provides a drop-in admin panel for Rails apps. It uses the Administrate dashboard DSL with a React SPA frontend powered by Superglue. UI is built with shadcn/ui + Tailwind.
 
 ## Key directories
 
 - `lib/` — gem source (fields, base dashboard, generators)
-- `lib/generators/super_admin/` — Rails generators (install, dashboard, views, routes, field)
+- `lib/generators/terrazzo/` — Rails generators (install, dashboard, views, routes, field)
 - `app/` — engine controllers, views, and assets
 - `docs/` — VitePress documentation site (deployed to GitHub Pages)
 - `spec/` — RSpec tests, including `spec/example_app/` for system specs
@@ -45,10 +45,10 @@ cd spec/example_app && bundle exec rspec   # system specs (requires Chrome)
 
 **Always run the relevant tests after making changes.** Use this guide:
 
-- **Changed a field type** (`lib/super_admin/fields/`) → run `bundle exec rspec spec/lib/fields/`
-- **Changed the dashboard DSL** (`lib/super_admin/base_dashboard.rb`) → run `bundle exec rspec spec/lib/`
+- **Changed a field type** (`lib/terrazzo/fields/`) → run `bundle exec rspec spec/lib/fields/`
+- **Changed the dashboard DSL** (`lib/terrazzo/base_dashboard.rb`) → run `bundle exec rspec spec/lib/`
 - **Changed query logic** (filtering, search, ordering) → run the corresponding spec in `spec/lib/`
-- **Changed page rendering** (`lib/super_admin/pages/`) → run `bundle exec rspec spec/lib/pages/`
+- **Changed page rendering** (`lib/terrazzo/pages/`) → run `bundle exec rspec spec/lib/pages/`
 - **Changed a generator** (`lib/generators/`) → run the full unit suite (`bundle exec rspec`) and manually verify generated output if needed
 - **Changed controllers, views, or frontend components** → run system specs (`cd spec/example_app && bundle exec rspec`)
 - **Before committing any non-trivial change** → run the full unit suite at minimum (`bundle exec rspec`)
@@ -74,9 +74,9 @@ Documentation lives in `docs/` (VitePress) and `README.md`. Keep them in sync wi
 
 ## Code conventions
 
-- Generators live under `lib/generators/super_admin/<name>/` with a `<name>_generator.rb` and a `templates/` directory.
-- Dashboard classes inherit from `SuperAdmin::BaseDashboard`.
-- Field classes live in `SuperAdmin::Field` namespace.
+- Generators live under `lib/generators/terrazzo/<name>/` with a `<name>_generator.rb` and a `templates/` directory.
+- Dashboard classes inherit from `Terrazzo::BaseDashboard`.
+- Field classes live in `Terrazzo::Field` namespace.
 - Tests use RSpec. System specs use Capybara with headless Chrome.
 - The example app in `spec/example_app/` is a full Rails app used for integration/system testing.
 
