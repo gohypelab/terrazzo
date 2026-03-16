@@ -53,6 +53,7 @@ json.pagination do
   json.currentPage @resources.current_page
   json.totalPages @resources.total_pages
   json.totalCount @resources.total_count
+  json.perPage @resources.limit_value
   if @resources.next_page
     json.nextPagePath url_for(
       _page: @resources.next_page,
@@ -61,7 +62,7 @@ json.pagination do
       direction: params[:direction],
       filter: @active_filter,
       filter_value: @filter_value,
-      props_at: "data.table+data.pagination",
+      props_at: "data.pagination",
       only_path: true
     )
   else
@@ -75,7 +76,7 @@ json.pagination do
       direction: params[:direction],
       filter: @active_filter,
       filter_value: @filter_value,
-      props_at: "data.table+data.pagination",
+      props_at: "data.pagination",
       only_path: true
     )
   else

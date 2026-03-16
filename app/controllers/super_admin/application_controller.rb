@@ -34,7 +34,7 @@ module SuperAdmin
       includes = dashboard.collection_includes
       resources = resources.includes(*includes) if includes.any?
 
-      @resources = resources.page(params[:_page]).per(params[:per_page] || 20)
+      @resources = resources.page(params[:_page]).per(params[:per_page] || 25)
       @page = SuperAdmin::Page::Collection.new(dashboard, resource_class, order: order)
       @search_term = params[:search]
       @active_filter = params[:filter]
