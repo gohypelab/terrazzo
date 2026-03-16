@@ -4,12 +4,12 @@ import { useContent } from "@thoughtbot/superglue";
 import { Layout } from "../components/Layout";
 import { FieldRenderer } from "../fields/FieldRenderer";
 import { Button } from "../components/ui/button";
-import { Card, CardContent } from "../components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "../components/ui/card";
 
 export default function AdminShow() {
   const {
     pageTitle,
-    attributes,
+    attributeGroups,
     editPath,
     deletePath,
     indexPath,
@@ -54,22 +54,29 @@ export default function AdminShow() {
         </div>
       }>
 
-      <Card>
-        <CardContent className="pt-6">
-          <dl className="divide-y">
-            {attributes.map((attr) =>
-            <div key={attr.attribute} className="py-4 grid grid-cols-3 gap-4">
-                <dt className="text-sm font-medium text-muted-foreground">
-                  {attr.label}
-                </dt>
-                <dd className="col-span-2 text-sm">
-                  <FieldRenderer mode="show" {...attr} />
-                </dd>
-              </div>
-            )}
-          </dl>
-        </CardContent>
-      </Card>
+      {attributeGroups.map((group, groupIndex) =>
+        <Card key={groupIndex}>
+          {group.name && (
+            <CardHeader>
+              <CardTitle>{group.name}</CardTitle>
+            </CardHeader>
+          )}
+          <CardContent className={group.name ? "" : "pt-6"}>
+            <dl className="divide-y">
+              {group.attributes.map((attr) =>
+              <div key={attr.attribute} className="py-4 grid grid-cols-3 gap-4">
+                  <dt className="text-sm font-medium text-muted-foreground">
+                    {attr.label}
+                  </dt>
+                  <dd className="col-span-2 text-sm">
+                    <FieldRenderer mode="show" {...attr} />
+                  </dd>
+                </div>
+              )}
+            </dl>
+          </CardContent>
+        </Card>
+      )}
     </Layout>);
 
 }

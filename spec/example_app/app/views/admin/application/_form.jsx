@@ -4,7 +4,7 @@ import { FieldRenderer } from "../fields/FieldRenderer";
 import { Button } from "../components/ui/button";
 
 export function AdminForm({ form, errors }) {
-  const { props: formProps, extras, fields } = form;
+  const { props: formProps, extras, fieldGroups, fields } = form;
 
   return (
     <>
@@ -26,21 +26,46 @@ export function AdminForm({ form, errors }) {
         <input key={hiddenProps.name} {...hiddenProps} />
         )}
 
-        <div className="space-y-6">
-          {fields.map((field) =>
-          <FieldRenderer
-            key={field.attribute}
-            mode="form"
-            fieldType={field.fieldType}
-            value={field.value}
-            options={field.options}
-            attribute={field.attribute}
-            label={field.label}
-            input={field.input}
-            required={field.required} />
-
-          )}
-        </div>
+        {fieldGroups ? (
+          <div className="space-y-8">
+            {fieldGroups.map((group, groupIndex) =>
+              <fieldset key={groupIndex} className="space-y-6">
+                {group.name && (
+                  <legend className="text-lg font-semibold">{group.name}</legend>
+                )}
+                <div className="space-y-6">
+                  {group.fields.map((field) =>
+                    <FieldRenderer
+                      key={field.attribute}
+                      mode="form"
+                      fieldType={field.fieldType}
+                      value={field.value}
+                      options={field.options}
+                      attribute={field.attribute}
+                      label={field.label}
+                      input={field.input}
+                      required={field.required} />
+                  )}
+                </div>
+              </fieldset>
+            )}
+          </div>
+        ) : (
+          <div className="space-y-6">
+            {fields.map((field) =>
+            <FieldRenderer
+              key={field.attribute}
+              mode="form"
+              fieldType={field.fieldType}
+              value={field.value}
+              options={field.options}
+              attribute={field.attribute}
+              label={field.label}
+              input={field.input}
+              required={field.required} />
+            )}
+          </div>
+        )}
 
         <div className="mt-6 flex gap-2">
           <Button type="submit">Save</Button>

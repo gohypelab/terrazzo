@@ -39,7 +39,6 @@ export default function AdminEdit() {
           <AdminForm form={form} errors={errors} />
         </CardContent>
       </Card>
-
     </Layout>);
 
 }
