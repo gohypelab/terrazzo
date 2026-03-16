@@ -1,6 +1,4 @@
 module Admin
-  module Blog
-    class TagsController < Admin::ApplicationController
-    end
+  class Blog::TagsController < ApplicationController
   end
 end
