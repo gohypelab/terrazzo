@@ -21,6 +21,7 @@ module Terrazzo
     autoload :String, "terrazzo/field/string"
     autoload :Text, "terrazzo/field/text"
     autoload :Number, "terrazzo/field/number"
+    autoload :Money, "terrazzo/field/money"
     autoload :Boolean, "terrazzo/field/boolean"
     autoload :Date, "terrazzo/field/date"
     autoload :DateTime, "terrazzo/field/date_time"

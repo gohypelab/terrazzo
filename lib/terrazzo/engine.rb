@@ -8,5 +8,14 @@ module Terrazzo
       end
     end
 
+    # Prevent Superglue's auto-include since Terrazzo handles controller
+    # setup explicitly. This also avoids a load-order issue where
+    # Superglue's scaffold controller generator triggers a require of
+    # rails/generators/model_helpers before ActiveSupport core extensions
+    # are available (mattr_accessor undefined on Ruby 4.0+).
+    initializer "terrazzo.configure_superglue", before: "superglue" do |app|
+      app.config.superglue = ActiveSupport::OrderedOptions.new unless app.config.respond_to?(:superglue)
+      app.config.superglue.auto_include = false
+    end
   end
 end

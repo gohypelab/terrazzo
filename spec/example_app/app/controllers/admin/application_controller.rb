@@ -1,7 +1,7 @@
 module Admin
   class ApplicationController < Terrazzo::ApplicationController
     layout "admin/application"
-    superglue_template "admin/application"
+    superglue_template "terrazzo/application/superglue"
 
     # before_action :authenticate_admin
 

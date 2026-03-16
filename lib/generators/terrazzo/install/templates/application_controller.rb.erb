@@ -1,7 +1,7 @@
 module <%= namespace_name.camelize %>
   class ApplicationController < Terrazzo::ApplicationController
     layout "<%= namespace_name %>/application"
-    superglue_template "<%= namespace_name %>/application"
+    superglue_template "terrazzo/application/superglue"
 
     # before_action :authenticate_admin
 

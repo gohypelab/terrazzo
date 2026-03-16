@@ -33,6 +33,7 @@ RSpec.describe "Admin Pages", type: :system do
 
       fill_in "Title", with: "New Page"
       fill_in "Body", with: "New page content"
+      select product.name, from: "Product"
       click_button "Save"
 
       expect(page).to have_content("New Page")

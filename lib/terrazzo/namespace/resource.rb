@@ -19,6 +19,10 @@ module Terrazzo
         resource_name
       end
 
+      def to_sym
+        resource_name.to_sym
+      end
+
       def ==(other)
         resource_name == other.resource_name
       end

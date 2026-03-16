@@ -4,7 +4,7 @@ json.data(dig: path) do
   yield
 end
 
-json.componentIdentifier active_template_virtual_path
+json.componentIdentifier terrazzo_page_identifier
 json.defers json.deferred!
 json.fragments json.fragments!
 json.assets []

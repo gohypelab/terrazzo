@@ -12,11 +12,9 @@ module Terrazzo
       Superglue::Resolver.new(Rails.root.join("app/views"))
     )
 
-    layout "admin/application"
-    superglue_template "admin/application"
     before_action :use_jsx_rendering_defaults
 
-    helper_method :namespace, :dashboard, :resource_name, :resource_class, :application_title
+    helper_method :namespace, :dashboard, :resource_name, :resource_class, :application_title, :terrazzo_page_identifier
 
     def index
       search = Terrazzo::Search.new(scoped_resource, dashboard, params[:search])
@@ -191,6 +189,14 @@ module Terrazzo
 
     def resource_name
       @_resource_name ||= resolver.resource_title
+    end
+
+    # Build a page identifier that matches the user's namespace, not the
+    # engine's internal template path. The React page-to-component mapping
+    # keys off this identifier (e.g. "admin/application/index").
+    def terrazzo_page_identifier
+      ns = controller_path.split("/").first
+      "#{ns}/application/#{action_name}"
     end
 
     private

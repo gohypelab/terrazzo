@@ -20,9 +20,19 @@ module Terrazzo
           "app/views/layouts/#{namespace_name}/application.html.erb"
       end
 
+      def create_json_props_layout
+        copy_file "application.json.props",
+          "app/views/layouts/#{namespace_name}/application.json.props"
+      end
+
       def create_js_entry_point
         template "application.js.erb",
           "app/javascript/#{namespace_name}/application.jsx"
+      end
+
+      def create_store
+        template "store.js.erb",
+          "app/javascript/#{namespace_name}/store.js"
       end
 
       def create_page_to_page_mapping
