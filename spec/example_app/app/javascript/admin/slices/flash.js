@@ -14,17 +14,17 @@ export const flashSlice = createSlice({
       delete state[key]
 
       return {
-        ...state,
+        ...state
       }
     },
     flash(state, { payload }) {
       return {
         ...state,
-        ...payload,
+        ...payload
       }
-    },
+    }
   },
-  extraReducers: (builder) => {
+  extraReducers: builder => {
     builder.addCase(beforeVisit, (_state, _action) => {
       return {}
     })
@@ -33,10 +33,10 @@ export const flashSlice = createSlice({
 
       return {
         ...state,
-        ...page.slices.flash,
+        ...page.slices.flash
       }
     })
-  },
+  }
 })
 
 export const { clearFlash, flash } = flashSlice.actions
