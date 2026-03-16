@@ -46,7 +46,7 @@ module SuperAdmin
         col_attrs = options[:collection_attributes]
 
         records = if limit && limit > 0
-          data.limit(limit)
+          data.respond_to?(:limit) ? data.limit(limit) : data.first(limit)
         else
           data
         end
