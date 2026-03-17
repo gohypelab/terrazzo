@@ -10,9 +10,9 @@
   <%%= vite_react_refresh_tag %>
   <%%= vite_javascript_tag "<%= namespace_name %>/application" %>
 <% else -%>
-  <%%= javascript_include_tag "<%= namespace_name %>/application", type: "module" %>
+  <%%= javascript_include_tag "<%= namespace_name %>", type: "module" %>
 <% end -%>
-  <%%= stylesheet_link_tag "application", "data-turbo-track": "reload" %>
+  <%%= stylesheet_link_tag "<%= namespace_name %>", "data-turbo-track": "reload" %>
 </head>
 <body>
   <%%= yield %>

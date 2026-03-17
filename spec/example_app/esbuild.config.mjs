@@ -46,7 +46,7 @@ const dedupePlugin = {
 }
 
 const ctx = await esbuild.context({
-  entryPoints: ["app/javascript/admin/application.jsx"],
+  entryPoints: { admin: "app/javascript/admin/application.jsx" },
   bundle: true,
   sourcemap: true,
   format: "esm",
