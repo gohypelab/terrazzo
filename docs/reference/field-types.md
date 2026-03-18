@@ -36,6 +36,7 @@ All field types inherit from `Terrazzo::Field::Base`.
 | HasMany | `Field::HasMany` | No | Yes | No |
 | HasOne | `Field::HasOne` | No | No | Yes |
 | Polymorphic | `Field::Polymorphic` | No | No | No |
+| Money | `Field::Money` | No | Yes | No |
 | Hstore | `Field::Hstore` | No | No | No |
 
 ## Options by Field Type
@@ -47,6 +48,13 @@ All field types inherit from `Terrazzo::Field::Base`.
 - `prefix` — string prepended to display (e.g., `"$"`)
 - `suffix` — string appended to display
 - `decimals` — number of decimal places
+
+### Money
+- `prefix` — string prepended to display (e.g., `"$"`)
+- `suffix` — string appended to display
+- `decimals` — number of decimal places (default: 2)
+
+Renders like `Field::Number` but defaults to 2 decimal places. The React component receives the numeric value along with the prefix/suffix/decimals options.
 
 ### Select
 - `collection` — array, proc, or enum name

@@ -1,6 +1,6 @@
 # Fields
 
-Terrazzo ships with 16 field types. Each field knows how to serialize itself for JSON and has three display modes: **index** (table cell), **show** (detail view), and **form** (input).
+Terrazzo ships with 17 field types. Each field knows how to serialize itself for JSON and has three display modes: **index** (table cell), **show** (detail view), and **form** (input).
 
 ## Basic Fields
 
@@ -32,6 +32,15 @@ price: Terrazzo::Field::Number.with_options(prefix: "$", decimals: 2)
 ```
 
 Options: `prefix`, `suffix`, `decimals`
+
+### Money
+
+```ruby
+price: Terrazzo::Field::Money
+amount: Terrazzo::Field::Money.with_options(prefix: "€", decimals: 2)
+```
+
+Like `Number` but defaults to 2 decimal places. Options: `prefix`, `suffix`, `decimals`
 
 ### Boolean
 

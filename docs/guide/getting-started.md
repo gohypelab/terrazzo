@@ -81,7 +81,7 @@ This creates an isolated admin namespace alongside your existing app — it won'
 - `app/views/admin/application/` — page views (index, show, new, edit, _form)
 - `app/views/admin/components/` — shared components (Layout, AppSidebar, SearchBar, etc.)
 - `app/views/admin/components/ui/` — shadcn UI primitives (Button, Input, Table, etc.)
-- `app/views/admin/fields/` — field renderers for all 16 field types
+- `app/views/admin/fields/` — field renderers for all 17 field types
 
 **Dashboards** — automatically generates a dashboard for each `ApplicationRecord` model it finds.
 

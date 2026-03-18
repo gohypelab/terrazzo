@@ -5,7 +5,7 @@ A drop-in admin panel for Rails apps. Uses the [Administrate](https://github.com
 - **Familiar DSL** — same `ATTRIBUTE_TYPES`, `COLLECTION_ATTRIBUTES`, `FORM_ATTRIBUTES` you already know
 - **React SPA** — search, sort, and paginate without full page reloads, no separate API needed
 - **shadcn/ui + Tailwind** — every generated component lives in your app and is fully editable
-- **16 field types** — string, number, boolean, date/time, email, URL, select, rich text, belongs_to, has_many, has_one, polymorphic, and more
+- **17 field types** — string, number, money, boolean, date/time, email, URL, select, rich text, belongs_to, has_many, has_one, polymorphic, and more
 
 ## Quick start
 

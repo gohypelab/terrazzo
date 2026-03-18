@@ -66,7 +66,9 @@ The generator inspects your model's columns and associations:
 - Text columns → `Field::Text`
 - Enums → `Field::Select` with collection
 - `belongs_to` associations → `Field::BelongsTo`
+- `belongs_to` polymorphic associations → `Field::Polymorphic`
 - `has_many` associations → `Field::HasMany`
+- `has_one` associations → `Field::HasOne`
 
 `FORM_ATTRIBUTES` excludes `id`, `created_at`, and `updated_at`. `COLLECTION_ATTRIBUTES` is limited to 4 attributes.
 
