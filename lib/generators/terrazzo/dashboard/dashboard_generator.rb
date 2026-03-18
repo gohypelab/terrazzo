@@ -75,7 +75,7 @@ module Terrazzo
         associations.each do |assoc|
           case assoc.macro
           when :belongs_to
-            types[assoc.name] = "Field::BelongsTo"
+            types[assoc.name] = assoc.options[:polymorphic] ? "Field::Polymorphic" : "Field::BelongsTo"
           when :has_many, :has_and_belongs_to_many
             types[assoc.name] = "Field::HasMany"
           when :has_one
