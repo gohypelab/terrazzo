@@ -21,3 +21,5 @@ export function Layout({ navigation, title, actions, children }) {
     </SidebarProvider>);
 
 }
+
+export default Layout;
