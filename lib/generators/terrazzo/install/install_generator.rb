@@ -50,6 +50,11 @@ module Terrazzo
           "app/javascript/#{namespace_name}/slices/flash.js"
       end
 
+      def create_stylesheet
+        copy_file "admin.css",
+          "app/assets/stylesheets/#{namespace_name}.css"
+      end
+
       def run_views_generator
         generate "terrazzo:views", "--namespace=#{namespace_name}"
       end
@@ -75,10 +80,16 @@ module Terrazzo
       end
 
       def application_models
-        Rails.application.eager_load! if defined?(Rails)
-        ApplicationRecord.descendants.reject(&:abstract_class?)
-      rescue
-        []
+        models_path = Rails.root.join("app", "models")
+        return [] unless models_path.exist?
+
+        Dir[models_path.join("**", "*.rb")].filter_map do |file|
+          relative = Pathname.new(file).relative_path_from(models_path).to_s
+          next if relative.start_with?("concerns/")
+          next if relative == "application_record.rb"
+
+          relative.delete_suffix(".rb").camelize.safe_constantize
+        end.select { |klass| klass < ApplicationRecord && !klass.abstract_class? }
       end
     end
   end

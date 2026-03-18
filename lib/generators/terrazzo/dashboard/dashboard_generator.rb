@@ -15,12 +15,12 @@ module Terrazzo
 
       def create_dashboard
         template "dashboard.rb.erb",
-          "app/dashboards/#{file_name}_dashboard.rb"
+          "app/dashboards/#{class_path.join('/')}/#{file_name}_dashboard.rb".squeeze("/")
       end
 
       def create_controller
         template "controller.rb.erb",
-          "app/controllers/#{options[:namespace]}/#{file_name.pluralize}_controller.rb"
+          "app/controllers/#{options[:namespace]}/#{class_path.join('/')}/#{file_name.pluralize}_controller.rb".squeeze("/")
       end
 
       def update_page_to_page_mapping
