@@ -1,0 +1,22 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+EXAMPLE_APP_DIR="$(cd "$(dirname "$0")/../spec/example_app" && pwd)"
+
+echo "Resetting example app to base state..."
+cd "$EXAMPLE_APP_DIR"
+
+# Discard all changes and remove untracked files
+git checkout .
+git clean -fd
+
+# Reinstall dependencies
+bundle install --quiet
+npm install --silent
+
+echo "Done. Example app is back to base state."
+echo ""
+echo "To test the Terrazzo install flow, run:"
+echo "  cd spec/example_app"
+echo "  bin/rails generate terrazzo:install admin --bundler=esbuild"
+echo "  npm install && npm run build"

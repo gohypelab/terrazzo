@@ -13,6 +13,8 @@ spec/example_app/tmp/
 npm/node_modules/
 npm/dist/
 spec/example_app/node_modules/
+spec/example_app/.git/
+spec/example_app/package-lock.json
 docs/node_modules/
 docs/.vitepress/dist/
 docs/.vitepress/cache/
