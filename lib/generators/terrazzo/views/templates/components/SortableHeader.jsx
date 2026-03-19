@@ -1,5 +1,5 @@
 import React from "react";
-import { ArrowUp, ArrowDown, ArrowUpDown } from "lucide-react";
+import { ChevronUp, ChevronDown, ChevronsUpDown } from "lucide-react";
 
 import { TableHead } from "./ui/table";
 
@@ -17,11 +17,11 @@ export function SortableHeader({ label, sortable, sortUrl, sortDirection }) {
 
         {label}
         {sortDirection === "asc" ?
-        <ArrowUp className="h-4 w-4" /> :
+        <ChevronUp className="h-4 w-4" /> :
         sortDirection === "desc" ?
-        <ArrowDown className="h-4 w-4" /> :
+        <ChevronDown className="h-4 w-4" /> :
 
-        <ArrowUpDown className="h-4 w-4" />
+        <ChevronsUpDown className="h-4 w-4" />
         }
       </a>
     </TableHead>);
