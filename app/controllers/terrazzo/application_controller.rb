@@ -14,6 +14,8 @@ module Terrazzo
 
     before_action :use_jsx_rendering_defaults
 
+    prepend Terrazzo::UsesSuperglue::TemplateLookupOverride
+
     helper_method :namespace, :dashboard, :resource_name, :resource_class, :application_title, :terrazzo_page_identifier
 
     def index

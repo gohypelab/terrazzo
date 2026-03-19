@@ -13,6 +13,7 @@ module Terrazzo
   autoload :Filter, "terrazzo/filter"
   autoload :Namespace, "terrazzo/namespace"
   autoload :GeneratorHelpers, "terrazzo/generator_helpers"
+  autoload :UsesSuperglue, "terrazzo/uses_superglue"
 
   module Field
     autoload :Base, "terrazzo/field/base"

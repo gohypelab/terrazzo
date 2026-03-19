@@ -17,5 +17,11 @@ module Terrazzo
       app.config.superglue = ActiveSupport::OrderedOptions.new unless app.config.respond_to?(:superglue)
       app.config.superglue.auto_include = false
     end
+
+    initializer "terrazzo.uses_superglue" do
+      ActiveSupport.on_load(:action_controller_base) do
+        extend Terrazzo::UsesSuperglue
+      end
+    end
   end
 end
