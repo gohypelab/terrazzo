@@ -42,11 +42,11 @@ Returns `SHOW_PAGE_ATTRIBUTES`.
 
 ### `#search_attributes`
 
-Returns only attributes where the field type's `.searchable?` returns `true`.
+Returns only attributes (from `ATTRIBUTE_TYPES`) where the field type's `.searchable?` returns `true`. No field types are searchable by default — opt in with `.with_options(searchable: true)`.
 
 ### `#collection_includes`
 
-Returns attributes where the field type's `.eager_load?` returns `true`. Used for eager-loading associations on the index page.
+Returns attributes that appear in `COLLECTION_ATTRIBUTES` **and** whose field type's `.eager_load?` returns `true`. Used for eager-loading associations on the index page. Only associations visible in the collection view are included, avoiding unnecessary JOINs.
 
 ### `#permitted_attributes`
 

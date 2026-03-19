@@ -6,8 +6,8 @@ require "terrazzo/base_dashboard"
 class CustomerDashboard < Terrazzo::BaseDashboard
   ATTRIBUTE_TYPES = {
     id: Terrazzo::Field::Number,
-    name: Terrazzo::Field::String,
-    email: Terrazzo::Field::Email,
+    name: Terrazzo::Field::String.with_options(searchable: true),
+    email: Terrazzo::Field::Email.with_options(searchable: true),
     created_at: Terrazzo::Field::DateTime,
     updated_at: Terrazzo::Field::DateTime,
     email_subscriber: Terrazzo::Field::Boolean,
@@ -25,6 +25,7 @@ class CustomerDashboard < Terrazzo::BaseDashboard
     name
     email
     kind
+    territory
   ].freeze
 
   SHOW_PAGE_ATTRIBUTES = %i[

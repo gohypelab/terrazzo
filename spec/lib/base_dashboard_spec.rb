@@ -8,8 +8,8 @@ class SpecCustomerDashboard < Terrazzo::BaseDashboard
 
   ATTRIBUTE_TYPES = {
     id: Terrazzo::Field::Number,
-    name: Terrazzo::Field::String,
-    email: Terrazzo::Field::Email,
+    name: Terrazzo::Field::String.with_options(searchable: true),
+    email: Terrazzo::Field::Email.with_options(searchable: true),
     email_subscriber: Terrazzo::Field::Boolean,
     kind: Terrazzo::Field::Select.with_options(collection: %w[standard vip]),
     orders: Terrazzo::Field::HasMany,
@@ -18,7 +18,7 @@ class SpecCustomerDashboard < Terrazzo::BaseDashboard
     updated_at: Terrazzo::Field::DateTime,
   }.freeze
 
-  COLLECTION_ATTRIBUTES = %i[id name email kind].freeze
+  COLLECTION_ATTRIBUTES = %i[id name email kind territory].freeze
   SHOW_PAGE_ATTRIBUTES = %i[id name email email_subscriber kind orders territory created_at updated_at].freeze
   FORM_ATTRIBUTES = %i[name email email_subscriber kind territory].freeze
 end
@@ -49,7 +49,9 @@ RSpec.describe Terrazzo::BaseDashboard do
 
   describe "#attribute_type_for" do
     it "returns correct field class for known attribute" do
-      expect(dashboard.attribute_type_for(:name)).to eq(Terrazzo::Field::String)
+      type = dashboard.attribute_type_for(:name)
+      field_class = type.is_a?(Terrazzo::Field::Deferred) ? type.deferred_class : type
+      expect(field_class).to eq(Terrazzo::Field::String)
     end
 
     it "raises error for unknown attribute" do
@@ -77,7 +79,7 @@ RSpec.describe Terrazzo::BaseDashboard do
 
   describe "#collection_attributes" do
     it "returns array as-is" do
-      expect(dashboard.collection_attributes).to eq(%i[id name email kind])
+      expect(dashboard.collection_attributes).to eq(%i[id name email kind territory])
     end
   end
 
@@ -117,11 +119,11 @@ RSpec.describe Terrazzo::BaseDashboard do
   end
 
   describe "#collection_includes" do
-    it "returns attributes where eager_load? is true" do
+    it "returns eager-loadable attributes that appear in COLLECTION_ATTRIBUTES" do
       includes = dashboard.collection_includes
-      expect(includes).to include(:orders)
       expect(includes).to include(:territory)
-      expect(includes).not_to include(:name)
+      expect(includes).not_to include(:orders)   # eager_load? true but not in COLLECTION_ATTRIBUTES
+      expect(includes).not_to include(:name)     # in COLLECTION_ATTRIBUTES but not eager_load?
     end
   end
 

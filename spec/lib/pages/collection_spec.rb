@@ -7,7 +7,7 @@ RSpec.describe Terrazzo::Page::Collection do
 
   describe "#attribute_names" do
     it "returns dashboard's collection_attributes" do
-      expect(page.attribute_names).to eq(%i[id name email kind])
+      expect(page.attribute_names).to eq(%i[id name email kind territory])
     end
   end
 

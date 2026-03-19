@@ -2,8 +2,8 @@ require "spec_helper"
 
 RSpec.describe Terrazzo::Field::String do
   describe ".searchable?" do
-    it "returns true" do
-      expect(described_class.searchable?).to be true
+    it "returns false by default" do
+      expect(described_class.searchable?).to be false
     end
   end
 
