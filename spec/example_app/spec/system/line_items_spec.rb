@@ -39,7 +39,7 @@ RSpec.describe "Admin Line Items", type: :system do
 
       accept_confirm { click_button "Delete" }
 
-      expect(page).to have_current_path(admin_root_path)
+      expect(page).to have_current_path(admin_line_items_path)
     end
   end
 end
