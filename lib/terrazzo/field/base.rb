@@ -107,7 +107,7 @@ module Terrazzo
       private
 
       def resolve_data
-        resource.public_send(attribute)
+        resource.try(attribute)
       end
     end
   end
