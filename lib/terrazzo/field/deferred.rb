@@ -19,11 +19,11 @@ module Terrazzo
       end
 
       def searchable?
-        deferred_class.searchable?
+        options.key?(:searchable) ? options[:searchable] : deferred_class.searchable?
       end
 
       def sortable?
-        deferred_class.sortable?
+        options.key?(:sortable) ? options[:sortable] : deferred_class.sortable?
       end
 
       def eager_load?

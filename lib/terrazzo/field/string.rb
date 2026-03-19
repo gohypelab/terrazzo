@@ -14,10 +14,6 @@ module Terrazzo
       end
 
       class << self
-        def searchable?
-          true
-        end
-
         def default_options
           { truncate: 50 }
         end

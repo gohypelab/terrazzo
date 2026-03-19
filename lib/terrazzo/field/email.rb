@@ -4,12 +4,6 @@ module Terrazzo
       def serialize_value(_mode)
         data
       end
-
-      class << self
-        def searchable?
-          true
-        end
-      end
     end
   end
 end
