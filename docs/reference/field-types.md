@@ -10,7 +10,7 @@ All field types inherit from `Terrazzo::Field::Base`.
 | `#serialize_value(mode)` | Returns the serialized value for `:index`, `:show`, or `:form` mode |
 | `#serializable_options` | Returns a hash of options sent to the React component |
 | `#required?` | `true` if the model has a presence validator on this attribute |
-| `.searchable?` | Whether this field type supports search (default: `false`) |
+| `.searchable?` | Whether this field type supports search (default: `false`). Opt in per-field with `.with_options(searchable: true)`. |
 | `.sortable?` | Whether this field type supports sorting (default: `true`) |
 | `.eager_load?` | Whether to eager-load this association (default: `false`) |
 | `.with_options(opts)` | Returns a deferred field with merged options |
@@ -18,26 +18,40 @@ All field types inherit from `Terrazzo::Field::Base`.
 
 ## Field Types
 
+All field types default to `searchable: false`. Enable search on specific fields using `.with_options(searchable: true)` in your dashboard's `ATTRIBUTE_TYPES`.
+
+> **Note:** Unlike Administrate, Terrazzo does not auto-enable search on String/Text/Email fields. This avoids accidentally exposing sensitive data in search queries. Always opt in explicitly.
+
 | Type | Class | Searchable | Sortable | Eager Load |
 |------|-------|-----------|----------|------------|
-| String | `Field::String` | Yes | Yes | No |
-| Text | `Field::Text` | Yes | Yes | No |
+| String | `Field::String` | No | Yes | No |
+| Text | `Field::Text` | No | Yes | No |
 | Number | `Field::Number` | No | Yes | No |
 | Boolean | `Field::Boolean` | No | Yes | No |
 | Date | `Field::Date` | No | Yes | No |
 | DateTime | `Field::DateTime` | No | Yes | No |
 | Time | `Field::Time` | No | Yes | No |
-| Email | `Field::Email` | Yes | Yes | No |
+| Email | `Field::Email` | No | Yes | No |
 | URL | `Field::Url` | No | Yes | No |
 | Password | `Field::Password` | No | No | No |
 | Select | `Field::Select` | No | Yes | No |
-| Rich Text | `Field::RichText` | Yes | No | No |
+| Rich Text | `Field::RichText` | No | No | No |
 | BelongsTo | `Field::BelongsTo` | No | Yes | Yes |
 | HasMany | `Field::HasMany` | No | Yes | No |
 | HasOne | `Field::HasOne` | No | No | Yes |
 | Polymorphic | `Field::Polymorphic` | No | No | No |
 | Money | `Field::Money` | No | Yes | No |
 | Hstore | `Field::Hstore` | No | No | No |
+
+### Enabling search
+
+```ruby
+ATTRIBUTE_TYPES = {
+  name:  Field::String.with_options(searchable: true),
+  email: Field::Email.with_options(searchable: true),
+  owner: Field::BelongsTo.with_options(searchable: true, searchable_fields: ["name"]),
+}
+```
 
 ## Options by Field Type
 

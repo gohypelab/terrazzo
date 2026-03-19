@@ -72,6 +72,12 @@ class Admin::ProductsController < Admin::ApplicationController
 end
 ```
 
+## Superglue Template Lookup
+
+Terrazzo uses Superglue to render React pages server-side. When a controller has a long view prefix chain (e.g. from Devise or other engine-mounted controllers), Superglue's template existence check can accidentally match a gem-supplied HTML template and render it instead of the React page.
+
+Terrazzo automatically scopes the template lookup to your app's `app/views` directory only, so gem templates are never used as a fallback.
+
 ## How It Works
 
 `Terrazzo::ApplicationController` provides standard CRUD actions:
