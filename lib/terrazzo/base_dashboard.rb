@@ -63,7 +63,9 @@ module Terrazzo
     end
 
     def collection_includes
+      collection_attr_set = Set.new(collection_attributes)
       attribute_types.each_with_object([]) do |(attr, type), includes|
+        next unless collection_attr_set.include?(attr)
         next unless type.eager_load?
         next unless self.class.model.reflect_on_association(attr)
         includes << attr
