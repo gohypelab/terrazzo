@@ -1,5 +1,5 @@
-import React from "react";
-import { useContent } from "@thoughtbot/superglue";
+import React, { useContext } from "react";
+import { useContent, NavigationContext } from "@thoughtbot/superglue";
 
 import { Layout } from "../components/Layout";
 import { SearchBar } from "../components/SearchBar";
@@ -17,6 +17,7 @@ import {
 } from "../components/ui/table";
 
 export default function AdminIndex() {
+  const { visit } = useContext(NavigationContext);
   const {
     table,
     searchBar,
@@ -26,6 +27,13 @@ export default function AdminIndex() {
     resourceName,
     singularResourceName
   } = useContent();
+
+  const handleRowClick = (e, showPath) => {
+    if (!showPath) return;
+    if (e.target.closest("a, button, form")) return;
+    if (window.getSelection().toString()) return;
+    visit(showPath, {});
+  };
 
   return (
     <Layout
@@ -53,10 +61,19 @@ export default function AdminIndex() {
           </TableHeader>
           <TableBody>
             {table.rows.map((row) =>
-            <TableRow key={row.id}>
+            <TableRow
+              key={row.id}
+              className={row.showPath ? "cursor-pointer" : ""}
+              onClick={(e) => handleRowClick(e, row.showPath)}>
                 {row.cells.map((cell) =>
               <TableCell key={cell.attribute}>
-                    <FieldRenderer mode="index" {...cell} />
+                    {cell.showPath ? (
+                      <a href={cell.showPath} data-sg-visit className="hover:underline">
+                        <FieldRenderer mode="index" {...cell} />
+                      </a>
+                    ) : (
+                      <FieldRenderer mode="index" {...cell} />
+                    )}
                   </TableCell>
               )}
                 <TableCell>

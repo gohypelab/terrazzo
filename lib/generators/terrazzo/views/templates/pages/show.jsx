@@ -69,7 +69,13 @@ export default function AdminShow() {
                     {attr.label}
                   </dt>
                   <dd className="col-span-2 text-sm">
-                    <FieldRenderer mode="show" {...attr} />
+                    {attr.showPath ? (
+                      <a href={attr.showPath} data-sg-visit className="hover:underline">
+                        <FieldRenderer mode="show" {...attr} />
+                      </a>
+                    ) : (
+                      <FieldRenderer mode="show" {...attr} />
+                    )}
                   </dd>
                 </div>
               )}

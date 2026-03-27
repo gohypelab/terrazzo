@@ -42,22 +42,17 @@ module Terrazzo
 
       def serialize_show_value
         limit = options.fetch(:limit, 5)
-        total = data.size
+        all_records = data.to_a
+        total = all_records.size
         col_attrs = options[:collection_attributes]
 
-        records = if limit && limit > 0
-          data.respond_to?(:limit) ? data.limit(limit) : data.first(limit)
-        else
-          data
-        end
-
         if col_attrs
-          serialize_with_collection_attributes(records, col_attrs, total, limit)
+          serialize_with_collection_attributes(all_records, col_attrs, total, limit)
         else
           {
-            items: records.map { |r| { id: r.id, display: display_name(r) } },
+            items: all_records.map { |r| { id: r.id, display: display_name(r) } },
             total: total,
-            hasMore: limit && limit > 0 ? total > limit : false
+            initialLimit: limit
           }
         end
       end
@@ -85,7 +80,7 @@ module Terrazzo
           headers: headers,
           items: items,
           total: total,
-          hasMore: limit && limit > 0 ? total > limit : false
+          initialLimit: limit
         }
       end
 

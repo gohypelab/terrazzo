@@ -25,7 +25,7 @@ RSpec.describe Terrazzo::Field::HasMany do
       expect(field.serialize_value(:index)).to eq(2)
     end
 
-    it "returns paginated hash for :show" do
+    it "returns all items for :show" do
       field = described_class.new(:orders, nil, :show, resource: customer)
       result = field.serialize_value(:show)
       expect(result).to be_a(Hash)
@@ -33,16 +33,16 @@ RSpec.describe Terrazzo::Field::HasMany do
       expect(result[:items].first).to have_key(:id)
       expect(result[:items].first).to have_key(:display)
       expect(result[:total]).to eq(2)
-      expect(result[:hasMore]).to be false
+      expect(result[:initialLimit]).to eq(5)
     end
 
-    it "respects :limit option" do
+    it "sends all items with initialLimit for frontend truncation" do
       3.times { create_order(customer: customer) }
       field = described_class.new(:orders, nil, :show, resource: customer, options: { limit: 2 })
       result = field.serialize_value(:show)
-      expect(result[:items].length).to eq(2)
+      expect(result[:items].length).to eq(5)
       expect(result[:total]).to eq(5)
-      expect(result[:hasMore]).to be true
+      expect(result[:initialLimit]).to eq(2)
     end
 
     it "uses default limit of 5" do

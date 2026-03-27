@@ -1,15 +1,29 @@
 json.pageTitle @page.page_title
 
+show_field_json = ->(json, field) do
+  json.attribute field.attribute.to_s
+  json.label field.attribute.to_s.humanize
+  json.fieldType field.field_type
+  json.value field.serialize_value(:show)
+  json.options field.serializable_options
+
+  if field.class.associative? && field.data.present?
+    if field.is_a?(Terrazzo::Field::HasMany)
+      json.itemShowPaths(field.data.each_with_object({}) do |record, paths|
+        paths[record.id.to_s] = polymorphic_path([namespace, record]) rescue nil
+      end)
+    else
+      json.showPath polymorphic_path([namespace, field.data]) rescue nil
+    end
+  end
+end
+
 json.attributeGroups do
   json.array! @page.grouped_attributes do |group|
     json.name group[:name]
     json.attributes do
       json.array! group[:fields] do |field|
-        json.attribute field.attribute.to_s
-        json.label field.attribute.to_s.humanize
-        json.fieldType field.field_type
-        json.value field.serialize_value(:show)
-        json.options field.serializable_options
+        show_field_json.call(json, field)
       end
     end
   end
@@ -17,11 +31,7 @@ end
 
 json.attributes do
   json.array! @page.attributes do |field|
-    json.attribute field.attribute.to_s
-    json.label field.attribute.to_s.humanize
-    json.fieldType field.field_type
-    json.value field.serialize_value(:show)
-    json.options field.serializable_options
+    show_field_json.call(json, field)
   end
 end
 

@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 
 import {
   Table,
@@ -8,16 +8,23 @@ import {
   TableHead,
   TableCell,
 } from "../../components/ui/table";
+import { Badge } from "../../components/ui/badge";
+import { Button } from "../../components/ui/button";
 import { FieldRenderer } from "../FieldRenderer";
 
-export function ShowField({ value }) {
+export function ShowField({ value, itemShowPaths }) {
   if (!value) return <span className="text-muted-foreground">None</span>;
 
-  const { items, headers, total, hasMore } = value;
+  const { items, headers, total, initialLimit } = value;
+  const [expanded, setExpanded] = useState(false);
 
   if (!items || items.length === 0) {
     return <span className="text-muted-foreground">None</span>;
   }
+
+  const pathFor = (id) => itemShowPaths?.[String(id)];
+  const hasMore = initialLimit && initialLimit > 0 && total > initialLimit;
+  const visibleItems = expanded || !hasMore ? items : items.slice(0, initialLimit);
 
   // Table mode: collection_attributes specified
   if (headers) {
@@ -33,22 +40,35 @@ export function ShowField({ value }) {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {items.map((item) =>
-                <TableRow key={item.id}>
-                  {item.columns.map((col) =>
-                    <TableCell key={col.attribute}>
-                      <FieldRenderer mode="index" {...col} />
-                    </TableCell>
-                  )}
-                </TableRow>
-              )}
+              {visibleItems.map((item) => {
+                const showPath = pathFor(item.id);
+                return (
+                  <TableRow key={item.id}>
+                    {item.columns.map((col, colIndex) =>
+                      <TableCell key={col.attribute}>
+                        {showPath && colIndex === 0 ? (
+                          <a href={showPath} data-sg-visit className="hover:underline">
+                            <FieldRenderer mode="index" {...col} />
+                          </a>
+                        ) : (
+                          <FieldRenderer mode="index" {...col} />
+                        )}
+                      </TableCell>
+                    )}
+                  </TableRow>
+                );
+              })}
             </TableBody>
           </Table>
         </div>
         {hasMore && (
-          <p className="text-sm text-muted-foreground mt-2">
-            Showing {items.length} of {total}
-          </p>
+          <Button
+            variant="link"
+            size="sm"
+            className="mt-2 px-0"
+            onClick={() => setExpanded(!expanded)}>
+            {expanded ? "Show less" : `Show ${total - initialLimit} more`}
+          </Button>
         )}
       </div>
     );
@@ -57,16 +77,27 @@ export function ShowField({ value }) {
   // Simple list mode
   return (
     <div>
-      <ul className="list-disc pl-5 space-y-1">
-        {items.map((item) =>
-          <li key={item.id}>{item.display}</li>
+      <div className="flex flex-wrap items-center gap-1.5">
+        {visibleItems.map((item) => {
+          const showPath = pathFor(item.id);
+          return showPath ? (
+            <a key={item.id} href={showPath} data-sg-visit>
+              <Badge variant="secondary" className="cursor-pointer">{item.display}</Badge>
+            </a>
+          ) : (
+            <Badge key={item.id} variant="secondary">{item.display}</Badge>
+          );
+        })}
+        {hasMore && (
+          <Button
+            variant="link"
+            size="sm"
+            className="px-0"
+            onClick={() => setExpanded(!expanded)}>
+            {expanded ? "Show less" : `Show ${total - initialLimit} more`}
+          </Button>
         )}
-      </ul>
-      {hasMore && (
-        <p className="text-sm text-muted-foreground mt-2">
-          Showing {items.length} of {total}
-        </p>
-      )}
+      </div>
     </div>
   );
 }
