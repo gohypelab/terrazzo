@@ -42,7 +42,6 @@ json.table do
           json.attribute attr.to_s
           json.fieldType field.field_type
           json.value field.serialize_value(:index)
-          json.options field.serializable_options
 
           if field.class.associative? && field.data.present?
             json.showPath polymorphic_path([namespace, field.data]) rescue nil

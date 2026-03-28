@@ -5,7 +5,6 @@ show_field_json = ->(json, field) do
   json.label field.attribute.to_s.humanize
   json.fieldType field.field_type
   json.value field.serialize_value(:show)
-  json.options field.serializable_options
 
   if field.class.associative? && field.data.present?
     if field.is_a?(Terrazzo::Field::HasMany)
