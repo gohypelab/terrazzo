@@ -1,4 +1,5 @@
-import React, { useState } from "react";
+import React, { useState, useContext } from "react";
+import { NavigationContext } from "@thoughtbot/superglue";
 
 import {
   Table,
@@ -17,6 +18,7 @@ export function ShowField({ value, itemShowPaths }) {
 
   const { items, headers, total, initialLimit } = value;
   const [expanded, setExpanded] = useState(false);
+  const { visit } = useContext(NavigationContext);
 
   if (!items || items.length === 0) {
     return <span className="text-muted-foreground">None</span>;
@@ -25,6 +27,13 @@ export function ShowField({ value, itemShowPaths }) {
   const pathFor = (id) => itemShowPaths?.[String(id)];
   const hasMore = initialLimit && initialLimit > 0 && total > initialLimit;
   const visibleItems = expanded || !hasMore ? items : items.slice(0, initialLimit);
+
+  const handleRowClick = (e, showPath) => {
+    if (!showPath) return;
+    if (e.target.closest("a, button, form")) return;
+    if (window.getSelection().toString()) return;
+    visit(showPath, {});
+  };
 
   // Table mode: collection_attributes specified
   if (headers) {
@@ -43,7 +52,10 @@ export function ShowField({ value, itemShowPaths }) {
               {visibleItems.map((item) => {
                 const showPath = pathFor(item.id);
                 return (
-                  <TableRow key={item.id}>
+                  <TableRow
+                    key={item.id}
+                    className={showPath ? "cursor-pointer" : ""}
+                    onClick={(e) => handleRowClick(e, showPath)}>
                     {item.columns.map((col, colIndex) =>
                       <TableCell key={col.attribute}>
                         {showPath && colIndex === 0 ? (

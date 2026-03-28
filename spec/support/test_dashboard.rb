@@ -57,3 +57,16 @@ class CustomerDashboard < Terrazzo::BaseDashboard
     log_entries
   ].freeze
 end
+
+class OrderDashboard < Terrazzo::BaseDashboard
+  ATTRIBUTE_TYPES = {
+    id: Terrazzo::Field::Number,
+    customer: Terrazzo::Field::BelongsTo,
+    address_line_one: Terrazzo::Field::String,
+    created_at: Terrazzo::Field::DateTime,
+  }.freeze
+
+  COLLECTION_ATTRIBUTES = %i[id address_line_one created_at].freeze
+  SHOW_PAGE_ATTRIBUTES = %i[id customer address_line_one created_at].freeze
+  FORM_ATTRIBUTES = %i[customer address_line_one].freeze
+end

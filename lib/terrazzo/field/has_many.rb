@@ -44,7 +44,7 @@ module Terrazzo
         limit = options.fetch(:limit, 5)
         all_records = data.to_a
         total = all_records.size
-        col_attrs = options[:collection_attributes]
+        col_attrs = options[:collection_attributes] || resolve_default_collection_attributes
 
         if col_attrs
           serialize_with_collection_attributes(all_records, col_attrs, total, limit)
@@ -55,6 +55,13 @@ module Terrazzo
             initialLimit: limit
           }
         end
+      end
+
+      def resolve_default_collection_attributes
+        dashboard_class = find_associated_dashboard
+        dashboard_class.new.collection_attributes
+      rescue NameError
+        nil
       end
 
       def serialize_with_collection_attributes(records, col_attrs, total, limit)

@@ -25,13 +25,15 @@ RSpec.describe Terrazzo::Field::HasMany do
       expect(field.serialize_value(:index)).to eq(2)
     end
 
-    it "returns all items for :show" do
+    it "returns a nested table using associated dashboard's COLLECTION_ATTRIBUTES for :show" do
       field = described_class.new(:orders, nil, :show, resource: customer)
       result = field.serialize_value(:show)
       expect(result).to be_a(Hash)
+      expect(result[:headers]).to be_an(Array)
+      expect(result[:headers].map { |h| h[:attribute] }).to eq(%w[id address_line_one created_at])
       expect(result[:items].length).to eq(2)
       expect(result[:items].first).to have_key(:id)
-      expect(result[:items].first).to have_key(:display)
+      expect(result[:items].first).to have_key(:columns)
       expect(result[:total]).to eq(2)
       expect(result[:initialLimit]).to eq(5)
     end
@@ -43,6 +45,7 @@ RSpec.describe Terrazzo::Field::HasMany do
       expect(result[:items].length).to eq(5)
       expect(result[:total]).to eq(5)
       expect(result[:initialLimit]).to eq(2)
+      expect(result[:headers]).to be_an(Array)
     end
 
     it "uses default limit of 5" do
