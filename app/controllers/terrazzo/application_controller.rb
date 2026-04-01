@@ -196,9 +196,15 @@ module Terrazzo
     # Build a page identifier that matches the user's namespace, not the
     # engine's internal template path. The React page-to-component mapping
     # keys off this identifier (e.g. "admin/application/index").
+    #
+    # Map create → new and update → edit so that failed validations
+    # (which render :new / :edit) resolve to the correct React component.
+    TERRAZZO_ACTION_MAP = { "create" => "new", "update" => "edit" }.freeze
+
     def terrazzo_page_identifier
       ns = controller_path.split("/").first
-      "#{ns}/application/#{action_name}"
+      mapped_action = TERRAZZO_ACTION_MAP[action_name] || action_name
+      "#{ns}/application/#{mapped_action}"
     end
 
     private
