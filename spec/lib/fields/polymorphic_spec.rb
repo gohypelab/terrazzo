@@ -9,7 +9,7 @@ RSpec.describe Terrazzo::Field::Polymorphic do
       field = described_class.new(:loggable, nil, :show, resource: log_entry)
       result = field.serialize_value(:show)
       expect(result[:type]).to eq("Customer")
-      expect(result[:id]).to eq(customer.id)
+      expect(result[:id]).to eq(customer.id.to_s)
       expect(result[:display]).to eq("Alice")
     end
 
@@ -17,7 +17,7 @@ RSpec.describe Terrazzo::Field::Polymorphic do
       field = described_class.new(:loggable, nil, :form, resource: log_entry)
       result = field.serialize_value(:form)
       expect(result[:type]).to eq("Customer")
-      expect(result[:id]).to eq(customer.id)
+      expect(result[:id]).to eq(customer.id.to_s)
     end
 
     it "returns nil when association is nil" do

@@ -57,7 +57,7 @@ RSpec.describe Terrazzo::Field::HasMany do
       result = field.serialize_value(:form)
       expect(result).to be_an(Array)
       expect(result.length).to eq(2)
-      expect(result).to all(be_a(Integer))
+      expect(result).to all(be_a(String))
     end
   end
 

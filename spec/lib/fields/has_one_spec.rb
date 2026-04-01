@@ -17,7 +17,7 @@ RSpec.describe Terrazzo::Field::HasOne do
 
       field = described_class.new(:product_meta_tag, nil, :show, resource: product)
       result = field.serialize_value(:show)
-      expect(result[:id]).to eq(meta_tag.id)
+      expect(result[:id]).to eq(meta_tag.id.to_s)
       expect(result[:display]).to be_present
     end
 

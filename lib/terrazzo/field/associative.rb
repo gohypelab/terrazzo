@@ -44,7 +44,7 @@ module Terrazzo
           associated_class.all
         end
         pk = association_primary_key
-        scope.map { |r| [display_name(r), r.public_send(pk)] }
+        scope.map { |r| [display_name(r), r.public_send(pk).to_s] }
       end
 
       def association_primary_key

@@ -5,10 +5,10 @@ module Terrazzo
         case mode
         when :form
           return nil if data.nil?
-          { type: data.class.name, id: data.id }
+          { type: data.class.name, id: data.id.to_s }
         else
           return nil if data.nil?
-          { id: data.id, display: display_name(data), type: data.class.name }
+          { id: data.id.to_s, display: display_name(data), type: data.class.name }
         end
       end
 
@@ -17,7 +17,7 @@ module Terrazzo
         classes = options[:classes] || []
         opts[:groupedOptions] = classes.each_with_object({}) do |klass, hash|
           klass = klass.constantize if klass.is_a?(::String)
-          hash[klass.name] = klass.all.map { |r| [display_name(r), r.id] }
+          hash[klass.name] = klass.all.map { |r| [display_name(r), r.id.to_s] }
         end
         opts
       end

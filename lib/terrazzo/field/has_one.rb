@@ -4,10 +4,10 @@ module Terrazzo
       def serialize_value(mode)
         case mode
         when :form
-          data&.id
+          data&.id&.to_s
         else
           return nil if data.nil?
-          { id: data.id, display: display_name(data) }
+          { id: data.id.to_s, display: display_name(data) }
         end
       end
 

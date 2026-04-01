@@ -20,21 +20,21 @@ RSpec.describe Terrazzo::Field::BelongsTo do
     it "returns { id, display } for :index" do
       field = described_class.new(:customer, nil, :index, resource: order)
       result = field.serialize_value(:index)
-      expect(result[:id]).to eq(customer.id)
+      expect(result[:id]).to eq(customer.id.to_s)
       expect(result[:display]).to eq("Alice")
     end
 
     it "returns { id, display } for :show" do
       field = described_class.new(:customer, nil, :show, resource: order)
       result = field.serialize_value(:show)
-      expect(result[:id]).to eq(customer.id)
+      expect(result[:id]).to eq(customer.id.to_s)
       expect(result[:display]).to eq("Alice")
     end
 
     it "returns foreign key value for :form" do
       field = described_class.new(:customer, nil, :form, resource: order)
       result = field.serialize_value(:form)
-      expect(result).to eq(customer.id)
+      expect(result).to eq(customer.id.to_s)
     end
 
     it "returns nil when association is nil" do
@@ -51,7 +51,7 @@ RSpec.describe Terrazzo::Field::BelongsTo do
       field = described_class.new(:customer, nil, :form, resource: order)
       opts = field.serializable_options
       expect(opts[:resourceOptions]).to be_an(Array)
-      expect(opts[:resourceOptions].first).to eq(["Alice", customer.id])
+      expect(opts[:resourceOptions].first).to eq(["Alice", customer.id.to_s])
     end
   end
 

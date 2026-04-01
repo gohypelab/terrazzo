@@ -8,11 +8,11 @@ module Terrazzo
         when :index
           data.size
         when :form
-          data.map(&:id)
+          data.map { |r| r.id.to_s }
         when :show
           serialize_show_value
         else
-          data.map { |r| { id: r.id, display: display_name(r) } }
+          data.map { |r| { id: r.id.to_s, display: display_name(r) } }
         end
       end
 
@@ -50,7 +50,7 @@ module Terrazzo
           serialize_with_collection_attributes(all_records, col_attrs, total, limit)
         else
           {
-            items: all_records.map { |r| { id: r.id, display: display_name(r) } },
+            items: all_records.map { |r| { id: r.id.to_s, display: display_name(r) } },
             total: total,
             initialLimit: limit
           }
@@ -80,7 +80,7 @@ module Terrazzo
               value: field.serialize_value(:index)
             }
           end
-          { id: record.id, columns: columns }
+          { id: record.id.to_s, columns: columns }
         end
 
         {
