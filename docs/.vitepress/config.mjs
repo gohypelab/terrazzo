@@ -19,7 +19,7 @@ export default defineConfig({
         items: [
           {
             text: "Changelog",
-            link: "https://github.com/wengzilla/terrazzo/releases",
+            link: "https://github.com/gohypelab/terrazzo/releases",
           },
         ],
       },
@@ -57,7 +57,7 @@ export default defineConfig({
     },
 
     socialLinks: [
-      { icon: "github", link: "https://github.com/wengzilla/terrazzo" },
+      { icon: "github", link: "https://github.com/gohypelab/terrazzo" },
     ],
 
     search: {

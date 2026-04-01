@@ -7,7 +7,7 @@ Gem::Specification.new do |spec|
   spec.email = []
   spec.summary = "A Rails admin framework powered by Superglue and React"
   spec.description = "Drop-in admin panel for Rails apps using the Administrate dashboard DSL with a React SPA frontend powered by Superglue."
-  spec.homepage = "https://github.com/wengzilla/terrazzo"
+  spec.homepage = "https://github.com/gohypelab/terrazzo"
   spec.license = "MIT"
   spec.required_ruby_version = ">= 3.1"
 

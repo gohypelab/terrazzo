@@ -29,7 +29,7 @@ Visit `http://localhost:3000/admin` to see your admin panel.
 
 ## Documentation
 
-Full docs at **[wengzilla.github.io/terrazzo](https://wengzilla.github.io/terrazzo/)** — covers dashboards, fields, controllers, views, generators, and customization.
+Full docs at **[gohypelab.github.io/terrazzo](https://gohypelab.github.io/terrazzo/)** — covers dashboards, fields, controllers, views, generators, and customization.
 
 ## Requirements
 
