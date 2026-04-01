@@ -21,7 +21,7 @@ module Terrazzo
       end
 
       def create_json_props_layout
-        copy_file "application.json.props",
+        template "application.json.props.tt",
           "app/views/layouts/#{namespace_name}/application.json.props"
       end
 

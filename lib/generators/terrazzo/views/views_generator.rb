@@ -33,6 +33,7 @@ module Terrazzo
           "pages/new.jsx" => "application/new.jsx",
           "pages/edit.jsx" => "application/edit.jsx",
           "pages/_form.jsx" => "application/_form.jsx",
+          "pages/_navigation.json.props" => "application/_navigation.json.props",
         }.each do |src, dest|
           copy_file src, "app/views/#{namespace_name}/#{dest}"
         end

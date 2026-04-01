@@ -1,0 +1,5 @@
+json.array! Terrazzo::Namespace.new(namespace).resources_with_index_route do |nav_resource|
+  json.label nav_resource.resource_name.humanize.pluralize
+  json.path url_for(controller: "/#{nav_resource.controller_path}", action: :index, only_path: true)
+  json.active nav_resource.controller_path == controller_path
+end
