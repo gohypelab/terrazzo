@@ -75,15 +75,6 @@ In this app, `CustomerDashboard#kind` needs this fix.
 **Auto-set fields in FORM_ATTRIBUTES** — The generator includes all attributes in `FORM_ATTRIBUTES`, but some should be excluded because they're managed by custom model setters. For example, `Product#name=` auto-sets `slug`, so including `slug` in `FORM_ATTRIBUTES` causes the empty slug field to overwrite it on submit, failing validation. Remove such fields from `FORM_ATTRIBUTES` (keep them in `SHOW_PAGE_ATTRIBUTES`).
 In this app, remove `slug` from `ProductDashboard::FORM_ATTRIBUTES`.
 
-**Polymorphic field classes** — The generator doesn't infer which model classes a polymorphic association can point to. Without `classes`, the polymorphic form field renders empty dropdowns. In `LogEntryDashboard`, change:
-```ruby
-loggable: Terrazzo::Field::Polymorphic,
-```
-to:
-```ruby
-loggable: Terrazzo::Field::Polymorphic.with_options(classes: ["Customer", "Order"]),
-```
-
 **Custom grouped navigation** — The install generator creates a `_navigation.json.props` partial at `app/views/admin/application/_navigation.json.props` with a flat list of resource links. The system specs expect grouped navigation (a "Resources" group and a "Blog" group), so replace the generated partial with:
 
 ```ruby

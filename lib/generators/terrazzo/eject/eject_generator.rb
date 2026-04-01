@@ -106,7 +106,7 @@ module Terrazzo
 
       def eject_navigation
         source = File.join(Terrazzo::Engine.root, "app/views/terrazzo/application/_navigation.json.props")
-        dest = "app/views/terrazzo/application/_navigation.json.props"
+        dest = "app/views/#{namespace_name}/application/_navigation.json.props"
         copy_file source, dest
         say "\nNavigation partial ejected to #{dest}.", :green
         say "Edit it to customize your admin navigation."

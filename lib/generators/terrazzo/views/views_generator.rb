@@ -32,6 +32,23 @@ module Terrazzo
         JS
       end
 
+      def create_navigation_partial
+        create_file "app/views/#{namespace_name}/application/_navigation.json.props", <<~RUBY
+          resources = Terrazzo::Namespace.new(namespace).resources_with_index_route
+
+          json.array! [{ label: "Resources", resources: resources }] do |group|
+            json.label group[:label]
+            json.items do
+              json.array! group[:resources] do |r|
+                json.label r.resource_name.humanize.pluralize
+                json.path url_for(controller: "/\#{r.controller_path}", action: :index, only_path: true)
+                json.active r.controller_path == controller_path
+              end
+            end
+          end
+        RUBY
+      end
+
       def create_page_stubs
         {
           "index" => "AdminIndex",

@@ -1,7 +1,7 @@
 path = request.format.json? ? param_to_dig_path(params[:props_at]) : nil
 
 json.data(dig: path) do
-  json.navigation(partial: ["terrazzo/application/navigation"]) {}
+  json.navigation(partial: ["<%= namespace_name %>/application/navigation"]) {}
   yield
 end
 
