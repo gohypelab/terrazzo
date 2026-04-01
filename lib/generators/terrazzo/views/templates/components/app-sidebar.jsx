@@ -11,7 +11,7 @@ import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
-} from "./ui/sidebar";
+} from "terrazzo/ui";
 
 export function AppSidebar({
   navigation,
@@ -27,7 +27,7 @@ export function AppSidebar({
               asChild
               className="data-[slot=sidebar-menu-button]:!p-1.5">
 
-              <a href={navigation[0]?.path ?? "#"} data-sg-visit>
+              <a href={navigation[0]?.items?.[0]?.path ?? navigation[0]?.path ?? "#"} data-sg-visit>
                 <LayoutDashboardIcon className="h-5 w-5" />
                 <span className="text-base font-semibold">{title}</span>
               </a>
@@ -36,26 +36,27 @@ export function AppSidebar({
         </SidebarMenu>
       </SidebarHeader>
       <SidebarContent>
-        <SidebarGroup>
-          <SidebarGroupLabel>Resources</SidebarGroupLabel>
-          <SidebarGroupContent>
-            <SidebarMenu>
-              {navigation.map((item) =>
-              <SidebarMenuItem key={item.path}>
-                  <SidebarMenuButton
-                  asChild
-                  isActive={item.active}
-                  tooltip={item.label}>
-
-                    <a href={item.path} data-sg-visit>
-                      <span>{item.label}</span>
-                    </a>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
-              )}
-            </SidebarMenu>
-          </SidebarGroupContent>
-        </SidebarGroup>
+        {navigation.map((group) =>
+          <SidebarGroup key={group.label}>
+            <SidebarGroupLabel>{group.label}</SidebarGroupLabel>
+            <SidebarGroupContent>
+              <SidebarMenu>
+                {group.items.map((item) =>
+                  <SidebarMenuItem key={item.path}>
+                    <SidebarMenuButton
+                      asChild
+                      isActive={item.active}
+                      tooltip={item.label}>
+                      <a href={item.path} data-sg-visit>
+                        <span>{item.label}</span>
+                      </a>
+                    </SidebarMenuButton>
+                  </SidebarMenuItem>
+                )}
+              </SidebarMenu>
+            </SidebarGroupContent>
+          </SidebarGroup>
+        )}
       </SidebarContent>
     </Sidebar>);
 

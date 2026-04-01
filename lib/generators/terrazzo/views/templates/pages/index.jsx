@@ -1,20 +1,9 @@
 import React, { useContext } from "react";
 import { useContent, NavigationContext } from "@thoughtbot/superglue";
 
-import { Layout } from "../components/Layout";
-import { SearchBar } from "../components/SearchBar";
-import { Pagination } from "../components/Pagination";
-import { SortableHeader } from "../components/SortableHeader";
-import { FieldRenderer } from "../fields/FieldRenderer";
-import { Button } from "../components/ui/button";
-import {
-  Table,
-  TableHeader,
-  TableBody,
-  TableRow,
-  TableHead,
-  TableCell,
-} from "../components/ui/table";
+import { Layout, SearchBar, Pagination, SortableHeader } from "terrazzo/components";
+import { FieldRenderer } from "terrazzo/fields";
+import { Button, Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from "terrazzo/ui";
 
 export default function AdminIndex() {
   const { visit } = useContext(NavigationContext);

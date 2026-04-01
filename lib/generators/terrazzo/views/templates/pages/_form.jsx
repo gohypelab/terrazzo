@@ -1,7 +1,7 @@
 import React from "react";
 
-import { FieldRenderer } from "../fields/FieldRenderer";
-import { Button } from "../components/ui/button";
+import { FieldRenderer } from "terrazzo/fields";
+import { Button } from "terrazzo/ui";
 
 export function AdminForm({ form, errors }) {
   const { props: formProps, extras, fieldGroups, fields } = form;

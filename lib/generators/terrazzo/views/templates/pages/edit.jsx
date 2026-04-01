@@ -1,10 +1,9 @@
 import React from "react";
 import { useContent } from "@thoughtbot/superglue";
 
-import { Layout } from "../components/Layout";
+import { Layout } from "terrazzo/components";
 import { AdminForm } from "./_form";
-import { Button } from "../components/ui/button";
-import { Card, CardContent } from "../components/ui/card";
+import { Button, Card, CardContent } from "terrazzo/ui";
 
 export default function AdminEdit() {
   const {

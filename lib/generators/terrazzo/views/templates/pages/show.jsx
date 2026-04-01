@@ -1,10 +1,9 @@
 import React from "react";
 import { useContent } from "@thoughtbot/superglue";
 
-import { Layout } from "../components/Layout";
-import { FieldRenderer } from "../fields/FieldRenderer";
-import { Button } from "../components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "../components/ui/card";
+import { Layout } from "terrazzo/components";
+import { FieldRenderer } from "terrazzo/fields";
+import { Button, Card, CardContent, CardHeader, CardTitle } from "terrazzo/ui";
 
 export default function AdminShow() {
   const {

@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 
-import { Label } from "../../components/ui/label";
+import { Label } from "terrazzo/ui";
 
 export function FormField({ value, label, input, options, required }) {
   const groupedOptions = options?.groupedOptions ?? {};

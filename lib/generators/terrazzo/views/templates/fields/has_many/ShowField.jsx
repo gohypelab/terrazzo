@@ -8,9 +8,9 @@ import {
   TableRow,
   TableHead,
   TableCell,
-} from "../../components/ui/table";
-import { Badge } from "../../components/ui/badge";
-import { Button } from "../../components/ui/button";
+} from "terrazzo/ui";
+import { Badge } from "terrazzo/ui";
+import { Button } from "terrazzo/ui";
 import { FieldRenderer } from "../FieldRenderer";
 
 export function ShowField({ value, itemShowPaths }) {

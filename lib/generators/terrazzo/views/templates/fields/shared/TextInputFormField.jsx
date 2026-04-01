@@ -1,7 +1,7 @@
 import React from "react";
 
-import { Input } from "../../components/ui/input";
-import { Label } from "../../components/ui/label";
+import { Input } from "terrazzo/ui";
+import { Label } from "terrazzo/ui";
 
 export function TextInputFormField({ type = "text", value, label, input, required, defaultValue, ...inputProps }) {
   const resolvedDefault = defaultValue !== undefined ? defaultValue : String(value ?? "");

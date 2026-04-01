@@ -1,7 +1,7 @@
 import React from "react";
 import { ChevronUp, ChevronDown, ChevronsUpDown } from "lucide-react";
 
-import { TableHead } from "./ui/table";
+import { TableHead } from "terrazzo/ui";
 
 export function SortableHeader({ label, sortable, sortUrl, sortDirection }) {
   if (!sortable) {

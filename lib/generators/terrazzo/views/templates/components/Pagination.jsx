@@ -1,14 +1,14 @@
 import React, { useContext } from "react";
 import { NavigationContext } from "@thoughtbot/superglue";
 
-import { Field, FieldLabel } from "./ui/field";
+import { Field, FieldLabel } from "terrazzo/ui";
 import {
   Pagination as PaginationRoot,
   PaginationContent,
   PaginationItem,
   PaginationNext,
   PaginationPrevious,
-} from "./ui/pagination";
+} from "terrazzo/ui";
 import {
   Select,
   SelectContent,
@@ -16,7 +16,7 @@ import {
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "./ui/select";
+} from "terrazzo/ui";
 
 export function Pagination({ currentPage, totalPages, totalCount, perPage, nextPagePath, prevPagePath }) {
   const { remote, pageKey } = useContext(NavigationContext);

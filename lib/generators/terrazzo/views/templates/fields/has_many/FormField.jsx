@@ -1,9 +1,9 @@
 import React, { useState, useRef, useCallback } from "react";
 import { X, Check } from "lucide-react";
 
-import { Label } from "../../components/ui/label";
-import { Badge } from "../../components/ui/badge";
-import { Popover, PopoverTrigger, PopoverContent } from "../../components/ui/popover";
+import { Label } from "terrazzo/ui";
+import { Badge } from "terrazzo/ui";
+import { Popover, PopoverTrigger, PopoverContent } from "terrazzo/ui";
 import { cn } from "terrazzo";
 
 export function FormField({ value, label, input, options, required }) {

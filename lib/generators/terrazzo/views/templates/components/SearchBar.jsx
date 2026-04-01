@@ -1,7 +1,7 @@
 import React, { useRef, useContext } from "react";
 import { NavigationContext } from "@thoughtbot/superglue";
 
-import { Input } from "./ui/input";
+import { Input } from "terrazzo/ui";
 import { Search } from "lucide-react";
 
 export function SearchBar({ searchTerm, searchPath }) {

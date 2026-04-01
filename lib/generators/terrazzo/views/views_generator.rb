@@ -8,39 +8,40 @@ module Terrazzo
       class_option :namespace, type: :string, default: "admin",
         desc: "Admin namespace"
 
-      def copy_ui_components
-        directory "components/ui", "app/views/#{namespace_name}/components/ui"
+      def create_fields_barrel
+        create_file "app/views/#{namespace_name}/fields/index.js", <<~JS
+          // Re-export all fields from the terrazzo package.
+          // To customize a field, run: rails g terrazzo:eject fields/<field_type>
+          export * from "terrazzo/fields";
+        JS
       end
 
-      def copy_shared_components
-        %w[
-          Layout.jsx
-          app-sidebar.jsx
-          site-header.jsx
-          FlashMessages.jsx
-          SearchBar.jsx
-          Pagination.jsx
-          SortableHeader.jsx
-        ].each do |file|
-          copy_file "components/#{file}", "app/views/#{namespace_name}/components/#{file}"
-        end
+      def create_components_barrel
+        create_file "app/views/#{namespace_name}/components/index.js", <<~JS
+          // Re-export all components from the terrazzo package.
+          // To customize, run: rails g terrazzo:eject components/<component_name>
+          export * from "terrazzo/components";
+        JS
       end
 
-      def copy_page_templates
+      def create_ui_barrel
+        create_file "app/views/#{namespace_name}/components/ui/index.js", <<~JS
+          // Re-export all UI primitives from the terrazzo package.
+          // To customize, run: rails g terrazzo:eject ui/<component_name>
+          export * from "terrazzo/ui";
+        JS
+      end
+
+      def create_page_stubs
         {
-          "pages/index.jsx" => "application/index.jsx",
-          "pages/show.jsx" => "application/show.jsx",
-          "pages/new.jsx" => "application/new.jsx",
-          "pages/edit.jsx" => "application/edit.jsx",
-          "pages/_form.jsx" => "application/_form.jsx",
-          "pages/_navigation.json.props" => "application/_navigation.json.props",
-        }.each do |src, dest|
-          copy_file src, "app/views/#{namespace_name}/#{dest}"
+          "index" => "AdminIndex",
+          "show" => "AdminShow",
+          "new" => "AdminNew",
+          "edit" => "AdminEdit",
+        }.each do |page, component|
+          create_file "app/views/#{namespace_name}/application/#{page}.jsx",
+            "export { #{component} as default } from \"terrazzo/pages\";\n"
         end
-      end
-
-      def copy_field_components
-        directory "fields", "app/views/#{namespace_name}/fields"
       end
 
       private

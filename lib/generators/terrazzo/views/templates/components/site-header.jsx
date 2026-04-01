@@ -1,6 +1,6 @@
 import React from "react";
-import { Separator } from "./ui/separator";
-import { SidebarTrigger } from "./ui/sidebar";
+import { Separator } from "terrazzo/ui";
+import { SidebarTrigger } from "terrazzo/ui";
 
 export function SiteHeader({ title, actions }) {
   return (

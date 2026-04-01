@@ -20,15 +20,22 @@ module Terrazzo
         end
       end
 
-      def show_registration_instructions
-        say "\nTo use your custom field, register it in your FieldRenderer.jsx:", :green
-        say "  import { IndexField as #{class_name}Index } from \"./#{file_name}/IndexField\";"
-        say "  import { ShowField as #{class_name}Show } from \"./#{file_name}/ShowField\";"
-        say "  import { FormField as #{class_name}Form } from \"./#{file_name}/FormField\";"
-        say ""
-        say "  registerFieldType(\"#{file_name}\", { index: #{class_name}Index, show: #{class_name}Show, form: #{class_name}Form });"
-        say ""
-        say "Then use it in your dashboard:"
+      def register_in_barrel
+        barrel_path = File.join(destination_root, "app/views/#{namespace_name}/fields/index.js")
+        return unless File.exist?(barrel_path)
+
+        registration = <<~JS
+
+          // #{class_name} - custom field
+          export { IndexField as #{class_name}IndexField } from "./#{file_name}/IndexField";
+          export { ShowField as #{class_name}ShowField } from "./#{file_name}/ShowField";
+          export { FormField as #{class_name}FormField } from "./#{file_name}/FormField";
+        JS
+
+        append_to_file "app/views/#{namespace_name}/fields/index.js", registration
+
+        say "\nCustom field '#{file_name}' registered in fields/index.js.", :green
+        say "Use it in your dashboard:"
         say "  #{file_name}: Terrazzo::Field::#{class_name},"
       end
 

@@ -3,7 +3,7 @@ import React from "react";
 import { AppSidebar } from "./app-sidebar";
 import { SiteHeader } from "./site-header";
 import { FlashMessages } from "./FlashMessages";
-import { SidebarProvider, SidebarInset } from "./ui/sidebar";
+import { SidebarProvider, SidebarInset } from "terrazzo/ui";
 
 export function Layout({ navigation, title, actions, children }) {
   return (
