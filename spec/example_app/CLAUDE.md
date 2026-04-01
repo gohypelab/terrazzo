@@ -75,6 +75,61 @@ In this app, `CustomerDashboard#kind` needs this fix.
 **Auto-set fields in FORM_ATTRIBUTES** — The generator includes all attributes in `FORM_ATTRIBUTES`, but some should be excluded because they're managed by custom model setters. For example, `Product#name=` auto-sets `slug`, so including `slug` in `FORM_ATTRIBUTES` causes the empty slug field to overwrite it on submit, failing validation. Remove such fields from `FORM_ATTRIBUTES` (keep them in `SHOW_PAGE_ATTRIBUTES`).
 In this app, remove `slug` from `ProductDashboard::FORM_ATTRIBUTES`.
 
+**Custom grouped navigation** — The install generator creates a `_navigation.json.props` partial at `app/views/admin/application/_navigation.json.props` with a flat list of resource links. The system specs expect grouped navigation (a "Resources" group and a "Blog" group), so replace the generated partial with:
+
+```ruby
+resources = Terrazzo::Namespace.new(namespace).resources_with_index_route
+blog_resources, main_resources = resources.partition do |r|
+  r.controller_path.start_with?("admin/blog")
+end
+
+groups = [
+  { label: "Resources", resources: main_resources },
+  { label: "Blog", resources: blog_resources },
+]
+
+json.array! groups do |group|
+  json.label group[:label]
+  json.items do
+    json.array! group[:resources] do |r|
+      json.label r.resource_name.humanize.pluralize
+      json.path url_for(controller: "/#{r.controller_path}", action: :index, only_path: true)
+      json.active r.controller_path == controller_path
+    end
+  end
+end
+```
+
+Then update `app/views/admin/components/app-sidebar.jsx` to render grouped navigation. Change the `<SidebarContent>` section to iterate over groups:
+
+```jsx
+<SidebarContent>
+  {navigation.map((group) =>
+    <SidebarGroup key={group.label}>
+      <SidebarGroupLabel>{group.label}</SidebarGroupLabel>
+      <SidebarGroupContent>
+        <SidebarMenu>
+          {group.items.map((item) =>
+            <SidebarMenuItem key={item.path}>
+              <SidebarMenuButton
+                asChild
+                isActive={item.active}
+                tooltip={item.label}>
+                <a href={item.path} data-sg-visit>
+                  <span>{item.label}</span>
+                </a>
+              </SidebarMenuButton>
+            </SidebarMenuItem>
+          )}
+        </SidebarMenu>
+      </SidebarGroupContent>
+    </SidebarGroup>
+  )}
+</SidebarContent>
+```
+
+Also update the header link from `navigation[0]?.path` to `navigation[0]?.items?.[0]?.path`.
+
 ## When to change the gem source (`lib/`)
 
 Change files in `lib/` (at the repo root) when:

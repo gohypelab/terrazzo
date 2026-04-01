@@ -21,11 +21,45 @@ RSpec.describe "Admin Navigation", type: :system do
       expect(page).to have_link("Products")
     end
 
+    it "renders the sidebar on the show page" do
+      visit admin_customer_path(customer)
+
+      expect(page).to have_link("Customers")
+      expect(page).to have_link("Orders")
+      expect(page).to have_link("Products")
+    end
+
+    it "renders the sidebar on the edit page" do
+      visit edit_admin_customer_path(customer)
+
+      expect(page).to have_link("Customers")
+      expect(page).to have_link("Orders")
+      expect(page).to have_link("Products")
+    end
+
+    it "renders the sidebar on the new page" do
+      visit new_admin_customer_path
+
+      expect(page).to have_link("Customers")
+      expect(page).to have_link("Orders")
+      expect(page).to have_link("Products")
+    end
+
     it "navigates between resources via sidebar" do
       visit admin_customers_path
       click_link "Products"
 
       expect(page).to have_current_path(admin_products_path)
+    end
+
+    it "renders grouped navigation from the overridden partial" do
+      visit admin_customers_path
+
+      expect(page).to have_text("Resources")
+      expect(page).to have_text("Blog")
+      expect(page).to have_link("Posts")
+      expect(page).to have_link("Tags")
+      expect(page).to have_link("Customers")
     end
   end
 

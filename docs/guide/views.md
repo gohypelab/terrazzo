@@ -7,11 +7,12 @@ All generated views and components live in your app at `app/views/admin/` and ca
 ```
 app/views/admin/
 ├── application/
-│   ├── index.jsx      # list view
-│   ├── show.jsx       # detail view
-│   ├── new.jsx        # new form
-│   ├── edit.jsx       # edit form
-│   └── _form.jsx      # shared form partial
+│   ├── index.jsx                # list view
+│   ├── show.jsx                 # detail view
+│   ├── new.jsx                  # new form
+│   ├── edit.jsx                 # edit form
+│   ├── _form.jsx                # shared form partial
+│   └── _navigation.json.props   # sidebar navigation partial
 ├── components/
 │   ├── ui/            # shadcn UI primitives
 │   ├── Layout.jsx     # main layout wrapper
@@ -85,14 +86,7 @@ Setting `superglue_template "admin/reports"` tells Superglue to look for compone
 json.pageTitle "Reports"
 json.data @data
 # ... any props your component needs
-
-json.navigation do
-  json.array! Terrazzo::Namespace.new(namespace).resources_with_index_route do |nav_resource|
-    json.label nav_resource.resource_name.humanize.pluralize
-    json.path url_for(controller: "/#{nav_resource.controller_path}", action: :index, only_path: true)
-    json.active nav_resource.controller_path == controller_path
-  end
-end
+# Navigation is automatically provided by the layout partial
 ```
 
 ### 3. Create a React component
@@ -134,6 +128,95 @@ export const pageToPageMapping = {
   // ... existing entries
   'admin/reports/index': ReportsIndex,
 }
+```
+
+## Customizing the Sidebar Navigation
+
+The sidebar navigation is rendered by a shared partial at `app/views/admin/application/_navigation.json.props`. This partial is included automatically by the layout, so you don't need to add it to each page template.
+
+To customize the navigation (e.g., add custom links, reorder items, or group resources), edit the partial directly.
+
+### Adding custom links
+
+Build an array of items and pass it to `json.array!`:
+
+```ruby
+# app/views/admin/application/_navigation.json.props
+resources = Terrazzo::Namespace.new(namespace).resources_with_index_route
+
+items = [
+  { label: "Dashboard", path: admin_root_path, active: controller_path == "admin/dashboard" },
+]
+
+json.array! items do |item|
+  json.label item[:label]
+  json.path item[:path]
+  json.active item[:active]
+end
+
+json.array! resources do |nav_resource|
+  json.label nav_resource.resource_name.humanize.pluralize
+  json.path url_for(controller: "/#{nav_resource.controller_path}", action: :index, only_path: true)
+  json.active nav_resource.controller_path == controller_path
+end
+```
+
+### Grouping resources into sections
+
+You can split navigation into groups by changing the partial to output grouped data, then updating the sidebar component to render each group separately.
+
+**1. Update the navigation partial** to return groups with labels and items:
+
+```ruby
+# app/views/admin/application/_navigation.json.props
+resources = Terrazzo::Namespace.new(namespace).resources_with_index_route
+blog_resources, main_resources = resources.partition do |r|
+  r.controller_path.start_with?("admin/blog")
+end
+
+groups = [
+  { label: "Resources", resources: main_resources },
+  { label: "Blog", resources: blog_resources },
+]
+
+json.array! groups do |group|
+  json.label group[:label]
+  json.items do
+    json.array! group[:resources] do |r|
+      json.label r.resource_name.humanize.pluralize
+      json.path url_for(controller: "/#{r.controller_path}", action: :index, only_path: true)
+      json.active r.controller_path == controller_path
+    end
+  end
+end
+```
+
+**2. Update `app-sidebar.jsx`** to render each group as a separate section:
+
+```jsx
+<SidebarContent>
+  {navigation.map((group) =>
+    <SidebarGroup key={group.label}>
+      <SidebarGroupLabel>{group.label}</SidebarGroupLabel>
+      <SidebarGroupContent>
+        <SidebarMenu>
+          {group.items.map((item) =>
+            <SidebarMenuItem key={item.path}>
+              <SidebarMenuButton
+                asChild
+                isActive={item.active}
+                tooltip={item.label}>
+                <a href={item.path} data-sg-visit>
+                  <span>{item.label}</span>
+                </a>
+              </SidebarMenuButton>
+            </SidebarMenuItem>
+          )}
+        </SidebarMenu>
+      </SidebarGroupContent>
+    </SidebarGroup>
+  )}
+</SidebarContent>
 ```
 
 ## SPA Navigation
