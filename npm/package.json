@@ -9,6 +9,22 @@
     ".": {
       "import": "./dist/index.js",
       "require": "./dist/index.cjs"
+    },
+    "./fields": {
+      "import": "./dist/fields.js",
+      "require": "./dist/fields.cjs"
+    },
+    "./ui": {
+      "import": "./dist/ui.js",
+      "require": "./dist/ui.cjs"
+    },
+    "./components": {
+      "import": "./dist/components.js",
+      "require": "./dist/components.cjs"
+    },
+    "./pages": {
+      "import": "./dist/pages.js",
+      "require": "./dist/pages.cjs"
     }
   },
   "files": [
@@ -23,8 +39,21 @@
     "lint": "eslint src/"
   },
   "peerDependencies": {
+    "@radix-ui/react-avatar": ">=1.0.0",
+    "@radix-ui/react-dialog": ">=1.0.0",
+    "@radix-ui/react-dropdown-menu": ">=2.0.0",
+    "@radix-ui/react-label": ">=2.0.0",
+    "@radix-ui/react-popover": ">=1.0.0",
+    "@radix-ui/react-select": ">=2.0.0",
+    "@radix-ui/react-separator": ">=1.0.0",
+    "@radix-ui/react-slot": ">=1.0.0",
+    "@radix-ui/react-tooltip": ">=1.0.0",
     "@reduxjs/toolkit": ">=1.9.0",
+    "@thoughtbot/superglue": ">=1.0.0",
+    "class-variance-authority": ">=0.7.0",
+    "lucide-react": ">=0.300.0",
     "react": ">=18.0.0",
+    "react-dom": ">=18.0.0",
     "react-redux": ">=8.0.0"
   },
   "dependencies": {
@@ -32,11 +61,22 @@
     "tailwind-merge": "^2.2.0"
   },
   "devDependencies": {
+    "@radix-ui/react-avatar": "^1.1.0",
+    "@radix-ui/react-dialog": "^1.1.0",
+    "@radix-ui/react-dropdown-menu": "^2.1.0",
+    "@radix-ui/react-label": "^2.1.0",
+    "@radix-ui/react-popover": "^1.1.0",
+    "@radix-ui/react-select": "^2.1.0",
+    "@radix-ui/react-separator": "^1.1.0",
+    "@radix-ui/react-slot": "^1.1.0",
+    "@radix-ui/react-tooltip": "^1.1.0",
     "@reduxjs/toolkit": "^2.0.0",
     "@testing-library/jest-dom": "^6.4.0",
     "@testing-library/react": "^14.2.0",
     "@thoughtbot/superglue": "^1.0.3",
+    "class-variance-authority": "^0.7.0",
     "jsdom": "^24.0.0",
+    "lucide-react": "^0.300.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-redux": "^9.1.0",

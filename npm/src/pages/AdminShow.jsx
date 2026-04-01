@@ -1,0 +1,87 @@
+import React from "react";
+import { useContent } from "@thoughtbot/superglue";
+
+import { Layout } from "terrazzo/components";
+import { FieldRenderer } from "terrazzo/fields";
+import { Button, Card, CardContent, CardHeader, CardTitle } from "terrazzo/ui";
+
+export default function AdminShow() {
+  const {
+    pageTitle,
+    attributeGroups,
+    editPath,
+    deletePath,
+    indexPath,
+    resourceName,
+    pluralResourceName,
+    navigation
+  } = useContent();
+
+  return (
+    <Layout
+      navigation={navigation}
+      title={pageTitle}
+      actions={
+      <div className="flex gap-2">
+          <a href={indexPath} data-sg-visit>
+            <Button variant="outline" size="sm">Back to {pluralResourceName}</Button>
+          </a>
+          {editPath &&
+        <a href={editPath} data-sg-visit>
+              <Button variant="outline" size="sm">Edit</Button>
+            </a>
+        }
+          {deletePath &&
+        <form
+          action={deletePath}
+          method="post"
+          data-sg-visit
+          style={{ display: "inline" }}
+          onSubmit={(e) => {
+            if (!window.confirm("Are you sure?")) e.preventDefault();
+          }}>
+
+              <input type="hidden" name="_method" value="delete" />
+              <input
+            type="hidden"
+            name="authenticity_token"
+            value={document.querySelector('meta[name="csrf-token"]')?.content ?? ""} />
+
+              <Button type="submit" variant="destructive" size="sm">Delete</Button>
+            </form>
+        }
+        </div>
+      }>
+
+      {attributeGroups.map((group, groupIndex) =>
+        <Card key={groupIndex}>
+          {group.name && (
+            <CardHeader>
+              <CardTitle>{group.name}</CardTitle>
+            </CardHeader>
+          )}
+          <CardContent className={group.name ? "" : "pt-6"}>
+            <dl className="divide-y">
+              {group.attributes.map((attr) =>
+              <div key={attr.attribute} className="py-4 grid grid-cols-3 gap-4">
+                  <dt className="text-sm font-medium text-muted-foreground">
+                    {attr.label}
+                  </dt>
+                  <dd className="col-span-2 text-sm">
+                    {attr.showPath ? (
+                      <a href={attr.showPath} data-sg-visit className="hover:underline">
+                        <FieldRenderer mode="show" {...attr} />
+                      </a>
+                    ) : (
+                      <FieldRenderer mode="show" {...attr} />
+                    )}
+                  </dd>
+                </div>
+              )}
+            </dl>
+          </CardContent>
+        </Card>
+      )}
+    </Layout>);
+
+}
