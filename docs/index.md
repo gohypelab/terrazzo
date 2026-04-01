@@ -4,7 +4,7 @@ layout: home
 hero:
   name: Terrazzo
   text: Rails admin powered by React
-  tagline: Drop-in admin panel using the Administrate dashboard DSL with a Superglue + React SPA frontend.
+  tagline: Drop-in admin panel for Rails using the Administrate dashboard DSL with a Superglue + React SPA frontend.
   actions:
     - theme: brand
       text: Get Started
