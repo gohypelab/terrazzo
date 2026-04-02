@@ -1,5 +1,6 @@
 class Product < ApplicationRecord
   has_rich_text :banner
+  has_one_attached :document
 
   has_many :line_items, dependent: :destroy
   has_many :pages, dependent: :destroy

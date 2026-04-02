@@ -9,7 +9,7 @@ Rails.application.routes.draw do
         resources :log_entries
         resources :orders
         resources :pages
-        resources :payments
+        resources :payments, except: [:destroy]
         resources :product_meta_tags
         resources :products
         resources :series

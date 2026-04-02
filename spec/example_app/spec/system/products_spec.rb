@@ -45,6 +45,17 @@ RSpec.describe "Admin Products", type: :system do
     end
   end
 
+  describe "file upload" do
+    it "uploads a document and displays the filename" do
+      visit edit_admin_product_path(product)
+
+      attach_file "Document", Rails.root.join("spec/fixtures/files/test_document.txt")
+      click_button "Save"
+
+      expect(page).to have_content("test_document.txt")
+    end
+  end
+
   describe "edit" do
     it "renders the edit product form" do
       visit edit_admin_product_path(product)
