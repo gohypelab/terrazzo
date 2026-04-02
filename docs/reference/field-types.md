@@ -42,6 +42,7 @@ All field types default to `searchable: false`. Enable search on specific fields
 | Polymorphic | `Field::Polymorphic` | No | No | No |
 | Money | `Field::Money` | No | Yes | No |
 | Hstore | `Field::Hstore` | No | No | No |
+| Asset | `Field::Asset` | No | No | Yes |
 
 ### Enabling search
 
@@ -70,6 +71,9 @@ ATTRIBUTE_TYPES = {
 
 Renders like `Field::Number` but defaults to 2 decimal places. The React component receives the numeric value along with the prefix/suffix/decimals options.
 
+### Date / DateTime / Time
+- `format` — Ruby `strftime` format string (e.g., `"%b %d, %Y"`). When set, the value is formatted on the server side. Without it, dates use the default serialization.
+
 ### Select
 - `collection` — array, proc, or enum name
 
@@ -88,6 +92,26 @@ ATTRIBUTE_TYPES = {
   settings: Field::Hstore.with_options(truncate: 50),
 }
 ```
+
+### Asset
+
+For Active Storage `has_one_attached` fields. Shows the filename on index and show pages, and a file input on forms.
+
+```ruby
+ATTRIBUTE_TYPES = {
+  avatar: Field::Asset,
+}
+```
+
+The model must declare the attachment:
+
+```ruby
+class User < ApplicationRecord
+  has_one_attached :avatar
+end
+```
+
+The dashboard generator auto-detects `has_one_attached` declarations and maps them to `Field::Asset`.
 
 ### HasMany / HasOne
 - `scope` — proc to filter available records

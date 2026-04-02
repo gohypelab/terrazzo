@@ -1,4 +1,9 @@
 import { defineConfig } from "vitepress";
+import { readFileSync } from "fs";
+
+const { version } = JSON.parse(
+  readFileSync(new URL("../../npm/package.json", import.meta.url), "utf-8")
+);
 
 export default defineConfig({
   title: "Terrazzo",
@@ -15,7 +20,7 @@ export default defineConfig({
       { text: "Guide", link: "/guide/getting-started" },
       { text: "Reference", link: "/reference/dashboards" },
       {
-        text: "0.1.0",
+        text: version,
         items: [
           {
             text: "Changelog",

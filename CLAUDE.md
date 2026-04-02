@@ -72,6 +72,14 @@ Documentation lives in `docs/` (VitePress) and `README.md`. Keep them in sync wi
 
 **General rule**: If you change a generator, field type, DSL behavior, or install flow, update the corresponding doc(s) and README in the same changeset. Do not leave docs out of date.
 
+## Version management
+
+The version string lives in two places that must stay in sync:
+- `lib/terrazzo/version.rb` — gem version (source of truth)
+- `npm/package.json` — npm package version
+
+`docs/.vitepress/config.mjs` reads the version from `npm/package.json` automatically.
+
 ## Code conventions
 
 - Generators live under `lib/generators/terrazzo/<name>/` with a `<name>_generator.rb` and a `templates/` directory.
