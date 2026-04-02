@@ -37,6 +37,7 @@ module Terrazzo
     autoload :HasMany, "terrazzo/field/has_many"
     autoload :HasOne, "terrazzo/field/has_one"
     autoload :Polymorphic, "terrazzo/field/polymorphic"
+    autoload :Asset, "terrazzo/field/asset"
   end
 
   module Page

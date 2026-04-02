@@ -68,6 +68,10 @@ import { IndexField as PolymorphicIndex } from "./polymorphic/IndexField";
 import { ShowField as PolymorphicShow } from "./polymorphic/ShowField";
 import { FormField as PolymorphicForm } from "./polymorphic/FormField";
 
+import { IndexField as AssetIndex } from "./asset/IndexField";
+import { ShowField as AssetShow } from "./asset/ShowField";
+import { FormField as AssetForm } from "./asset/FormField";
+
 const fieldMap = {
   string: { index: StringIndex, show: StringShow, form: StringForm },
   text: { index: TextIndex, show: TextShow, form: TextForm },
@@ -85,7 +89,8 @@ const fieldMap = {
   belongs_to: { index: BelongsToIndex, show: BelongsToShow, form: BelongsToForm },
   has_many: { index: HasManyIndex, show: HasManyShow, form: HasManyForm },
   has_one: { index: HasOneIndex, show: HasOneShow, form: HasOneForm },
-  polymorphic: { index: PolymorphicIndex, show: PolymorphicShow, form: PolymorphicForm }
+  polymorphic: { index: PolymorphicIndex, show: PolymorphicShow, form: PolymorphicForm },
+  asset: { index: AssetIndex, show: AssetShow, form: AssetForm }
 };
 
 // Allow consumers to register custom field components

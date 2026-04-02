@@ -71,8 +71,18 @@ module Terrazzo
           types[col.name.to_sym] = column_to_field_type(col)
         end
 
+        # Active Storage attachment names (used to filter internal associations)
+        attachment_names = if model_class.respond_to?(:reflect_on_all_attachments)
+          model_class.reflect_on_all_attachments.map(&:name).to_set
+        else
+          Set.new
+        end
+
         # Associations
         associations.each do |assoc|
+          # Skip Active Storage internal associations (e.g., document_attachment, document_blob)
+          next if active_storage_internal?(assoc.name, attachment_names)
+
           case assoc.macro
           when :belongs_to
             types[assoc.name] = assoc.options[:polymorphic] ? "Field::Polymorphic" : "Field::BelongsTo"
@@ -81,6 +91,13 @@ module Terrazzo
           when :has_one
             types[assoc.name] = "Field::HasOne"
           end
+        end
+
+        # Active Storage attachments
+        attachment_names.each do |name|
+          attachment = model_class.reflect_on_attachment(name)
+          next if attachment.macro == :has_many_attached
+          types[name] = "Field::Asset"
         end
 
         types
@@ -103,6 +120,15 @@ module Terrazzo
         associations.any? do |assoc|
           assoc.macro == :belongs_to &&
             assoc.foreign_key.to_s == column_name
+        end
+      end
+
+      def active_storage_internal?(assoc_name, attachment_names)
+        name = assoc_name.to_s
+        attachment_names.any? do |att|
+          att_s = att.to_s
+          name == "#{att_s}_attachment" || name == "#{att_s}_blob" ||
+            name == "#{att_s}_attachments" || name == "#{att_s}_blobs"
         end
       end
 

@@ -79,3 +79,8 @@ export { FormField as HasOneFormField } from "./has_one/FormField";
 export { IndexField as PolymorphicIndexField } from "./polymorphic/IndexField";
 export { ShowField as PolymorphicShowField } from "./polymorphic/ShowField";
 export { FormField as PolymorphicFormField } from "./polymorphic/FormField";
+
+// Asset
+export { IndexField as AssetIndexField } from "./asset/IndexField";
+export { ShowField as AssetShowField } from "./asset/ShowField";
+export { FormField as AssetFormField } from "./asset/FormField";

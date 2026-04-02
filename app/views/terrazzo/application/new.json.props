@@ -6,7 +6,8 @@ json.pageTitle t("terrazzo.actions.new", resource_name: resource_name)
 json.form do
   json.props({
     action: polymorphic_path([namespace, resource_class]),
-    method: "post"
+    method: "post",
+    encType: "multipart/form-data"
   })
   json.extras do
     if protect_against_forgery?
