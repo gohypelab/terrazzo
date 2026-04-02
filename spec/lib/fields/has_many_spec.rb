@@ -20,9 +20,16 @@ RSpec.describe Terrazzo::Field::HasMany do
       2.times { create_order(customer: customer) }
     end
 
-    it "returns count for :index" do
+    it "returns count and label for :index" do
       field = described_class.new(:orders, nil, :index, resource: customer)
-      expect(field.serialize_value(:index)).to eq(2)
+      expect(field.serialize_value(:index)).to eq({ count: 2, label: "orders" })
+    end
+
+    it "singularizes label when count is 1" do
+      customer2 = create_customer(name: "Bob")
+      create_order(customer: customer2)
+      field = described_class.new(:orders, nil, :index, resource: customer2)
+      expect(field.serialize_value(:index)).to eq({ count: 1, label: "order" })
     end
 
     it "returns a nested table using associated dashboard's COLLECTION_ATTRIBUTES for :show" do

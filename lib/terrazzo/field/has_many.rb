@@ -6,7 +6,10 @@ module Terrazzo
 
         case mode
         when :index
-          data.size
+          count = data.size
+          label = attribute.to_s.humanize.downcase
+          label = label.singularize if count == 1
+          { count: count, label: label }
         when :form
           data.map { |r| r.id.to_s }
         when :show
