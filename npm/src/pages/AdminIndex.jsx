@@ -28,7 +28,7 @@ export default function AdminIndex() {
     <Layout
       navigation={navigation}
       title={resourceName}
-      actions={
+      actions={newResourcePath &&
       <a href={newResourcePath} data-sg-visit>
           <Button size="sm">New {singularResourceName}</Button>
         </a>

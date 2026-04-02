@@ -33,8 +33,8 @@ json.table do
     json.array! @resources do |resource|
       json.id resource.id
       json.showPath polymorphic_path([namespace, resource]) rescue nil
-      json.editPath edit_polymorphic_path([namespace, resource]) rescue nil
-      json.deletePath polymorphic_path([namespace, resource]) rescue nil
+      json.editPath route_exists?(:edit) ? (edit_polymorphic_path([namespace, resource]) rescue nil) : nil
+      json.deletePath route_exists?(:destroy) ? (polymorphic_path([namespace, resource]) rescue nil) : nil
 
       json.cells do
         json.array! @page.attribute_names do |attr|
@@ -89,4 +89,4 @@ end
 
 json.resourceName resource_name.pluralize
 json.singularResourceName resource_name
-json.newResourcePath new_polymorphic_path([namespace, resource_class]) rescue nil
+json.newResourcePath route_exists?(:new) ? (new_polymorphic_path([namespace, resource_class]) rescue nil) : nil

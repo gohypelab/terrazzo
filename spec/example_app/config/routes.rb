@@ -2,12 +2,12 @@ Rails.application.routes.draw do
   root to: redirect("/admin")
 
   namespace :admin do
-        resources :countries
+        resources :countries, only: [:index, :show, :destroy]
         resources :customers
         resources :hosts
         resources :line_items
         resources :log_entries
-        resources :orders
+        resources :orders, except: [:destroy]
         resources :pages
         resources :payments, except: [:destroy]
         resources :product_meta_tags

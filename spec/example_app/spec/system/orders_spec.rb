@@ -11,6 +11,12 @@ RSpec.describe "Admin Orders", type: :system do
 
       expect(page).to have_content("Springfield")
     end
+
+    it "does not show delete links" do
+      visit admin_orders_path
+
+      expect(page).not_to have_button("Delete")
+    end
   end
 
   describe "pagination" do
@@ -40,6 +46,12 @@ RSpec.describe "Admin Orders", type: :system do
 
       expect(page).to have_content("Springfield")
       expect(page).to have_content("123 Main St")
+    end
+
+    it "does not show a delete button" do
+      visit admin_order_path(order)
+
+      expect(page).not_to have_button("Delete")
     end
   end
 end

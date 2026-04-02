@@ -16,7 +16,7 @@ module Terrazzo
 
     prepend Terrazzo::UsesSuperglue::TemplateLookupOverride
 
-    helper_method :namespace, :dashboard, :resource_name, :resource_class, :application_title, :terrazzo_page_identifier
+    helper_method :namespace, :dashboard, :resource_name, :resource_class, :application_title, :terrazzo_page_identifier, :route_exists?
 
     def index
       search = Terrazzo::Search.new(scoped_resource, dashboard, params[:search])
@@ -205,6 +205,16 @@ module Terrazzo
       ns = controller_path.split("/").first
       mapped_action = TERRAZZO_ACTION_MAP[action_name] || action_name
       "#{ns}/application/#{mapped_action}"
+    end
+
+    def route_exists?(action)
+      @_route_exists_cache ||= {}
+      return @_route_exists_cache[action] if @_route_exists_cache.key?(action)
+
+      @_route_exists_cache[action] = Rails.application.routes.routes.any? do |route|
+        route.defaults[:controller] == controller_path &&
+          route.defaults[:action] == action.to_s
+      end
     end
 
     private
