@@ -88,6 +88,10 @@ The version string lives in two places that must stay in sync:
 - Tests use RSpec. System specs use Capybara with headless Chrome.
 - The example app in `spec/example_app/` is a full Rails app used for integration/system testing.
 
+## Releasing
+
+Use `/release` to bump the version, publish the gem to RubyGems, publish the npm package, and create a GitHub Release. Pass `patch`, `minor`, or `major` as the argument (defaults to `patch`).
+
 ## Commit style
 
 Follow conventional-ish commits: lead with what changed (e.g., "Add --bundler option to install generator", "Fix polymorphic field rendering"). Keep the first line under 72 chars.
