@@ -44,7 +44,14 @@ module Terrazzo
           associated_class.all
         end
         pk = association_primary_key
-        scope.map { |r| [display_name(r), r.public_send(pk).to_s] }
+        dashboard = associated_dashboard
+        scope.map { |r| [dashboard ? dashboard.display_resource(r) : display_name(r), r.public_send(pk).to_s] }
+      end
+
+      def associated_dashboard
+        "#{associated_class.name}Dashboard".constantize.new
+      rescue NameError
+        nil
       end
 
       def association_primary_key

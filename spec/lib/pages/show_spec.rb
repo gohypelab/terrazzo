@@ -7,7 +7,7 @@ RSpec.describe Terrazzo::Page::Show do
 
   describe "#page_title" do
     it "returns dashboard's display_resource" do
-      expect(page.page_title).to eq("Customer ##{customer.id}")
+      expect(page.page_title).to eq("Alice")
     end
   end
 
