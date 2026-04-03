@@ -38,6 +38,28 @@ Full docs at **[gohypelab.github.io/terrazzo](https://gohypelab.github.io/terraz
 - Node.js 18+
 - A JS bundler (Vite recommended, esbuild and Sprockets also supported)
 
+## Customizing Per-Row Actions
+
+Terrazzo generates Show, Edit, and Destroy action buttons for each row on index pages and has_many tables on show pages. These are driven by the `collection_item_actions(resource)` helper (defined in `Terrazzo::CollectionActionsHelper`).
+
+Override in your controller helper to customize actions per resource type:
+
+```ruby
+module Admin
+  module CollectionActionsHelper
+    def collection_item_actions(resource)
+      actions = super
+      if resource.is_a?(User)
+        actions << { label: "Ghost", url: admin_user_ghost_path(user_id: resource.id) }
+      end
+      actions
+    end
+  end
+end
+```
+
+Each action hash supports `label` (String), `url` (String), `method` (optional, e.g. `"delete"`), and `confirm` (optional confirmation message).
+
 ## License
 
 MIT

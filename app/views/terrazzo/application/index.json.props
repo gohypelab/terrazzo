@@ -33,8 +33,7 @@ json.table do
     json.array! @resources do |resource|
       json.id resource.id
       json.showPath polymorphic_path([namespace, resource]) rescue nil
-      json.editPath route_exists?(:edit) ? (edit_polymorphic_path([namespace, resource]) rescue nil) : nil
-      json.deletePath route_exists?(:destroy) ? (polymorphic_path([namespace, resource]) rescue nil) : nil
+      json.collectionItemActions collection_item_actions(resource)
 
       json.cells do
         json.array! @page.attribute_names do |attr|

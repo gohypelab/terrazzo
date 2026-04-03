@@ -17,6 +17,7 @@ module Terrazzo
     prepend Terrazzo::UsesSuperglue::TemplateLookupOverride
 
     helper_method :namespace, :dashboard, :resource_name, :resource_class, :application_title, :terrazzo_page_identifier, :route_exists?
+    helper Terrazzo::CollectionActionsHelper
 
     def index
       search = Terrazzo::Search.new(scoped_resource, dashboard, params[:search])

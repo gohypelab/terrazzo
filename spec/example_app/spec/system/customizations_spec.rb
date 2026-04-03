@@ -34,6 +34,46 @@ RSpec.describe "Admin Customizations", type: :system do
     end
   end
 
+  describe "collection_item_actions customization for orders" do
+    let!(:customer) { create(:customer, name: "Alice Johnson", territory: country) }
+    let!(:order) { create(:order, customer: customer) }
+
+    it "shows custom action buttons on the orders index" do
+      visit admin_orders_path
+
+      expect(page).to have_link("View Order")
+      expect(page).to have_link("Edit")
+      expect(page).to have_link("Invoice")
+      expect(page).not_to have_link("Show")
+      expect(page).not_to have_link("Destroy")
+    end
+
+    it "shows custom action buttons in the has_many orders table on customer#show" do
+      visit admin_customer_path(customer)
+
+      within("table", match: :first) do
+        expect(page).to have_link("View Order")
+        expect(page).to have_link("Invoice")
+      end
+    end
+
+    it "invoice action redirects with a flash notice" do
+      visit admin_orders_path
+      click_link "Invoice", match: :first
+
+      expect(page).to have_content("Printing invoice")
+    end
+
+    it "non-order resources still use default actions" do
+      create(:customer, name: "Other Customer", territory: country)
+      visit admin_customers_path
+
+      # Custom card grid — no table, no action links from default helper
+      expect(page).not_to have_link("View Order")
+      expect(page).not_to have_link("Invoice")
+    end
+  end
+
   describe "ejected boolean field with icons" do
     let!(:customer) { create(:customer, name: "Bool Test", hidden: false, territory: country) }
 

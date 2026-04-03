@@ -7,5 +7,8 @@ export { useIsMobile } from "./hooks/use-mobile"
 // Store
 export { useAppSelector } from "./store"
 
+// Components
+export { CollectionItemActions } from "./components/CollectionItemActions"
+
 // Field registry
 export { registerFieldType, getFieldComponent } from "./fieldRegistry"

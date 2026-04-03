@@ -12,8 +12,9 @@ import {
 import { Badge } from "terrazzo/ui";
 import { Button } from "terrazzo/ui";
 import { FieldRenderer } from "../FieldRenderer";
+import { CollectionItemActions } from "terrazzo/components";
 
-export function ShowField({ value, itemShowPaths }) {
+export function ShowField({ value, itemShowPaths, collectionItemActions }) {
   if (!value) return <span className="text-muted-foreground">None</span>;
 
   const { items, headers, total, initialLimit } = value;
@@ -25,6 +26,7 @@ export function ShowField({ value, itemShowPaths }) {
   }
 
   const pathFor = (id) => itemShowPaths?.[String(id)];
+  const actionsFor = (id) => collectionItemActions?.[String(id)];
   const hasMore = initialLimit && initialLimit > 0 && total > initialLimit;
   const visibleItems = expanded || !hasMore ? items : items.slice(0, initialLimit);
 
@@ -46,11 +48,13 @@ export function ShowField({ value, itemShowPaths }) {
                 {headers.map((header) =>
                   <TableHead key={header.attribute}>{header.label}</TableHead>
                 )}
+                <TableHead className="w-[120px]">Actions</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {visibleItems.map((item) => {
                 const showPath = pathFor(item.id);
+                const actions = actionsFor(item.id);
                 return (
                   <TableRow
                     key={item.id}
@@ -67,6 +71,9 @@ export function ShowField({ value, itemShowPaths }) {
                         )}
                       </TableCell>
                     )}
+                    <TableCell>
+                      <CollectionItemActions actions={actions} />
+                    </TableCell>
                   </TableRow>
                 );
               })}
