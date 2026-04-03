@@ -152,6 +152,12 @@ orders: Terrazzo::Field::HasMany
 - **Form**: Multi-select
 
 Options:
+- `collection_attributes` — array of attributes to show in the has_many table on the show page. Defaults to the associated dashboard's `COLLECTION_ATTRIBUTES`. Use this to show fewer or different columns:
+  ```ruby
+  orders: Field::HasMany.with_options(
+    collection_attributes: [:id, :address_city, :created_at]
+  )
+  ```
 - `scope` — proc to filter records
 - `sort_by` — attribute to sort related items on show page (e.g., `sort_by: :created_at`)
 - `direction` — sort direction, `:asc` (default) or `:desc`
