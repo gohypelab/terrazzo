@@ -1,10 +1,20 @@
+require "active_support/number_helper"
+
 module Terrazzo
   module Field
     class Number < Base
       def serialize_value(mode)
-        return data if data.nil? || mode == :form || !options.key?(:multiplier)
+        return data if data.nil? || mode == :form
 
-        data * options[:multiplier]
+        value = options.key?(:multiplier) ? data * options[:multiplier] : data
+
+        if options[:format]
+          formatter = options[:format][:formatter]
+          formatter_options = options[:format][:formatter_options].to_h
+          ActiveSupport::NumberHelper.try(formatter, value, **formatter_options) || value
+        else
+          value
+        end
       end
 
       def serializable_options

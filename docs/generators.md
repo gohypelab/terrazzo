@@ -82,6 +82,45 @@ rails g terrazzo:views
 
 Use this after upgrading the gem to get the latest component versions. **This will overwrite your local customizations.**
 
+## `terrazzo:views:index`, `terrazzo:views:show`, `terrazzo:views:new`, `terrazzo:views:edit`
+
+Ejects a view for customization. Without a resource argument, ejects the shared JSX page component. With a resource argument, ejects a complete resource-specific view: the page JSX, its associated partial (`_collection.jsx` or `_form.jsx`), and a `.json.props` that extends the base serialization.
+
+```bash
+# Eject the shared JSX page component
+rails g terrazzo:views:show
+
+# Eject a resource-specific view
+rails g terrazzo:views:show User
+rails g terrazzo:views:index Order
+rails g terrazzo:views:edit Product
+rails g terrazzo:views:new BlogPost
+```
+
+When ejecting for a resource, the generator creates a complete set of files:
+
+- `terrazzo:views:index User` → `index.jsx` + `_collection.jsx` + `index.json.props`
+- `terrazzo:views:edit User` → `edit.jsx` + `_form.jsx` + `edit.json.props`
+- `terrazzo:views:new User` → `new.jsx` + `_form.jsx` + `new.json.props`
+- `terrazzo:views:show User` → `show.json.props`
+
+Because `edit` and `new` share the same `_form.jsx` partial via a relative import, ejecting one without the other means the non-ejected view continues using the built-in form. To keep them in sync, the `edit` and `new` generators will prompt you to also eject the counterpart view if it hasn't been ejected already.
+
+The ejected `.json.props` calls the gem's base partial and leaves room for custom props:
+
+```ruby
+# app/views/admin/users/show.json.props
+json.partial! partial: "terrazzo/application/show_base"
+# Add custom props below:
+# json.customProp @resource.some_method
+```
+
+### Options
+
+| Option | Default | Description |
+|--------|---------|-------------|
+| `--namespace` | `admin` | Admin namespace |
+
 ## `terrazzo:routes`
 
 Generates the admin namespace routes.

@@ -15,9 +15,11 @@ module Terrazzo
       def serializable_options
         opts = {}
         classes = options[:classes] || []
+        order = options[:order]
         opts[:groupedOptions] = classes.each_with_object({}) do |klass, hash|
           klass = klass.constantize if klass.is_a?(::String)
-          hash[klass.name] = klass.all.map { |r| [display_name(r), r.id.to_s] }
+          scope = order ? klass.order(order) : klass.all
+          hash[klass.name] = scope.map { |r| [display_name(r), r.id.to_s] }
         end
         opts
       end

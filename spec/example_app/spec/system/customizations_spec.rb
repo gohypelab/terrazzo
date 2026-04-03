@@ -3,10 +3,10 @@ require "rails_helper"
 RSpec.describe "Admin Customizations", type: :system do
   let!(:country) { Country.find_or_create_by!(code: "US", name: "United States") }
 
-  describe "custom customers index page" do
+  describe "ejected customers index with custom _collection" do
     let!(:customer) { create(:customer, name: "Test Customer", territory: country) }
 
-    it "renders customers in a card grid instead of a table" do
+    it "renders customers in a card grid via the ejected _collection partial" do
       visit admin_customers_path
 
       # Card grid layout — no table element on the customers index
@@ -15,11 +15,55 @@ RSpec.describe "Admin Customizations", type: :system do
       expect(page).to have_css(".grid .rounded-lg")
     end
 
+    it "renders the custom index wrapper with a count badge" do
+      visit admin_customers_path
+
+      expect(page).to have_css('[data-testid="customer-count"]')
+      expect(find('[data-testid="customer-count"]').text).to include("shown")
+    end
+
     it "still uses the default table layout for other resources" do
       create(:order, customer: customer)
       visit admin_orders_path
 
       expect(page).to have_css("table")
+    end
+  end
+
+  describe "ejected orders show with custom props" do
+    let!(:customer) { create(:customer, name: "Alice Johnson", territory: country) }
+    let!(:order) { create(:order, customer: customer) }
+
+    it "renders the custom total price prop" do
+      visit admin_order_path(order)
+
+      expect(page).to have_css('[data-testid="total-price"]')
+      expect(find('[data-testid="total-price"]').text).to include("$")
+    end
+  end
+
+  describe "has_many collection_attributes override" do
+    let!(:customer) { create(:customer, name: "Alice Johnson", territory: country) }
+    let!(:order) { create(:order, customer: customer, address_city: "Springfield") }
+
+    it "shows only the specified columns in the has_many table on customer#show" do
+      visit admin_customer_path(customer)
+
+      orders_table = find("dt", text: "Orders").find(:xpath, "../..").find("table")
+
+      within(orders_table) do
+        headers = all("th").map(&:text)
+        expect(headers).to include("Id", "Address city")
+        expect(headers).not_to include("Address line one", "Address line two")
+        expect(page).to have_content("Springfield")
+      end
+    end
+
+    it "still shows all columns on the orders index page" do
+      visit admin_orders_path
+
+      headers = all("th").map(&:text)
+      expect(headers).to include("Address line one", "Address line two", "Address city")
     end
   end
 

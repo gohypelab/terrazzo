@@ -45,7 +45,18 @@ description: Terrazzo::Field::Text
 price: Terrazzo::Field::Number.with_options(prefix: "$", decimals: 2)
 ```
 
-Options: `prefix`, `suffix`, `decimals`
+Options: `prefix`, `suffix`, `decimals`, `multiplier`, `format`
+
+The `format` option uses `ActiveSupport::NumberHelper` for advanced formatting:
+
+```ruby
+price: Terrazzo::Field::Number.with_options(
+  format: { formatter: :number_to_currency, formatter_options: { unit: "€" } }
+)
+percentage: Terrazzo::Field::Number.with_options(
+  format: { formatter: :number_to_percentage, formatter_options: { precision: 1 } }
+)
+```
 
 ### **Field::Money**
 
@@ -73,7 +84,9 @@ created_at: Terrazzo::Field::DateTime
 starts_at: Terrazzo::Field::Time
 ```
 
-Options: `format` — Ruby `strftime` format string (e.g., `"%b %d, %Y"`). When set, the value is formatted server-side.
+Options:
+- `format` — Ruby `strftime` format string (e.g., `"%b %d, %Y"`). When set, the value is formatted server-side.
+- `timezone` — Timezone name (e.g., `"Eastern Time (US & Canada)"`) to convert the value before formatting. Defaults to `Time.zone`.
 
 ### **Field::Email**
 
@@ -126,7 +139,7 @@ customer: Terrazzo::Field::BelongsTo
 - **Index/Show**: Link to the associated record
 - **Form**: Select dropdown with all available records
 
-Options: `scope` (proc to filter records), `include_blank`
+Options: `scope` (proc to filter records), `include_blank`, `order` (e.g., `order: :name` to sort dropdown options)
 
 ### **Field::HasMany**
 
@@ -138,7 +151,11 @@ orders: Terrazzo::Field::HasMany
 - **Show**: Table with collection attributes and per-row actions
 - **Form**: Multi-select
 
-Options: `scope`
+Options:
+- `scope` — proc to filter records
+- `sort_by` — attribute to sort related items on show page (e.g., `sort_by: :created_at`)
+- `direction` — sort direction, `:asc` (default) or `:desc`
+- `includes` — eager-load nested associations (e.g., `includes: [:author]`)
 
 ### **Field::HasOne**
 
@@ -161,7 +178,9 @@ commentable: Terrazzo::Field::Polymorphic.with_options(
 
 - **Form**: Grouped select (by type, then by record)
 
-Options: `classes` — array of model class names this association can point to.
+Options:
+- `classes` — array of model class names this association can point to
+- `order` — sort candidate resources per class (e.g., `order: :name`)
 
 ### **Field::Hstore**
 

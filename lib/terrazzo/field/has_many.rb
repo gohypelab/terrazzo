@@ -45,7 +45,8 @@ module Terrazzo
 
       def serialize_show_value
         limit = options.fetch(:limit, 5)
-        all_records = data.to_a
+        records = apply_sorting(data)
+        all_records = records.to_a
         total = all_records.size
         col_attrs = options[:collection_attributes] || resolve_default_collection_attributes
 
@@ -92,6 +93,29 @@ module Terrazzo
           total: total,
           initialLimit: limit
         }
+      end
+
+      def resource_options
+        return [] unless associated_class
+        scope = if options[:scope].is_a?(Proc)
+          options[:scope].call(associated_class)
+        elsif options[:scope]
+          associated_class.public_send(options[:scope])
+        else
+          associated_class.all
+        end
+        scope = scope.includes(*options[:includes]) if options.key?(:includes)
+        pk = association_primary_key
+        dashboard = associated_dashboard
+        scope.map { |r| [dashboard ? dashboard.display_resource(r) : display_name(r), r.public_send(pk).to_s] }
+      end
+
+      def apply_sorting(records)
+        sort_by = options[:sort_by]
+        return records unless sort_by
+
+        direction = options.fetch(:direction, :asc)
+        records.reorder(sort_by => direction)
       end
 
       def find_associated_dashboard

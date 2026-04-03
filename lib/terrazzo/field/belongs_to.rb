@@ -14,7 +14,7 @@ module Terrazzo
       def serializable_options
         opts = {}
         if resource
-          collection = resource_options
+          collection = ordered_resource_options
           if options[:include_blank]
             collection = [["", nil]] + collection
           end
@@ -37,6 +37,21 @@ module Terrazzo
       end
 
       private
+
+      def ordered_resource_options
+        return [] unless associated_class
+        scope = if options[:scope].is_a?(Proc)
+          options[:scope].call(associated_class)
+        elsif options[:scope]
+          associated_class.public_send(options[:scope])
+        else
+          associated_class.all
+        end
+        scope = scope.reorder(options[:order]) if options[:order]
+        pk = association_primary_key
+        dashboard = associated_dashboard
+        scope.map { |r| [dashboard ? dashboard.display_resource(r) : display_name(r), r.public_send(pk).to_s] }
+      end
 
       def foreign_key_value
         return nil unless resource

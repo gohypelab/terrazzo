@@ -11,6 +11,7 @@ app/views/admin/
 │   ├── show.jsx                 # detail view
 │   ├── new.jsx                  # new form
 │   ├── edit.jsx                 # edit form
+│   ├── _collection.jsx          # shared collection table partial
 │   ├── _form.jsx                # shared form partial
 │   └── _navigation.json.props   # sidebar navigation partial
 ├── components/
@@ -26,14 +27,39 @@ app/views/admin/
 
 ## Overriding Views Per Resource
 
-To customize a page for a specific resource, create a view at that resource's path:
+### Extending the JSON props
+
+To add custom props to a specific resource's JSON response, generate a resource-specific view:
+
+```bash
+rails g terrazzo:views:show Product
+rails g terrazzo:views:index Product
+rails g terrazzo:views:edit Product
+```
+
+Each generator ejects a `.json.props` that calls the gem's base partial, plus the associated JSX partial (`_collection.jsx` for index, `_form.jsx` for edit/new):
+
+```ruby
+# app/views/admin/products/show.json.props
+json.partial! partial: "terrazzo/application/show_base"
+json.inventoryCount @resource.inventory_count
+json.onSale @resource.on_sale?
+```
+
+The base partials (`show_base`, `index_base`, `edit_base`, `new_base`) provide the standard Terrazzo serialization. Your file just adds to it.
+
+The ejected JSX partials let you customize the collection table or form for that resource — for example, adding custom columns, changing the row layout, or adding extra form fields.
+
+### Overriding the React component
+
+To customize the page component for a specific resource, create a view at that resource's path:
 
 ```
 app/views/admin/products/index.jsx    → overrides the products index page
 app/views/admin/products/show.jsx     → overrides the products show page
 ```
 
-Your custom component receives the same props as the default:
+Your custom component receives the same props as the default (plus any custom props from your `.json.props`):
 
 ```jsx
 // app/views/admin/products/index.jsx
