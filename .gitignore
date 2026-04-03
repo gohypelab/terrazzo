@@ -3,6 +3,7 @@
 /pkg/
 /tmp/
 *.gem
+npm/*.tgz
 Gemfile.lock
 spec/example_app/db/*.sqlite3
 spec/example_app/db/*.sqlite3-*
