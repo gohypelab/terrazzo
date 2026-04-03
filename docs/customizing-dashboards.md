@@ -8,17 +8,17 @@ Dashboards define which fields appear on each page of your admin panel. The DSL 
 # app/dashboards/product_dashboard.rb
 class ProductDashboard < Terrazzo::BaseDashboard
   ATTRIBUTE_TYPES = {
-    id: Terrazzo::Field::Number,
-    name: Terrazzo::Field::String,
-    price: Terrazzo::Field::Number.with_options(prefix: "$", decimals: 2),
-    description: Terrazzo::Field::Text,
-    category: Terrazzo::Field::Select.with_options(
+    id: Field::Number,
+    name: Field::String,
+    price: Field::Number.with_options(prefix: "$", decimals: 2),
+    description: Field::Text,
+    category: Field::Select.with_options(
       collection: %w[Electronics Books Clothing]
     ),
-    customer: Terrazzo::Field::BelongsTo,
-    tags: Terrazzo::Field::HasMany,
-    created_at: Terrazzo::Field::DateTime,
-    updated_at: Terrazzo::Field::DateTime,
+    customer: Field::BelongsTo,
+    tags: Field::HasMany,
+    created_at: Field::DateTime,
+    updated_at: Field::DateTime,
   }.freeze
 
   COLLECTION_ATTRIBUTES = %i[id name price category].freeze

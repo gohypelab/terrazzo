@@ -8,10 +8,10 @@ Use `.with_options` to configure any field:
 
 ```ruby
 ATTRIBUTE_TYPES = {
-  name: Terrazzo::Field::String.with_options(truncate: 30),
-  price: Terrazzo::Field::Number.with_options(prefix: "$", decimals: 2),
-  status: Terrazzo::Field::Select.with_options(collection: -> { MyModel.statuses.keys }),
-  author: Terrazzo::Field::BelongsTo.with_options(scope: -> { User.where(role: :author) }),
+  name: Field::String.with_options(truncate: 30),
+  price: Field::Number.with_options(prefix: "$", decimals: 2),
+  status: Field::Select.with_options(collection: -> { MyModel.statuses.keys }),
+  author: Field::BelongsTo.with_options(scope: -> { User.where(role: :author) }),
 }
 ```
 
@@ -20,7 +20,7 @@ ATTRIBUTE_TYPES = {
 ### **Field::String**
 
 ```ruby
-name: Terrazzo::Field::String
+name: Field::String
 ```
 
 - **Index**: Truncated to 50 characters (configurable with `truncate` option)
@@ -32,7 +32,7 @@ Options: `truncate` (default: 50)
 ### **Field::Text**
 
 ```ruby
-description: Terrazzo::Field::Text
+description: Field::Text
 ```
 
 - **Index**: Truncated
@@ -42,7 +42,7 @@ description: Terrazzo::Field::Text
 ### **Field::Number**
 
 ```ruby
-price: Terrazzo::Field::Number.with_options(prefix: "$", decimals: 2)
+price: Field::Number.with_options(prefix: "$", decimals: 2)
 ```
 
 Options: `prefix`, `suffix`, `decimals`, `multiplier`, `format`
@@ -50,10 +50,10 @@ Options: `prefix`, `suffix`, `decimals`, `multiplier`, `format`
 The `format` option uses `ActiveSupport::NumberHelper` for advanced formatting:
 
 ```ruby
-price: Terrazzo::Field::Number.with_options(
+price: Field::Number.with_options(
   format: { formatter: :number_to_currency, formatter_options: { unit: "€" } }
 )
-percentage: Terrazzo::Field::Number.with_options(
+percentage: Field::Number.with_options(
   format: { formatter: :number_to_percentage, formatter_options: { precision: 1 } }
 )
 ```
@@ -61,8 +61,8 @@ percentage: Terrazzo::Field::Number.with_options(
 ### **Field::Money**
 
 ```ruby
-price: Terrazzo::Field::Money
-amount: Terrazzo::Field::Money.with_options(prefix: "€", decimals: 2)
+price: Field::Money
+amount: Field::Money.with_options(prefix: "€", decimals: 2)
 ```
 
 Like `Number` but defaults to 2 decimal places. Options: `prefix`, `suffix`, `decimals`
@@ -70,7 +70,7 @@ Like `Number` but defaults to 2 decimal places. Options: `prefix`, `suffix`, `de
 ### **Field::Boolean**
 
 ```ruby
-active: Terrazzo::Field::Boolean
+active: Field::Boolean
 ```
 
 - **Index/Show**: Check or X badge
@@ -79,9 +79,9 @@ active: Terrazzo::Field::Boolean
 ### **Field::Date** / **Field::DateTime** / **Field::Time**
 
 ```ruby
-published_on: Terrazzo::Field::Date
-created_at: Terrazzo::Field::DateTime
-starts_at: Terrazzo::Field::Time
+published_on: Field::Date
+created_at: Field::DateTime
+starts_at: Field::Time
 ```
 
 Options:
@@ -91,7 +91,7 @@ Options:
 ### **Field::Email**
 
 ```ruby
-email: Terrazzo::Field::Email
+email: Field::Email
 ```
 
 Renders as a clickable `mailto:` link on index and show pages.
@@ -99,7 +99,7 @@ Renders as a clickable `mailto:` link on index and show pages.
 ### **Field::Url**
 
 ```ruby
-website: Terrazzo::Field::Url
+website: Field::Url
 ```
 
 Renders as an external link on index and show pages.
@@ -107,7 +107,7 @@ Renders as an external link on index and show pages.
 ### **Field::Password**
 
 ```ruby
-password: Terrazzo::Field::Password
+password: Field::Password
 ```
 
 Renders as `••••••••` on index and show pages. Password input on forms.
@@ -115,7 +115,7 @@ Renders as `••••••••` on index and show pages. Password input on
 ### **Field::Select**
 
 ```ruby
-status: Terrazzo::Field::Select.with_options(
+status: Field::Select.with_options(
   collection: %w[draft published archived]
 )
 ```
@@ -125,7 +125,7 @@ Options: `collection` — array, proc, or ActiveRecord enum name.
 ### **Field::RichText**
 
 ```ruby
-body: Terrazzo::Field::RichText
+body: Field::RichText
 ```
 
 For Action Text fields. Renders HTML on show, textarea on form.
@@ -133,7 +133,7 @@ For Action Text fields. Renders HTML on show, textarea on form.
 ### **Field::BelongsTo**
 
 ```ruby
-customer: Terrazzo::Field::BelongsTo
+customer: Field::BelongsTo
 ```
 
 - **Index/Show**: Link to the associated record
@@ -144,7 +144,7 @@ Options: `scope` (proc to filter records), `include_blank`, `order` (e.g., `orde
 ### **Field::HasMany**
 
 ```ruby
-orders: Terrazzo::Field::HasMany
+orders: Field::HasMany
 ```
 
 - **Index**: Count badge
@@ -166,7 +166,7 @@ Options:
 ### **Field::HasOne**
 
 ```ruby
-profile: Terrazzo::Field::HasOne
+profile: Field::HasOne
 ```
 
 - **Index/Show**: Link to the associated record
@@ -177,7 +177,7 @@ Options: `scope`
 ### **Field::Polymorphic**
 
 ```ruby
-commentable: Terrazzo::Field::Polymorphic.with_options(
+commentable: Field::Polymorphic.with_options(
   classes: ["Post", "Comment"]
 )
 ```
@@ -191,8 +191,8 @@ Options:
 ### **Field::Hstore**
 
 ```ruby
-metadata: Terrazzo::Field::Hstore
-settings: Terrazzo::Field::Hstore.with_options(truncate: 50)
+metadata: Field::Hstore
+settings: Field::Hstore.with_options(truncate: 50)
 ```
 
 Renders PostgreSQL `hstore` columns as interactive key-value pair editors. Index shows a truncated preview, show displays each key-value pair with badges, and the form provides an add/remove row editor.
@@ -202,7 +202,7 @@ Options: `truncate` (default: 80)
 ### **Field::Asset**
 
 ```ruby
-avatar: Terrazzo::Field::Asset
+avatar: Field::Asset
 ```
 
 For Active Storage `has_one_attached` fields. Shows the filename on index and show pages, file input on forms. The dashboard generator auto-detects `has_one_attached` declarations.
@@ -245,9 +245,103 @@ ATTRIBUTE_TYPES = {
 | Hstore | `Field::Hstore` | No | No | No |
 | Asset | `Field::Asset` | No | No | Yes |
 
+## Creating a Custom Field
+
+Use the field generator to scaffold a custom field type:
+
+```bash
+rails g terrazzo:field Gravatar
+```
+
+This creates:
+
+- `app/fields/gravatar_field.rb` — Ruby field class
+- `app/views/admin/fields/gravatar/IndexField.jsx` — table cell component
+- `app/views/admin/fields/gravatar/ShowField.jsx` — detail view component
+- `app/views/admin/fields/gravatar/FormField.jsx` — form input component
+
+It also registers the components in `app/views/admin/fields/index.js` so the field renderer can find them.
+
+### The Ruby class
+
+The generated class inherits from `Field::Base`. Override `serialize_value(mode)` to control what data is sent to the frontend for each mode (`:index`, `:show`, `:form`):
+
+```ruby
+module Terrazzo
+  module Field
+    class Gravatar < Base
+      def serialize_value(mode)
+        return nil if data.blank?
+
+        email = data.downcase.strip
+        hash = Digest::MD5.hexdigest(email)
+        case mode
+        when :index
+          { url: "https://gravatar.com/avatar/#{hash}?s=32", email: email }
+        when :show
+          { url: "https://gravatar.com/avatar/#{hash}?s=128", email: email }
+        when :form
+          email
+        end
+      end
+
+      class << self
+        def searchable?
+          false
+        end
+
+        def sortable?
+          false
+        end
+      end
+    end
+  end
+end
+```
+
+Use `serializable_options` to pass field configuration to the frontend:
+
+```ruby
+def serializable_options
+  { size: options.fetch(:size, 128) }
+end
+```
+
+### The JSX components
+
+Each component receives the serialized value and options as props. For example, `ShowField.jsx`:
+
+```jsx
+import React from "react";
+
+export function ShowField({ value, options }) {
+  if (!value) return null;
+  return (
+    <img
+      src={value.url}
+      alt={value.email}
+      className="rounded-full"
+      width={options.size || 128}
+    />
+  );
+}
+```
+
+### Using the field
+
+Reference it in your dashboard like any built-in field:
+
+```ruby
+ATTRIBUTE_TYPES = {
+  email: Field::Gravatar,
+  # or with options:
+  email: Field::Gravatar.with_options(size: 64),
+}
+```
+
 ## Base Field API
 
-All field types inherit from `Terrazzo::Field::Base`.
+All field types inherit from `Field::Base`.
 
 | Method | Description |
 |--------|-------------|

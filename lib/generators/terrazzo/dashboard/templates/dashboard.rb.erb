@@ -4,9 +4,9 @@ class <%= class_name %>Dashboard < Terrazzo::BaseDashboard
   ATTRIBUTE_TYPES = {
 <% attribute_types.each do |attr, type| -%>
 <% if has_enum?(attr.to_s) -%>
-    <%= attr %>: Terrazzo::<%= type %>.with_options(collection: <%= enum_collection(attr.to_s).inspect %>),
+    <%= attr %>: <%= type %>.with_options(collection: <%= enum_collection(attr.to_s).inspect %>),
 <% else -%>
-    <%= attr %>: Terrazzo::<%= type %>,
+    <%= attr %>: <%= type %>,
 <% end -%>
 <% end -%>
   }.freeze
