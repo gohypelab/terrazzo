@@ -118,6 +118,23 @@ RSpec.describe "Admin Customizations", type: :system do
     end
   end
 
+  describe "custom layout via setLayout" do
+    it "renders the custom layout on index pages" do
+      visit admin_countries_path
+      expect(page).to have_css('[data-testid="custom-layout"]')
+    end
+
+    it "renders the custom layout on show pages" do
+      visit admin_country_path(country)
+      expect(page).to have_css('[data-testid="custom-layout"]')
+    end
+
+    it "renders the custom layout on new pages" do
+      visit new_admin_page_path
+      expect(page).to have_css('[data-testid="custom-layout"]')
+    end
+  end
+
   describe "ejected boolean field with icons" do
     let!(:customer) { create(:customer, name: "Bool Test", hidden: false, territory: country) }
 

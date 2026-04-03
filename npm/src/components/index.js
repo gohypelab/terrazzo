@@ -1,4 +1,4 @@
-export { Layout } from "./Layout";
+export { Layout, Layout as DefaultLayout } from "./Layout";
 export { AppSidebar } from "./app-sidebar";
 export { SiteHeader } from "./site-header";
 export { FlashMessages } from "./FlashMessages";

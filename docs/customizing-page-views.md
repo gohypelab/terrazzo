@@ -156,6 +156,45 @@ export const pageToPageMapping = {
 }
 ```
 
+## Custom Layout
+
+The gem's page components use a `Layout` component that wraps every page with a sidebar, header, and flash messages. To replace it globally without ejecting every page, register a custom Layout in your entry point:
+
+```js
+// app/javascript/admin/application.jsx
+import { setLayout } from "terrazzo";
+import { CustomLayout } from "../../views/admin/components/CustomLayout";
+
+setLayout(CustomLayout);
+```
+
+Your custom Layout must accept the same props as the default:
+
+```jsx
+function CustomLayout({ navigation, title, actions, children }) {
+  return (
+    // your custom shell — sidebar, header, etc.
+  );
+}
+```
+
+All gem page components (`AdminIndex`, `AdminShow`, `AdminEdit`, `AdminNew`) will automatically use your custom Layout. If no custom Layout is registered, the gem's default Layout is used.
+
+The default Layout is also available as `DefaultLayout` from `terrazzo/components`, so you can extend it:
+
+```jsx
+import { DefaultLayout } from "terrazzo/components";
+
+function CustomLayout(props) {
+  return (
+    <DefaultLayout {...props}>
+      <MyDrawerPanel />
+      {props.children}
+    </DefaultLayout>
+  );
+}
+```
+
 ## Customizing the Sidebar Navigation
 
 The sidebar navigation is rendered by a shared partial at `app/views/admin/application/_navigation.json.props`. This partial is included automatically by the layout, so you don't need to add it to each page template.

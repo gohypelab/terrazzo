@@ -33,4 +33,11 @@ class <%= class_name %>Dashboard < Terrazzo::BaseDashboard
   #   active: ->(resources) { resources.where(active: true) },
   #   recent: ->(resources) { resources.where("created_at > ?", 30.days.ago) },
   # }.freeze
+
+  # Overwrite this method to customize how <%= file_name.pluralize.humanize.downcase %> are displayed
+  # across all pages of the admin dashboard.
+  #
+  # def display_resource(resource)
+  #   "<%= class_name %> ##{resource.id}"
+  # end
 end

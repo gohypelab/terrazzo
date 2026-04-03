@@ -48,6 +48,18 @@ module Terrazzo
           end
         RUBY
 
+        if File.read(Rails.root.join("config/routes.rb")).include?("namespace :#{namespace_name}")
+          say_status :skip, "namespace :#{namespace_name} already exists in config/routes.rb", :yellow
+          say ""
+          say "Add these resource routes to your existing namespace :#{namespace_name} block:", :green
+          say ""
+          lines.each { |line| say line }
+          say ""
+          say "    root to: \"#{first_resource}#index\"", :green if first_resource
+          say ""
+          return
+        end
+
         route route_block.strip
       end
 

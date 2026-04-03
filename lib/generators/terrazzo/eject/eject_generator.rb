@@ -136,10 +136,17 @@ module Terrazzo
             new_content = build_fields_barrel_with_ejection(field_type)
             create_file barrel_path, new_content, force: true
           else
-            # Barrel already has explicit exports; replace the line for this field type
-            # by inserting local exports before the terrazzo re-exports
+            # Barrel already has explicit exports; replace the terrazzo re-export
+            # for this field type with local imports
             unless content.include?("./#{field_type}/")
-              append_to_file barrel_path, "\n#{local_exports}\n"
+              # Remove the existing terrazzo re-export line for this field type
+              terrazzo_export = "export { #{type_label}IndexField, #{type_label}ShowField, #{type_label}FormField } from \"terrazzo/fields\";"
+              if content.include?(terrazzo_export)
+                new_content = content.sub(terrazzo_export, local_exports)
+                create_file barrel_path, new_content, force: true
+              else
+                append_to_file barrel_path, "\n#{local_exports}\n"
+              end
             end
           end
         end

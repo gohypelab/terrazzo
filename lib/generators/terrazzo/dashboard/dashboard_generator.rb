@@ -68,7 +68,7 @@ module Terrazzo
           next if col.name.end_with?("_type") && columns.any? { |c| c.name == col.name.sub(/_type$/, "_id") }
           next if association_foreign_key?(col.name, associations)
 
-          types[col.name.to_sym] = column_to_field_type(col)
+          types[col.name.to_sym] = has_enum?(col.name) ? "Field::Select" : column_to_field_type(col)
         end
 
         # Active Storage attachment names (used to filter internal associations)
