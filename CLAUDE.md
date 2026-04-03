@@ -64,9 +64,9 @@ Documentation lives in `docs/` (VitePress) and `README.md`. Keep them in sync wi
 - **When to update `docs/guide/getting-started.md`**: Changes to the install generator, setup steps, or prerequisites.
 - **When to update `docs/reference/generators.md`**: Adding/removing/changing generator options, generated files, or generator behavior.
 - **When to update `docs/reference/field-types.md`**: Adding a new field type, changing field options, or modifying field behavior.
-- **When to update `docs/reference/dashboards.md`**: Changes to the dashboard DSL (ATTRIBUTE_TYPES, COLLECTION_ATTRIBUTES, etc.).
+- **When to update `docs/reference/dashboards.md`**: Changes to the dashboard DSL (ATTRIBUTE_TYPES, COLLECTION_ATTRIBUTES, etc.), adding/changing instance methods or overridable hooks on `BaseDashboard`.
 - **When to update `docs/guide/fields.md`**: Changes to how fields are configured or used in dashboards.
-- **When to update `docs/guide/dashboards.md`**: Changes to dashboard generation, customization, or conventions.
+- **When to update `docs/guide/dashboards.md`**: Changes to dashboard generation, customization, conventions, or adding new overridable dashboard methods.
 - **When to update `docs/guide/controllers.md`**: Changes to controller generation or admin controller behavior.
 - **When to update `docs/guide/views.md`**: Changes to view components or the views generator.
 

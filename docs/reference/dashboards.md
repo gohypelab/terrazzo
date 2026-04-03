@@ -64,6 +64,33 @@ def display_resource(resource)
 end
 ```
 
+### `#collection_item_actions(resource, view)`
+
+Returns an array of action hashes for each row on the index page and in has_many tables on show pages. Override this to customize the per-row action buttons for a specific resource type.
+
+Each action hash supports:
+
+| Key | Required | Description |
+|-----|----------|-------------|
+| `label` | Yes | Button text |
+| `url` | Yes | Link URL |
+| `method` | No | HTTP method (e.g. `"delete"`) — renders as a form instead of a link |
+| `confirm` | No | Confirmation message shown before executing (only used with `method: "delete"`) |
+
+**Default behavior** (when not overridden): renders Show, Edit, and Destroy buttons using polymorphic routes.
+
+```ruby
+def collection_item_actions(resource, view)
+  [
+    { label: "View", url: view.admin_order_path(resource) },
+    { label: "Edit", url: view.edit_admin_order_path(resource) },
+    { label: "Invoice", url: view.invoice_admin_order_path(resource) },
+  ]
+end
+```
+
+The `view` parameter is the view context, giving access to route helpers and other view methods.
+
 ## Constants
 
 | Constant | Required | Description |

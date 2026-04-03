@@ -64,6 +64,43 @@ end
 
 The default is `"ClassName #id"`.
 
+## Custom Row Actions
+
+By default, each row on the index page shows Show, Edit, and Destroy buttons. Override `collection_item_actions` in your dashboard to customize these per resource type:
+
+```ruby
+class OrderDashboard < Terrazzo::BaseDashboard
+  # ...
+
+  def collection_item_actions(resource, view)
+    [
+      { label: "View Order", url: view.admin_order_path(resource) },
+      { label: "Edit", url: view.edit_admin_order_path(resource) },
+      { label: "Invoice", url: view.invoice_admin_order_path(resource) },
+    ]
+  end
+end
+```
+
+The `view` parameter provides access to route helpers. Custom actions also appear in has_many tables on show pages — for example, if a Customer has_many Orders, the orders table on the customer show page will use the OrderDashboard's custom actions.
+
+To add a custom action endpoint, define the route and controller action:
+
+```ruby
+# config/routes.rb
+resources :orders do
+  member { get :invoice }
+end
+
+# app/controllers/admin/orders_controller.rb
+def invoice
+  redirect_to request.referer || admin_orders_path,
+    notice: "Printing invoice"
+end
+```
+
+Resources without a `collection_item_actions` override use the default Show/Edit/Destroy buttons.
+
 ## Generating Dashboards
 
 ```bash
