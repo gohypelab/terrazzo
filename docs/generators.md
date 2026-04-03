@@ -1,4 +1,4 @@
-# Generators Reference
+# Generators
 
 ## `terrazzo:install`
 

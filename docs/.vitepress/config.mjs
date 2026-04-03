@@ -17,8 +17,7 @@ export default defineConfig({
 
   themeConfig: {
     nav: [
-      { text: "Guide", link: "/guide/getting-started" },
-      { text: "Reference", link: "/reference/dashboards" },
+      { text: "Documentation", link: "/getting-started" },
       {
         text: version,
         items: [
@@ -30,36 +29,22 @@ export default defineConfig({
       },
     ],
 
-    sidebar: {
-      "/guide/": [
-        {
-          text: "Introduction",
-          items: [
-            { text: "What is Terrazzo?", link: "/guide/what-is-terrazzo" },
-            { text: "Getting Started", link: "/guide/getting-started" },
-          ],
-        },
-        {
-          text: "Essentials",
-          items: [
-            { text: "Dashboards", link: "/guide/dashboards" },
-            { text: "Fields", link: "/guide/fields" },
-            { text: "Controllers", link: "/guide/controllers" },
-            { text: "Views & Components", link: "/guide/views" },
-          ],
-        },
-      ],
-      "/reference/": [
-        {
-          text: "Reference",
-          items: [
-            { text: "Dashboard DSL", link: "/reference/dashboards" },
-            { text: "Field Types", link: "/reference/field-types" },
-            { text: "Generators", link: "/reference/generators" },
-          ],
-        },
-      ],
-    },
+    sidebar: [
+      {
+        text: "Documentation",
+        items: [
+          { text: "What is Terrazzo?", link: "/what-is-terrazzo" },
+          { text: "Getting Started", link: "/getting-started" },
+          { text: "Customizing Dashboards", link: "/customizing-dashboards" },
+          { text: "Customizing Page Views", link: "/customizing-page-views" },
+          { text: "Customizing Fields", link: "/customizing-fields" },
+          { text: "Customizing Controller Actions", link: "/customizing-controller-actions" },
+          { text: "Authentication", link: "/authentication" },
+          { text: "Authorization", link: "/authorization" },
+          { text: "Generators", link: "/generators" },
+        ],
+      },
+    ],
 
     socialLinks: [
       { icon: "github", link: "https://github.com/gohypelab/terrazzo" },

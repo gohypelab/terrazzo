@@ -58,17 +58,17 @@ If a test fails, fix the issue before proceeding. Do not commit code with failin
 
 ## Documentation rules
 
-Documentation lives in `docs/` (VitePress) and `README.md`. Keep them in sync with code changes:
+Documentation lives in `docs/` (VitePress, flat structure like Administrate) and `README.md`. Keep them in sync with code changes:
 
 - **When to update `README.md`**: Changes to installation steps, quick-start flow, supported Ruby/Rails/Node versions, or the project description.
-- **When to update `docs/guide/getting-started.md`**: Changes to the install generator, setup steps, or prerequisites.
-- **When to update `docs/reference/generators.md`**: Adding/removing/changing generator options, generated files, or generator behavior.
-- **When to update `docs/reference/field-types.md`**: Adding a new field type, changing field options, or modifying field behavior.
-- **When to update `docs/reference/dashboards.md`**: Changes to the dashboard DSL (ATTRIBUTE_TYPES, COLLECTION_ATTRIBUTES, etc.), adding/changing instance methods or overridable hooks on `BaseDashboard`.
-- **When to update `docs/guide/fields.md`**: Changes to how fields are configured or used in dashboards.
-- **When to update `docs/guide/dashboards.md`**: Changes to dashboard generation, customization, conventions, or adding new overridable dashboard methods.
-- **When to update `docs/guide/controllers.md`**: Changes to controller generation or admin controller behavior.
-- **When to update `docs/guide/views.md`**: Changes to view components or the views generator.
+- **When to update `docs/getting-started.md`**: Changes to the install generator, setup steps, or prerequisites.
+- **When to update `docs/customizing-dashboards.md`**: Changes to the dashboard DSL, constants, instance methods, overridable hooks, filters, or display options.
+- **When to update `docs/customizing-fields.md`**: Adding a new field type, changing field options, modifying field behavior, or changing how fields are configured in dashboards.
+- **When to update `docs/customizing-page-views.md`**: Changes to view components, the views generator, sidebar navigation, or SPA navigation behavior.
+- **When to update `docs/customizing-controller-actions.md`**: Changes to controller generation, admin controller behavior, CRUD action overrides, `find_resource`, or scoping.
+- **When to update `docs/authentication.md`**: Changes to how authentication is integrated (before_action patterns, Devise/Clearance examples).
+- **When to update `docs/authorization.md`**: Changes to `authorized_action?`, `scoped_resource`, Pundit integration, or route-based action hiding.
+- **When to update `docs/generators.md`**: Adding/removing/changing generator options, generated files, or generator behavior.
 
 **General rule**: If you change a generator, field type, DSL behavior, or install flow, update the corresponding doc(s) and README in the same changeset. Do not leave docs out of date.
 

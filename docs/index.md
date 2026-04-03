@@ -8,7 +8,7 @@ hero:
   actions:
     - theme: brand
       text: Get Started
-      link: /guide/getting-started
+      link: /getting-started
     - theme: alt
       text: View on GitHub
       link: https://github.com/gohypelab/terrazzo
@@ -20,6 +20,6 @@ features:
     details: A full single-page application powered by Superglue — no separate API layer needed. Search, sort, and paginate without full page reloads.
   - title: shadcn/ui Components
     details: Ships with Tailwind CSS and shadcn/ui primitives. Every generated component lives in your app and is fully customizable.
-  - title: 16 Field Types
-    details: String, text, number, boolean, date, datetime, time, email, URL, password, select, rich text, belongs_to, has_many, has_one, and polymorphic — all with index, show, and form variants.
+  - title: 19 Field Types
+    details: String, text, number, money, boolean, date, datetime, time, email, URL, password, select, rich text, hstore, asset, belongs_to, has_many, has_one, and polymorphic — all with index, show, and form variants.
 ---

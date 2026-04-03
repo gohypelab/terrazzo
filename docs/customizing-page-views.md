@@ -1,4 +1,4 @@
-# Views & Components
+# Customizing Page Views
 
 All generated views and components live in your app at `app/views/admin/` and can be edited directly.
 
