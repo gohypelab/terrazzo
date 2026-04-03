@@ -129,9 +129,6 @@ module Terrazzo
 
     def find_resource(id)
       scoped_resource.find(id)
-    rescue ActiveRecord::RecordNotFound
-      # Support models that override to_param (e.g., slug-based URLs)
-      scoped_resource.find_by!(slug: id)
     end
 
     def resource_params(action = nil)
