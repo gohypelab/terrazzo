@@ -146,4 +146,15 @@ RSpec.describe "Admin Customizations", type: :system do
       expect(hidden_row).to have_css("svg")
     end
   end
+
+  describe "number field with suffix option" do
+    let!(:product) { create(:product, name: "Widget", release_year: 2024) }
+
+    it "renders the suffix next to the number value on the show page" do
+      visit admin_product_path(product)
+
+      release_row = find("dt", text: "Release year").find(:xpath, "..").find("dd")
+      expect(release_row).to have_text("2024 AD")
+    end
+  end
 end

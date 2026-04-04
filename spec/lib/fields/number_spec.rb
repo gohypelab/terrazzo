@@ -7,6 +7,37 @@ RSpec.describe Terrazzo::Field::Number do
       expect(field.serialize_value(:index)).to eq(42.5)
     end
 
+    context "with format option" do
+      it "formats as currency" do
+        field = described_class.new(:price, 1234.5, nil, options: {
+          format: { formatter: :number_to_currency, formatter_options: { unit: "$" } }
+        })
+        expect(field.serialize_value(:index)).to eq("$1,234.50")
+      end
+
+      it "formats as percentage" do
+        field = described_class.new(:rate, 75.5, nil, options: {
+          format: { formatter: :number_to_percentage, formatter_options: { precision: 1 } }
+        })
+        expect(field.serialize_value(:show)).to eq("75.5%")
+      end
+
+      it "applies multiplier before formatting" do
+        field = described_class.new(:price, 100, nil, options: {
+          multiplier: 0.01,
+          format: { formatter: :number_to_currency, formatter_options: { unit: "$" } }
+        })
+        expect(field.serialize_value(:index)).to eq("$1.00")
+      end
+
+      it "returns raw value for :form" do
+        field = described_class.new(:price, 1234.5, nil, options: {
+          format: { formatter: :number_to_currency, formatter_options: {} }
+        })
+        expect(field.serialize_value(:form)).to eq(1234.5)
+      end
+    end
+
     context "with multiplier option" do
       let(:field) { described_class.new(:size_bytes, 2048, nil, options: { multiplier: 0.001 }) }
 

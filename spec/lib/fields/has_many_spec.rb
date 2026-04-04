@@ -68,6 +68,43 @@ RSpec.describe Terrazzo::Field::HasMany do
     end
   end
 
+  describe "#serialize_value with sort_by and direction" do
+    let(:customer) { create_customer(name: "Alice") }
+
+    it "sorts related items by the specified attribute ascending" do
+      order_b = create_order(customer: customer, address_city: "Boston")
+      order_a = create_order(customer: customer, address_city: "Atlanta")
+      field = described_class.new(:orders, nil, :show, resource: customer, options: {
+        sort_by: :address_city, direction: :asc
+      })
+      result = field.serialize_value(:show)
+      ids = result[:items].map { |i| i[:id] }
+      expect(ids).to eq([order_a.id.to_s, order_b.id.to_s])
+    end
+
+    it "sorts related items descending" do
+      order_b = create_order(customer: customer, address_city: "Boston")
+      order_a = create_order(customer: customer, address_city: "Atlanta")
+      field = described_class.new(:orders, nil, :show, resource: customer, options: {
+        sort_by: :address_city, direction: :desc
+      })
+      result = field.serialize_value(:show)
+      ids = result[:items].map { |i| i[:id] }
+      expect(ids).to eq([order_b.id.to_s, order_a.id.to_s])
+    end
+
+    it "defaults direction to :asc" do
+      order_b = create_order(customer: customer, address_city: "Boston")
+      order_a = create_order(customer: customer, address_city: "Atlanta")
+      field = described_class.new(:orders, nil, :show, resource: customer, options: {
+        sort_by: :address_city
+      })
+      result = field.serialize_value(:show)
+      ids = result[:items].map { |i| i[:id] }
+      expect(ids).to eq([order_a.id.to_s, order_b.id.to_s])
+    end
+  end
+
   describe ".permitted_attribute" do
     it 'returns { "attr_ids" => [] }' do
       expect(described_class.permitted_attribute(:orders)).to eq({ "order_ids" => [] })

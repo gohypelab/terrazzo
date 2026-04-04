@@ -55,6 +55,21 @@ RSpec.describe Terrazzo::Field::BelongsTo do
     end
   end
 
+  describe "#serializable_options with order" do
+    it "sorts candidate resources by the specified attribute" do
+      create_customer(name: "Charlie")
+      create_customer(name: "Alice")
+      create_customer(name: "Bob")
+      order = create_order
+      field = described_class.new(:customer, nil, :form, resource: order, options: {
+        order: :name
+      })
+      opts = field.serializable_options
+      names = opts[:resourceOptions].map(&:first)
+      expect(names).to eq(names.sort)
+    end
+  end
+
   describe ".permitted_attribute" do
     it "returns foreign key name" do
       expect(described_class.permitted_attribute(:customer)).to eq(:customer_id)

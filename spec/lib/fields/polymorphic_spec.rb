@@ -27,6 +27,22 @@ RSpec.describe Terrazzo::Field::Polymorphic do
     end
   end
 
+  describe "#serializable_options with order" do
+    it "sorts candidate resources per class" do
+      create_customer(name: "Charlie")
+      create_customer(name: "Alice")
+      create_customer(name: "Bob")
+      log_entry = LogEntry.create!(action: "test", loggable: Customer.first)
+      field = described_class.new(:loggable, nil, :form, resource: log_entry, options: {
+        classes: ["Customer"],
+        order: :name
+      })
+      opts = field.serializable_options
+      names = opts[:groupedOptions]["Customer"].map(&:first)
+      expect(names).to eq(names.sort)
+    end
+  end
+
   describe ".permitted_attribute" do
     it "returns [:attr_type, :attr_id]" do
       expect(described_class.permitted_attribute(:loggable)).to eq([:loggable_type, :loggable_id])
