@@ -178,7 +178,9 @@ function CustomLayout({ navigation, title, actions, children }) {
 }
 ```
 
-All gem page components (`AdminIndex`, `AdminShow`, `AdminEdit`, `AdminNew`) will automatically use your custom Layout. If no custom Layout is registered, the gem's default Layout is used.
+All page components — both the gem's built-in pages and ejected pages — will automatically use your custom Layout. If no custom Layout is registered, the gem's default Layout is used.
+
+Ejected pages use `getLayout()` (also exported from `terrazzo`) to resolve the active Layout at render time, so they respect `setLayout` without any extra wiring.
 
 The default Layout is also available as `DefaultLayout` from `terrazzo/components`, so you can extend it:
 

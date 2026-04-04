@@ -1,11 +1,13 @@
 import React from "react";
 import { useContent } from "@thoughtbot/superglue";
 
-import { Layout, SearchBar, Pagination } from "../components";
+import { getLayout } from "terrazzo";
+import { SearchBar, Pagination } from "../components";
 import { AdminCollection } from "./_collection";
 import { Button } from "../components/ui";
 
 export default function AdminIndex() {
+  const Layout = getLayout();
   const {
     table,
     searchBar,

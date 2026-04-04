@@ -1,11 +1,12 @@
 import React from "react";
 import { useContent } from "@thoughtbot/superglue";
 
-import { Layout } from "terrazzo/components";
+import { getLayout } from "terrazzo";
 import { AdminForm } from "./_form";
 import { Button, Card, CardContent } from "terrazzo/ui";
 
 export default function AdminNew() {
+  const Layout = getLayout();
   const {
     pageTitle,
     form,

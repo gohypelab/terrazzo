@@ -14,4 +14,4 @@ export { CollectionItemActions } from "./components/CollectionItemActions"
 export { registerFieldType, getFieldComponent } from "./fieldRegistry"
 
 // Layout registry
-export { setLayout } from "./layoutRegistry"
+export { setLayout, getLayout } from "./layoutRegistry"
