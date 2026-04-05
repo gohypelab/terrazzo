@@ -1,9 +1,9 @@
 import React, { useContext } from "react";
 import { NavigationContext } from "@thoughtbot/superglue";
 
-import { SortableHeader, CollectionItemActions } from "../components";
-import { FieldRenderer } from "../fields";
-import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from "../components/ui";
+import { SortableHeader, CollectionItemActions } from "terrazzo/components";
+import { FieldRenderer } from "terrazzo/fields";
+import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from "terrazzo/ui";
 
 export function AdminCollection({ table }) {
   const { visit } = useContext(NavigationContext);

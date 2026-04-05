@@ -1,9 +1,12 @@
 require "rails/generators"
+require_relative "page_mapping_helper"
 
 module Terrazzo
   module Generators
     module Views
       class EditGenerator < Rails::Generators::Base
+        include PageMappingHelper
+
         source_root File.expand_path("templates", __dir__)
 
         argument :resource, type: :string, required: false,
@@ -17,6 +20,7 @@ module Terrazzo
             eject_json_props
             copy_file "pages/edit.jsx", "app/views/#{namespace_name}/#{resource_path}/edit.jsx"
             copy_file "pages/_form.jsx", "app/views/#{namespace_name}/#{resource_path}/_form.jsx"
+            register_page_mapping("edit")
             eject_new_view if should_eject_new?
           else
             copy_file "pages/edit.jsx", "app/views/#{namespace_name}/application/edit.jsx"
@@ -50,6 +54,7 @@ module Terrazzo
           if resource.present?
             eject_new_json_props
             copy_file "pages/new.jsx", "app/views/#{namespace_name}/#{resource_path}/new.jsx"
+            register_page_mapping("new")
           else
             copy_file "pages/new.jsx", "app/views/#{namespace_name}/application/new.jsx"
           end

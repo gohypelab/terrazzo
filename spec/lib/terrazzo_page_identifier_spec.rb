@@ -14,32 +14,32 @@ RSpec.describe Terrazzo::ApplicationController, "#terrazzo_page_identifier" do
     context "when action is index" do
       let(:action_name) { "index" }
 
-      it "returns admin/application/index" do
-        expect(controller.send(:terrazzo_page_identifier)).to eq("admin/application/index")
+      it "returns the resource-specific identifier" do
+        expect(controller.send(:terrazzo_page_identifier)).to eq("admin/customers/index")
       end
     end
 
     context "when action is show" do
       let(:action_name) { "show" }
 
-      it "returns admin/application/show" do
-        expect(controller.send(:terrazzo_page_identifier)).to eq("admin/application/show")
+      it "returns the resource-specific identifier" do
+        expect(controller.send(:terrazzo_page_identifier)).to eq("admin/customers/show")
       end
     end
 
     context "when action is new" do
       let(:action_name) { "new" }
 
-      it "returns admin/application/new" do
-        expect(controller.send(:terrazzo_page_identifier)).to eq("admin/application/new")
+      it "returns the resource-specific identifier" do
+        expect(controller.send(:terrazzo_page_identifier)).to eq("admin/customers/new")
       end
     end
 
     context "when action is edit" do
       let(:action_name) { "edit" }
 
-      it "returns admin/application/edit" do
-        expect(controller.send(:terrazzo_page_identifier)).to eq("admin/application/edit")
+      it "returns the resource-specific identifier" do
+        expect(controller.send(:terrazzo_page_identifier)).to eq("admin/customers/edit")
       end
     end
 
@@ -47,7 +47,7 @@ RSpec.describe Terrazzo::ApplicationController, "#terrazzo_page_identifier" do
       let(:action_name) { "create" }
 
       it "maps to new so failed validations resolve to the correct React component" do
-        expect(controller.send(:terrazzo_page_identifier)).to eq("admin/application/new")
+        expect(controller.send(:terrazzo_page_identifier)).to eq("admin/customers/new")
       end
     end
 
@@ -55,15 +55,15 @@ RSpec.describe Terrazzo::ApplicationController, "#terrazzo_page_identifier" do
       let(:action_name) { "update" }
 
       it "maps to edit so failed validations resolve to the correct React component" do
-        expect(controller.send(:terrazzo_page_identifier)).to eq("admin/application/edit")
+        expect(controller.send(:terrazzo_page_identifier)).to eq("admin/customers/edit")
       end
     end
 
     context "when action is destroy" do
       let(:action_name) { "destroy" }
 
-      it "returns admin/application/destroy" do
-        expect(controller.send(:terrazzo_page_identifier)).to eq("admin/application/destroy")
+      it "returns the resource-specific identifier" do
+        expect(controller.send(:terrazzo_page_identifier)).to eq("admin/customers/destroy")
       end
     end
   end
@@ -72,8 +72,8 @@ RSpec.describe Terrazzo::ApplicationController, "#terrazzo_page_identifier" do
     let(:controller_path) { "dashboard/orders" }
     let(:action_name) { "index" }
 
-    it "uses the first segment of controller_path as the namespace" do
-      expect(controller.send(:terrazzo_page_identifier)).to eq("dashboard/application/index")
+    it "returns the full controller path with action" do
+      expect(controller.send(:terrazzo_page_identifier)).to eq("dashboard/orders/index")
     end
   end
 
@@ -81,8 +81,8 @@ RSpec.describe Terrazzo::ApplicationController, "#terrazzo_page_identifier" do
     let(:controller_path) { "admin/blog/posts" }
     let(:action_name) { "show" }
 
-    it "uses only the first segment as the namespace" do
-      expect(controller.send(:terrazzo_page_identifier)).to eq("admin/application/show")
+    it "returns the full controller path with action" do
+      expect(controller.send(:terrazzo_page_identifier)).to eq("admin/blog/posts/show")
     end
   end
 end

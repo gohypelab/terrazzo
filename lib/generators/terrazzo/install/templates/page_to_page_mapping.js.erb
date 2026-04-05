@@ -3,9 +3,23 @@ import AdminShow from "../../views/<%= namespace_name %>/application/show";
 import AdminNew from "../../views/<%= namespace_name %>/application/new";
 import AdminEdit from "../../views/<%= namespace_name %>/application/edit";
 
-export const pageToPageMapping = {
+const pages = {
   '<%= namespace_name %>/application/index': AdminIndex,
   '<%= namespace_name %>/application/show': AdminShow,
   '<%= namespace_name %>/application/new': AdminNew,
   '<%= namespace_name %>/application/edit': AdminEdit,
 }
+
+// Resolves resource-specific page identifiers (e.g. "admin/orders/index")
+// with fallback to the shared application component (e.g. "admin/application/index").
+export const pageToPageMapping = new Proxy(pages, {
+  get(target, prop) {
+    if (prop in target) return target[prop]
+    if (typeof prop === "string") {
+      const action = prop.split("/").pop()
+      const fallback = "<%= namespace_name %>/application/" + action
+      if (fallback in target) return target[fallback]
+    }
+    return undefined
+  }
+})

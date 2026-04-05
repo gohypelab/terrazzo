@@ -1,9 +1,12 @@
 require "rails/generators"
+require_relative "page_mapping_helper"
 
 module Terrazzo
   module Generators
     module Views
       class IndexGenerator < Rails::Generators::Base
+        include PageMappingHelper
+
         source_root File.expand_path("templates", __dir__)
 
         argument :resource, type: :string, required: false,
@@ -17,6 +20,7 @@ module Terrazzo
             eject_json_props
             copy_file "pages/index.jsx", "app/views/#{namespace_name}/#{resource_path}/index.jsx"
             copy_file "pages/_collection.jsx", "app/views/#{namespace_name}/#{resource_path}/_collection.jsx"
+            register_page_mapping("index")
           else
             copy_file "pages/index.jsx", "app/views/#{namespace_name}/application/index.jsx"
             copy_file "pages/_collection.jsx", "app/views/#{namespace_name}/application/_collection.jsx"

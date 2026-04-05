@@ -7,7 +7,8 @@ export function CollectionItemActions({ actions }) {
   return (
     <div className="flex gap-1">
       {actions.map((action, index) => {
-        if (action.method === "delete") {
+        if (action.method && action.method !== "get") {
+          const isDestructive = action.method === "delete";
           return (
             <form
               key={index}
@@ -21,13 +22,15 @@ export function CollectionItemActions({ actions }) {
                 }
               }}
             >
-              <input type="hidden" name="_method" value="delete" />
+              {action.method !== "post" && (
+                <input type="hidden" name="_method" value={action.method} />
+              )}
               <input
                 type="hidden"
                 name="authenticity_token"
                 value={document.querySelector('meta[name="csrf-token"]')?.content ?? ""}
               />
-              <Button type="submit" variant="ghost" size="sm" className="text-destructive">
+              <Button type="submit" variant="ghost" size="sm" className={isDestructive ? "text-destructive" : ""}>
                 {action.label}
               </Button>
             </form>
