@@ -14,7 +14,7 @@ export function CollectionItemActions({ actions }) {
               key={index}
               action={action.url}
               method="post"
-              data-sg-visit
+              {...(action.sg_visit !== false && { "data-sg-visit": true })}
               style={{ display: "inline" }}
               onSubmit={(e) => {
                 if (action.confirm && !window.confirm(action.confirm)) {
@@ -38,7 +38,7 @@ export function CollectionItemActions({ actions }) {
         }
 
         return (
-          <a key={index} href={action.url} data-sg-visit>
+          <a key={index} href={action.url} {...(action.sg_visit !== false && { "data-sg-visit": true })}>
             <Button variant="ghost" size="sm">{action.label}</Button>
           </a>
         );

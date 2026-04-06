@@ -58,7 +58,7 @@ module Admin
 end
 ```
 
-Each action hash supports `label` (String), `url` (String), `method` (optional, e.g. `"delete"`), and `confirm` (optional confirmation message).
+Each action hash supports `label` (String), `url` (String), `method` (optional, e.g. `"delete"`), `confirm` (optional confirmation message), and `sg_visit` (set to `false` to bypass SPA navigation).
 
 ## License
 

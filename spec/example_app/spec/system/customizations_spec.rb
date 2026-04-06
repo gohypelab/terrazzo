@@ -108,6 +108,17 @@ RSpec.describe "Admin Customizations", type: :system do
       expect(page).to have_content("Printing invoice")
     end
 
+    it "renders Invoice link without data-sg-visit when sg_visit is false" do
+      visit admin_orders_path
+
+      invoice_link = find("a", text: "Invoice", match: :first)
+      expect(invoice_link["data-sg-visit"]).to be_nil
+
+      # Other links should still have data-sg-visit
+      view_link = find("a", text: "View Order", match: :first)
+      expect(view_link["data-sg-visit"]).to be_present
+    end
+
     it "non-order resources still use default actions" do
       create(:customer, name: "Other Customer", territory: country)
       visit admin_customers_path
