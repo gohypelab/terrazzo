@@ -38,9 +38,9 @@ RSpec.describe Terrazzo::Field::HasMany do
       expect(result).to be_a(Hash)
       expect(result[:headers]).to be_an(Array)
       expect(result[:headers].map { |h| h[:attribute] }).to eq(%w[id address_line_one created_at])
-      expect(result[:items].length).to eq(2)
-      expect(result[:items].first).to have_key(:id)
-      expect(result[:items].first).to have_key(:columns)
+      expect(result[:rows].length).to eq(2)
+      expect(result[:rows].first).to have_key(:id)
+      expect(result[:rows].first).to have_key(:cells)
       expect(result[:total]).to eq(2)
       expect(result[:initialLimit]).to eq(5)
     end
@@ -49,7 +49,7 @@ RSpec.describe Terrazzo::Field::HasMany do
       3.times { create_order(customer: customer) }
       field = described_class.new(:orders, nil, :show, resource: customer, options: { limit: 2 })
       result = field.serialize_value(:show)
-      expect(result[:items].length).to eq(5)
+      expect(result[:rows].length).to eq(5)
       expect(result[:total]).to eq(5)
       expect(result[:initialLimit]).to eq(2)
       expect(result[:headers]).to be_an(Array)
@@ -78,7 +78,7 @@ RSpec.describe Terrazzo::Field::HasMany do
         sort_by: :address_city, direction: :asc
       })
       result = field.serialize_value(:show)
-      ids = result[:items].map { |i| i[:id] }
+      ids = result[:rows].map { |i| i[:id] }
       expect(ids).to eq([order_a.id.to_s, order_b.id.to_s])
     end
 
@@ -89,7 +89,7 @@ RSpec.describe Terrazzo::Field::HasMany do
         sort_by: :address_city, direction: :desc
       })
       result = field.serialize_value(:show)
-      ids = result[:items].map { |i| i[:id] }
+      ids = result[:rows].map { |i| i[:id] }
       expect(ids).to eq([order_b.id.to_s, order_a.id.to_s])
     end
 
@@ -100,7 +100,7 @@ RSpec.describe Terrazzo::Field::HasMany do
         sort_by: :address_city
       })
       result = field.serialize_value(:show)
-      ids = result[:items].map { |i| i[:id] }
+      ids = result[:rows].map { |i| i[:id] }
       expect(ids).to eq([order_a.id.to_s, order_b.id.to_s])
     end
   end

@@ -6,3 +6,4 @@ export { SearchBar } from "./SearchBar";
 export { Pagination } from "./Pagination";
 export { SortableHeader } from "./SortableHeader";
 export { CollectionItemActions } from "./CollectionItemActions";
+export { ResourceTable } from "./ResourceTable";

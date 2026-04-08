@@ -5,5 +5,5 @@ export function ShowField({ value, options }) {
   const suffix = options?.suffix ?? "";
   const decimals = options?.decimals;
   const formatted = decimals != null && value != null ? Number(value).toFixed(decimals) : String(value ?? "");
-  return <span className="tabular-nums">{prefix}{formatted}{suffix}</span>;
+  return <span className="tabular-nums">{prefix}{formatted}{suffix && ` ${suffix}`}</span>;
 }

@@ -72,8 +72,8 @@ module Terrazzo
           { attribute: attr.to_s, label: attr.to_s.humanize }
         end
 
-        items = records.map do |record|
-          columns = col_attrs.map do |attr|
+        rows = records.map do |record|
+          cells = col_attrs.map do |attr|
             field = dashboard_class.new.attribute_type_for(attr).new(attr, nil, :index, resource: record)
             {
               attribute: attr.to_s,
@@ -81,12 +81,12 @@ module Terrazzo
               value: field.serialize_value(:index)
             }
           end
-          { id: record.id.to_s, columns: columns }
+          { id: record.id.to_s, cells: cells }
         end
 
         {
           headers: headers,
-          items: items,
+          rows: rows,
           total: total,
           initialLimit: limit
         }

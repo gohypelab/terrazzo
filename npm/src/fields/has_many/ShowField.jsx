@@ -1,85 +1,36 @@
-import React, { useState, useContext } from "react";
-import { NavigationContext } from "@thoughtbot/superglue";
+import React, { useState } from "react";
 
-import {
-  Table,
-  TableHeader,
-  TableBody,
-  TableRow,
-  TableHead,
-  TableCell,
-} from "terrazzo/ui";
+import { ResourceTable } from "terrazzo/components";
 import { Badge } from "terrazzo/ui";
 import { Button } from "terrazzo/ui";
-import { FieldRenderer } from "../FieldRenderer";
-import { CollectionItemActions } from "terrazzo/components";
 
-export function ShowField({ value, itemShowPaths, collectionItemActions }) {
+export function ShowField({ value, hasManyRowExtras }) {
   if (!value) return <span className="text-muted-foreground">None</span>;
 
-  const { items, headers, total, initialLimit } = value;
+  const { rows, headers, total, initialLimit, items } = value;
   const [expanded, setExpanded] = useState(false);
-  const { visit } = useContext(NavigationContext);
-
-  if (!items || items.length === 0) {
-    return <span className="text-muted-foreground">None</span>;
-  }
-
-  const pathFor = (id) => itemShowPaths?.[String(id)];
-  const actionsFor = (id) => collectionItemActions?.[String(id)];
-  const hasMore = initialLimit && initialLimit > 0 && total > initialLimit;
-  const visibleItems = expanded || !hasMore ? items : items.slice(0, initialLimit);
-
-  const handleRowClick = (e, showPath) => {
-    if (!showPath) return;
-    if (e.target.closest("a, button, form")) return;
-    if (window.getSelection().toString()) return;
-    visit(showPath, {});
-  };
 
   // Table mode: collection_attributes specified
-  if (headers) {
+  if (headers && rows) {
+    if (rows.length === 0) {
+      return <span className="text-muted-foreground">None</span>;
+    }
+
+    const hasMore = initialLimit && initialLimit > 0 && total > initialLimit;
+    const visibleRows = expanded || !hasMore ? rows : rows.slice(0, initialLimit);
+
+    const enrichedRows = visibleRows.map((row) => {
+      const extras = hasManyRowExtras?.[String(row.id)] || {};
+      return {
+        ...row,
+        showPath: extras.showPath,
+        collectionItemActions: extras.collectionItemActions,
+      };
+    });
+
     return (
       <div>
-        <div className="rounded-md border">
-          <Table>
-            <TableHeader>
-              <TableRow>
-                {headers.map((header) =>
-                  <TableHead key={header.attribute}>{header.label}</TableHead>
-                )}
-                <TableHead className="w-[120px]">Actions</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {visibleItems.map((item) => {
-                const showPath = pathFor(item.id);
-                const actions = actionsFor(item.id);
-                return (
-                  <TableRow
-                    key={item.id}
-                    className={showPath ? "cursor-pointer" : ""}
-                    onClick={(e) => handleRowClick(e, showPath)}>
-                    {item.columns.map((col, colIndex) =>
-                      <TableCell key={col.attribute}>
-                        {showPath && colIndex === 0 ? (
-                          <a href={showPath} data-sg-visit className="hover:underline">
-                            <FieldRenderer mode="index" {...col} />
-                          </a>
-                        ) : (
-                          <FieldRenderer mode="index" {...col} />
-                        )}
-                      </TableCell>
-                    )}
-                    <TableCell>
-                      <CollectionItemActions actions={actions} />
-                    </TableCell>
-                  </TableRow>
-                );
-              })}
-            </TableBody>
-          </Table>
-        </div>
+        <ResourceTable headers={headers} rows={enrichedRows} />
         {hasMore && (
           <Button
             variant="link"
@@ -93,12 +44,19 @@ export function ShowField({ value, itemShowPaths, collectionItemActions }) {
     );
   }
 
-  // Simple list mode
+  // Simple list mode (no collection_attributes)
+  if (!items || items.length === 0) {
+    return <span className="text-muted-foreground">None</span>;
+  }
+
+  const hasMore = initialLimit && initialLimit > 0 && total > initialLimit;
+  const visibleItems = expanded || !hasMore ? items : items.slice(0, initialLimit);
+
   return (
     <div>
       <div className="flex flex-wrap items-center gap-1.5">
         {visibleItems.map((item) => {
-          const showPath = pathFor(item.id);
+          const showPath = hasManyRowExtras?.[String(item.id)]?.showPath;
           return showPath ? (
             <a key={item.id} href={showPath} data-sg-visit>
               <Badge variant="secondary" className="cursor-pointer">{item.display}</Badge>
