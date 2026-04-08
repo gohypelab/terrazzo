@@ -12,16 +12,16 @@ module Terrazzo
         end
       end
 
-      def serializable_options
-        opts = {}
+      def serializable_options(page = nil)
+        return {} unless page == :form
         classes = options[:classes] || []
         order = options[:order]
-        opts[:groupedOptions] = classes.each_with_object({}) do |klass, hash|
+        grouped = classes.each_with_object({}) do |klass, hash|
           klass = klass.constantize if klass.is_a?(::String)
           scope = order ? klass.order(order) : klass.all
           hash[klass.name] = scope.map { |r| [display_name(r), r.id.to_s] }
         end
-        opts
+        { groupedOptions: grouped }
       end
 
       class << self

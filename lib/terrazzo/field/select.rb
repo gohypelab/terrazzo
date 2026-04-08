@@ -5,7 +5,8 @@ module Terrazzo
         data
       end
 
-      def serializable_options
+      def serializable_options(page = nil)
+        return {} unless page == :form
         { selectableOptions: resolve_collection }
       end
 

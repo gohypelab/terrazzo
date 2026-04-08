@@ -19,12 +19,9 @@ module Terrazzo
         end
       end
 
-      def serializable_options
-        opts = {}
-        if resource
-          opts[:resourceOptions] = resource_options
-        end
-        opts
+      def serializable_options(page = nil)
+        return {} unless page == :form && resource
+        { resourceOptions: resource_options }
       end
 
       class << self

@@ -17,7 +17,7 @@ module Terrazzo
         end
       end
 
-      def serializable_options
+      def serializable_options(page = nil)
         opts = {}
         opts[:prefix] = options[:prefix] if options.key?(:prefix)
         opts[:suffix] = options[:suffix] if options.key?(:suffix)

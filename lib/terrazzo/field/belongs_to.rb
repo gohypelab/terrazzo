@@ -11,16 +11,13 @@ module Terrazzo
         end
       end
 
-      def serializable_options
-        opts = {}
-        if resource
-          collection = ordered_resource_options
-          if options[:include_blank]
-            collection = [["", nil]] + collection
-          end
-          opts[:resourceOptions] = collection
+      def serializable_options(page = nil)
+        return {} unless page == :form && resource
+        collection = ordered_resource_options
+        if options[:include_blank]
+          collection = [["", nil]] + collection
         end
-        opts
+        { resourceOptions: collection }
       end
 
       class << self

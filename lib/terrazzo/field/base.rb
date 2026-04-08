@@ -20,7 +20,7 @@ module Terrazzo
         data
       end
 
-      def serializable_options
+      def serializable_options(page = nil)
         {}
       end
 
