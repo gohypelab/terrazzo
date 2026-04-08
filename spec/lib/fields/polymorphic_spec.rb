@@ -37,7 +37,7 @@ RSpec.describe Terrazzo::Field::Polymorphic do
         classes: ["Customer"],
         order: :name
       })
-      opts = field.serializable_options
+      opts = field.serializable_options(:form)
       names = opts[:groupedOptions]["Customer"].map(&:first)
       expect(names).to eq(names.sort)
     end

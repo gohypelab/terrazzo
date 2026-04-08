@@ -29,7 +29,7 @@ json.form do
       json.label field.attribute.to_s.humanize
       json.fieldType field.field_type
       json.value field.serialize_value(:form)
-      json.options field.serializable_options
+      json.options field.serializable_options(:form)
       json.required field.required?
       json.input field.form_input_attributes(param_key)
     end
@@ -43,7 +43,7 @@ json.form do
           json.label field.attribute.to_s.humanize
           json.fieldType field.field_type
           json.value field.serialize_value(:form)
-          json.options field.serializable_options
+          json.options field.serializable_options(:form)
           json.required field.required?
           json.input field.form_input_attributes(param_key)
         end

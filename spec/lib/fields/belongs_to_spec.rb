@@ -49,7 +49,7 @@ RSpec.describe Terrazzo::Field::BelongsTo do
       customer = create_customer(name: "Alice")
       order = ::Order.new(customer: customer)
       field = described_class.new(:customer, nil, :form, resource: order)
-      opts = field.serializable_options
+      opts = field.serializable_options(:form)
       expect(opts[:resourceOptions]).to be_an(Array)
       expect(opts[:resourceOptions].first).to eq(["Alice", customer.id.to_s])
     end
@@ -64,7 +64,7 @@ RSpec.describe Terrazzo::Field::BelongsTo do
       field = described_class.new(:customer, nil, :form, resource: order, options: {
         order: :name
       })
-      opts = field.serializable_options
+      opts = field.serializable_options(:form)
       names = opts[:resourceOptions].map(&:first)
       expect(names).to eq(names.sort)
     end

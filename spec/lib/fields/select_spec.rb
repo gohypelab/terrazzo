@@ -6,7 +6,7 @@ RSpec.describe Terrazzo::Field::Select do
       field = described_class.new(:kind, "vip", nil, options: {
         collection: %w[standard vip]
       })
-      opts = field.serializable_options[:selectableOptions]
+      opts = field.serializable_options(:form)[:selectableOptions]
       expect(opts).to eq([["Standard", "standard"], ["Vip", "vip"]])
     end
 
@@ -14,13 +14,13 @@ RSpec.describe Terrazzo::Field::Select do
       field = described_class.new(:kind, "vip", nil, options: {
         collection: ->(_resource) { %w[a b c] }
       })
-      opts = field.serializable_options[:selectableOptions]
+      opts = field.serializable_options(:form)[:selectableOptions]
       expect(opts).to eq([["A", "a"], ["B", "b"], ["C", "c"]])
     end
 
     it "returns empty array when no collection" do
       field = described_class.new(:kind, "vip")
-      expect(field.serializable_options[:selectableOptions]).to eq([])
+      expect(field.serializable_options(:form)[:selectableOptions]).to eq([])
     end
   end
 end
