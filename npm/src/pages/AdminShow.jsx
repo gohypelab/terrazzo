@@ -9,7 +9,7 @@ export default function AdminShow() {
   const Layout = getLayout();
   const {
     pageTitle,
-    attributeGroups,
+    attributes,
     editPath,
     deletePath,
     indexPath,
@@ -54,7 +54,7 @@ export default function AdminShow() {
         </div>
       }>
 
-      {attributeGroups.map((group, groupIndex) =>
+      {attributes.map((group, groupIndex) =>
         <Card key={groupIndex}>
           {group.name && (
             <CardHeader>

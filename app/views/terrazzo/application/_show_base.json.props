@@ -21,7 +21,7 @@ show_field_json = ->(json, field) do
   end
 end
 
-json.attributeGroups do
+json.attributes do
   json.array! @page.grouped_attributes do |group|
     json.name group[:name]
     json.attributes do
@@ -29,12 +29,6 @@ json.attributeGroups do
         show_field_json.call(json, field)
       end
     end
-  end
-end
-
-json.attributes do
-  json.array! @page.attributes do |field|
-    show_field_json.call(json, field)
   end
 end
 
