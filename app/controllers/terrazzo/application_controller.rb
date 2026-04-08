@@ -129,7 +129,7 @@ module Terrazzo
     end
 
     def find_resource(id)
-      scoped_resource.find(id)
+      @_find_resource ||= scoped_resource.find(id)
     end
 
     def resource_params(action = nil)
