@@ -21,6 +21,19 @@ RSpec.describe Terrazzo::Field::HasOne do
       expect(result[:display]).to be_present
     end
 
+    it "excludes resourceOptions on non-form pages" do
+      product = Product.create!(
+        name: "Widget",
+        price: 9.99,
+        description: "A widget",
+        image_url: "https://example.com/img.png"
+      )
+
+      field = described_class.new(:product_meta_tag, nil, :show, resource: product)
+      expect(field.serializable_options).to eq({})
+      expect(field.serializable_options(:show)).to eq({})
+    end
+
     it "returns nil when association is nil" do
       product = Product.create!(
         name: "Widget",

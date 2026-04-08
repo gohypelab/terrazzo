@@ -105,6 +105,15 @@ RSpec.describe Terrazzo::Field::HasMany do
     end
   end
 
+  describe "#serializable_options" do
+    it "excludes resourceOptions on non-form pages" do
+      customer = create_customer(name: "Alice")
+      field = described_class.new(:orders, nil, :show, resource: customer)
+      expect(field.serializable_options).to eq({})
+      expect(field.serializable_options(:show)).to eq({})
+    end
+  end
+
   describe ".permitted_attribute" do
     it 'returns { "attr_ids" => [] }' do
       expect(described_class.permitted_attribute(:orders)).to eq({ "order_ids" => [] })

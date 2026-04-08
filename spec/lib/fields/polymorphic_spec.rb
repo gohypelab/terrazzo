@@ -27,6 +27,17 @@ RSpec.describe Terrazzo::Field::Polymorphic do
     end
   end
 
+  describe "#serializable_options" do
+    it "excludes groupedOptions on non-form pages" do
+      log_entry = LogEntry.create!(action: "test", loggable: create_customer(name: "Alice"))
+      field = described_class.new(:loggable, nil, :show, resource: log_entry, options: {
+        classes: ["Customer"]
+      })
+      expect(field.serializable_options).to eq({})
+      expect(field.serializable_options(:show)).to eq({})
+    end
+  end
+
   describe "#serializable_options with order" do
     it "sorts candidate resources per class" do
       create_customer(name: "Charlie")

@@ -22,5 +22,13 @@ RSpec.describe Terrazzo::Field::Select do
       field = described_class.new(:kind, "vip")
       expect(field.serializable_options(:form)[:selectableOptions]).to eq([])
     end
+
+    it "excludes selectableOptions on non-form pages" do
+      field = described_class.new(:kind, "vip", nil, options: {
+        collection: %w[standard vip]
+      })
+      expect(field.serializable_options).to eq({})
+      expect(field.serializable_options(:show)).to eq({})
+    end
   end
 end

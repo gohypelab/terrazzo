@@ -45,13 +45,21 @@ RSpec.describe Terrazzo::Field::BelongsTo do
   end
 
   describe "#serializable_options" do
-    it "includes resourceOptions" do
+    it "includes resourceOptions on :form" do
       customer = create_customer(name: "Alice")
       order = ::Order.new(customer: customer)
       field = described_class.new(:customer, nil, :form, resource: order)
       opts = field.serializable_options(:form)
       expect(opts[:resourceOptions]).to be_an(Array)
       expect(opts[:resourceOptions].first).to eq(["Alice", customer.id.to_s])
+    end
+
+    it "excludes resourceOptions on non-form pages" do
+      create_customer(name: "Alice")
+      order = create_order
+      field = described_class.new(:customer, nil, :show, resource: order)
+      expect(field.serializable_options).to eq({})
+      expect(field.serializable_options(:show)).to eq({})
     end
   end
 
