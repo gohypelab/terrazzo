@@ -112,7 +112,13 @@ module Terrazzo
         return records unless sort_by
 
         direction = options.fetch(:direction, :asc)
-        records.reorder(sort_by => direction)
+
+        if records.respond_to?(:reorder)
+          records.reorder(sort_by => direction)
+        else
+          sorted = records.sort_by { |r| r.public_send(sort_by) }
+          direction.to_sym == :desc ? sorted.reverse : sorted
+        end
       end
 
       def find_associated_dashboard
