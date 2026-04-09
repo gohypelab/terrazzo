@@ -19,6 +19,13 @@ module Terrazzo
         end
       end
 
+      # Returns only the records that were serialized for the show page.
+      # Used by the view template to build hasManyRowExtras for only the
+      # visible records instead of iterating over the entire association.
+      def show_records
+        @show_records || data&.to_a || []
+      end
+
       def serializable_options(page = nil)
         opts = {}
         if page == :form && resource
@@ -49,15 +56,28 @@ module Terrazzo
       def serialize_show_value
         limit = options.fetch(:limit, 5)
         records = apply_sorting(data)
-        all_records = records.to_a
-        total = all_records.size
+
+        if limit && limit > 0
+          if !records.is_a?(Array) && records.respond_to?(:limit)
+            total = records.size
+            limited = records.limit(limit).to_a
+          else
+            total = records.size
+            limited = records.first(limit)
+          end
+        else
+          limited = records.to_a
+          total = limited.size
+        end
+
+        @show_records = limited
         col_attrs = options[:collection_attributes] || resolve_default_collection_attributes
 
         if col_attrs
-          serialize_with_collection_attributes(all_records, col_attrs, total, limit)
+          serialize_with_collection_attributes(limited, col_attrs, total, limit)
         else
           {
-            items: all_records.map { |r| { id: r.id.to_s, display: display_name(r) } },
+            items: limited.map { |r| { id: r.id.to_s, display: display_name(r) } },
             total: total,
             initialLimit: limit
           }

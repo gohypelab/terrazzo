@@ -45,14 +45,37 @@ RSpec.describe Terrazzo::Field::HasMany do
       expect(result[:initialLimit]).to eq(5)
     end
 
-    it "sends all items with initialLimit for frontend truncation" do
+    it "limits rows to the specified limit for server-side pagination" do
       3.times { create_order(customer: customer) }
       field = described_class.new(:orders, nil, :show, resource: customer, options: { limit: 2 })
       result = field.serialize_value(:show)
-      expect(result[:rows].length).to eq(5)
+      expect(result[:rows].length).to eq(2)
       expect(result[:total]).to eq(5)
       expect(result[:initialLimit]).to eq(2)
       expect(result[:headers]).to be_an(Array)
+    end
+
+    it "exposes show_records with only the limited records" do
+      3.times { create_order(customer: customer) }
+      field = described_class.new(:orders, nil, :show, resource: customer, options: { limit: 2 })
+      field.serialize_value(:show)
+      expect(field.show_records.length).to eq(2)
+    end
+
+    it "loads all records when limit is 0" do
+      3.times { create_order(customer: customer) }
+      field = described_class.new(:orders, nil, :show, resource: customer, options: { limit: 0 })
+      result = field.serialize_value(:show)
+      expect(result[:rows].length).to eq(5)
+      expect(result[:total]).to eq(5)
+    end
+
+    it "returns all records when total is less than limit" do
+      field = described_class.new(:orders, nil, :show, resource: customer, options: { limit: 10 })
+      result = field.serialize_value(:show)
+      expect(result[:rows].length).to eq(2)
+      expect(result[:total]).to eq(2)
+      expect(result[:initialLimit]).to eq(10)
     end
 
     it "uses default limit of 5" do

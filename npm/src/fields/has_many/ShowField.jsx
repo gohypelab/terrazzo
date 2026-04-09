@@ -16,8 +16,9 @@ export function ShowField({ value, hasManyRowExtras, options }) {
       return <span className="text-muted-foreground">None</span>;
     }
 
+    const allLoaded = rows.length >= total;
     const hasMore = initialLimit && initialLimit > 0 && total > initialLimit;
-    const visibleRows = expanded || !hasMore ? rows : rows.slice(0, initialLimit);
+    const visibleRows = expanded && allLoaded ? rows : rows.slice(0, initialLimit);
 
     const enrichedRows = visibleRows.map((row) => {
       const extras = hasManyRowExtras?.[String(row.id)] || {};
@@ -32,13 +33,19 @@ export function ShowField({ value, hasManyRowExtras, options }) {
       <div>
         <ResourceTable headers={headers} rows={enrichedRows} showActions={options?.renderActions !== false} />
         {hasMore && (
-          <Button
-            variant="link"
-            size="sm"
-            className="mt-2 px-0"
-            onClick={() => setExpanded(!expanded)}>
-            {expanded ? "Show less" : `Show ${total - initialLimit} more`}
-          </Button>
+          allLoaded ? (
+            <Button
+              variant="link"
+              size="sm"
+              className="mt-2 px-0"
+              onClick={() => setExpanded(!expanded)}>
+              {expanded ? "Show less" : `Show ${total - initialLimit} more`}
+            </Button>
+          ) : (
+            <span className="mt-2 block text-sm text-muted-foreground">
+              Showing {rows.length} of {total}
+            </span>
+          )
         )}
       </div>
     );
@@ -49,8 +56,9 @@ export function ShowField({ value, hasManyRowExtras, options }) {
     return <span className="text-muted-foreground">None</span>;
   }
 
+  const allLoaded = items.length >= total;
   const hasMore = initialLimit && initialLimit > 0 && total > initialLimit;
-  const visibleItems = expanded || !hasMore ? items : items.slice(0, initialLimit);
+  const visibleItems = expanded && allLoaded ? items : items.slice(0, initialLimit);
 
   return (
     <div>
@@ -66,13 +74,19 @@ export function ShowField({ value, hasManyRowExtras, options }) {
           );
         })}
         {hasMore && (
-          <Button
-            variant="link"
-            size="sm"
-            className="px-0"
-            onClick={() => setExpanded(!expanded)}>
-            {expanded ? "Show less" : `Show ${total - initialLimit} more`}
-          </Button>
+          allLoaded ? (
+            <Button
+              variant="link"
+              size="sm"
+              className="px-0"
+              onClick={() => setExpanded(!expanded)}>
+              {expanded ? "Show less" : `Show ${total - initialLimit} more`}
+            </Button>
+          ) : (
+            <span className="text-sm text-muted-foreground">
+              and {total - items.length} more
+            </span>
+          )
         )}
       </div>
     </div>
