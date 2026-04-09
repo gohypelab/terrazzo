@@ -4,7 +4,7 @@ import { ResourceTable } from "terrazzo/components";
 import { Badge } from "terrazzo/ui";
 import { Button } from "terrazzo/ui";
 
-export function ShowField({ value, hasManyRowExtras }) {
+export function ShowField({ value, hasManyRowExtras, options }) {
   if (!value) return <span className="text-muted-foreground">None</span>;
 
   const { rows, headers, total, initialLimit, items } = value;
@@ -30,7 +30,7 @@ export function ShowField({ value, hasManyRowExtras }) {
 
     return (
       <div>
-        <ResourceTable headers={headers} rows={enrichedRows} />
+        <ResourceTable headers={headers} rows={enrichedRows} showActions={options?.renderActions !== false} />
         {hasMore && (
           <Button
             variant="link"

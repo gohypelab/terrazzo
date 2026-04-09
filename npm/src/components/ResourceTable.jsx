@@ -13,7 +13,7 @@ import {
   TableCell,
 } from "terrazzo/ui";
 
-export function ResourceTable({ headers, rows }) {
+export function ResourceTable({ headers, rows, showActions = true }) {
   const { visit } = useContext(NavigationContext);
 
   const handleRowClick = (e, showPath) => {
@@ -31,7 +31,7 @@ export function ResourceTable({ headers, rows }) {
             {headers.map((header) => (
               <SortableHeader key={header.attribute} {...header} />
             ))}
-            <TableHead className="w-[120px]">Actions</TableHead>
+            {showActions && <TableHead className="w-[120px]">Actions</TableHead>}
           </TableRow>
         </TableHeader>
         <TableBody>
@@ -56,9 +56,11 @@ export function ResourceTable({ headers, rows }) {
                   )}
                 </TableCell>
               ))}
-              <TableCell>
-                <CollectionItemActions actions={row.collectionItemActions} />
-              </TableCell>
+              {showActions && (
+                <TableCell>
+                  <CollectionItemActions actions={row.collectionItemActions} />
+                </TableCell>
+              )}
             </TableRow>
           ))}
         </TableBody>

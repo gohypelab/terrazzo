@@ -9,11 +9,11 @@ show_field_json = ->(json, field) do
 
   if field.class.associative? && field.data.present?
     if field.is_a?(Terrazzo::Field::HasMany)
+      render_actions = field.options.fetch(:render_actions, true)
       json.hasManyRowExtras(field.data.each_with_object({}) do |record, hash|
-        hash[record.id.to_s] = {
-          showPath: (polymorphic_path([namespace, record]) rescue nil),
-          collectionItemActions: collection_item_actions(record)
-        }
+        extras = { showPath: (polymorphic_path([namespace, record]) rescue nil) }
+        extras[:collectionItemActions] = collection_item_actions(record) if render_actions
+        hash[record.id.to_s] = extras
       end)
     else
       json.showPath polymorphic_path([namespace, field.data]) rescue nil

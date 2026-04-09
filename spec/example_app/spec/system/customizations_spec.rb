@@ -67,6 +67,23 @@ RSpec.describe "Admin Customizations", type: :system do
     end
   end
 
+  describe "has_many render_actions: false" do
+    let!(:customer) { create(:customer, name: "Alice Johnson", territory: country) }
+    let!(:log_entry) { create(:log_entry, loggable: customer, action: "login") }
+
+    it "hides the actions column when render_actions is false" do
+      visit admin_customer_path(customer)
+
+      log_entries_dd = find("dt", text: "Log entries").find(:xpath, "..").find("dd")
+
+      within(log_entries_dd) do
+        headers = all("th").map(&:text)
+        expect(headers).not_to include("Actions")
+        expect(page).to have_content("login")
+      end
+    end
+  end
+
   describe "ejected email field with mail icon" do
     let!(:customer) { create(:customer, name: "Icon Test", email: "icon@example.com", territory: country) }
 
