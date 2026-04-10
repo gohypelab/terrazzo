@@ -46,7 +46,7 @@ module Terrazzo
       @resource = find_resource(params[:id])
       @page = Terrazzo::Page::Show.new(
         dashboard, @resource,
-        has_many_params: extract_has_many_params
+        has_many_params: Terrazzo::HasManyPagination.extract(params)
       )
     end
 
@@ -221,17 +221,6 @@ module Terrazzo
 
     def resolver
       @_resolver ||= Terrazzo::ResourceResolver.new(controller_path)
-    end
-
-    def extract_has_many_params
-      result = {}
-      params.each do |key, value|
-        next unless key.is_a?(String)
-        if (m = key.match(/\Ahm_(.+)_page\z/))
-          (result[m[1].to_sym] ||= {})[:_page] = value.to_i
-        end
-      end
-      result
     end
   end
 end

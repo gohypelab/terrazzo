@@ -30,20 +30,19 @@ module Terrazzo
         opts
       end
 
-      def page_records
-        @page_records ||= begin
-          scope = apply_sorting(data)
-          if scope.respond_to?(:page)
-            scope.page(current_page).per(per_page).tap { |p| @_paginated = p }
-          else
-            arr = scope.to_a
-            @_total_count = arr.size
-            arr[(current_page - 1) * per_page, per_page] || []
-          end
+      class << self
+        def sortable?
+          false
+        end
+
+        def default_options
+          {}
+        end
+
+        def permitted_attribute(attr, _options = {})
+          { "#{attr.to_s.singularize}_ids" => [] }
         end
       end
-
-      private
 
       def per_page
         (options[:per_page] || options[:limit] || 5).to_i
@@ -54,26 +53,43 @@ module Terrazzo
         p < 1 ? 1 : p
       end
 
-      def serialize_show_value
-        records = page_records.to_a
-        total = @_paginated ? @_paginated.total_count : (@_total_count || records.size)
-        total_pages = (total.to_f / per_page).ceil
-        total_pages = 1 if total_pages < 1
+      def total_count
+        paginated.total_count
+      end
 
+      def total_pages
+        [paginated.total_pages, 1].max
+      end
+
+      def page_records
+        paginated.to_a
+      end
+
+      private
+
+      def paginated
+        @paginated ||= begin
+          scope = apply_sorting(data)
+          scope = Kaminari.paginate_array(scope.to_a) unless scope.respond_to?(:page)
+          scope.page(current_page).per(per_page)
+        end
+      end
+
+      def serialize_show_value
         col_attrs = options[:collection_attributes] || resolve_default_collection_attributes
 
         meta = {
-          total: total,
+          total: total_count,
           perPage: per_page,
           currentPage: current_page,
           totalPages: total_pages,
         }
 
         if col_attrs
-          { **serialize_with_collection_attributes(records, col_attrs), **meta }
+          { **serialize_with_collection_attributes(page_records, col_attrs), **meta }
         else
           {
-            items: records.map { |r| { id: r.id.to_s, display: display_name(r) } },
+            items: page_records.map { |r| { id: r.id.to_s, display: display_name(r) } },
             **meta,
           }
         end
@@ -140,20 +156,6 @@ module Terrazzo
       def find_associated_dashboard
         klass = associated_class
         "#{klass.name}Dashboard".constantize
-      end
-
-      class << self
-        def sortable?
-          false
-        end
-
-        def default_options
-          {}
-        end
-
-        def permitted_attribute(attr, _options = {})
-          { "#{attr.to_s.singularize}_ids" => [] }
-        end
       end
     end
   end
