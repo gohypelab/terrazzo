@@ -1,25 +1,29 @@
-import React, { useState } from "react";
-
-import { ResourceTable } from "terrazzo/components";
+import React from "react";
+import { ResourceTable, HasManyPagination } from "terrazzo/components";
 import { Badge } from "terrazzo/ui";
-import { Button } from "terrazzo/ui";
 
-export function ShowField({ value, hasManyRowExtras, options }) {
+export function ShowField({ value, hasManyRowExtras, paginationPaths, options }) {
   if (!value) return <span className="text-muted-foreground">None</span>;
 
-  const { rows, headers, total, initialLimit, items } = value;
-  const [expanded, setExpanded] = useState(false);
+  const { rows, headers, items, total, currentPage, totalPages } = value;
+
+  const pagination = (
+    <HasManyPagination
+      currentPage={currentPage}
+      totalPages={totalPages}
+      total={total}
+      nextPagePath={paginationPaths?.nextPagePath}
+      prevPagePath={paginationPaths?.prevPagePath}
+    />
+  );
 
   // Table mode: collection_attributes specified
   if (headers && rows) {
-    if (rows.length === 0) {
+    if (rows.length === 0 && total === 0) {
       return <span className="text-muted-foreground">None</span>;
     }
 
-    const hasMore = initialLimit && initialLimit > 0 && total > initialLimit;
-    const visibleRows = expanded || !hasMore ? rows : rows.slice(0, initialLimit);
-
-    const enrichedRows = visibleRows.map((row) => {
+    const enrichedRows = rows.map((row) => {
       const extras = hasManyRowExtras?.[String(row.id)] || {};
       return {
         ...row,
@@ -31,31 +35,20 @@ export function ShowField({ value, hasManyRowExtras, options }) {
     return (
       <div>
         <ResourceTable headers={headers} rows={enrichedRows} showActions={options?.renderActions !== false} />
-        {hasMore && (
-          <Button
-            variant="link"
-            size="sm"
-            className="mt-2 px-0"
-            onClick={() => setExpanded(!expanded)}>
-            {expanded ? "Show less" : `Show ${total - initialLimit} more`}
-          </Button>
-        )}
+        {pagination}
       </div>
     );
   }
 
   // Simple list mode (no collection_attributes)
-  if (!items || items.length === 0) {
+  if ((!items || items.length === 0) && total === 0) {
     return <span className="text-muted-foreground">None</span>;
   }
-
-  const hasMore = initialLimit && initialLimit > 0 && total > initialLimit;
-  const visibleItems = expanded || !hasMore ? items : items.slice(0, initialLimit);
 
   return (
     <div>
       <div className="flex flex-wrap items-center gap-1.5">
-        {visibleItems.map((item) => {
+        {(items || []).map((item) => {
           const showPath = hasManyRowExtras?.[String(item.id)]?.showPath;
           return showPath ? (
             <a key={item.id} href={showPath} data-sg-visit>
@@ -65,16 +58,8 @@ export function ShowField({ value, hasManyRowExtras, options }) {
             <Badge key={item.id} variant="secondary">{item.display}</Badge>
           );
         })}
-        {hasMore && (
-          <Button
-            variant="link"
-            size="sm"
-            className="px-0"
-            onClick={() => setExpanded(!expanded)}>
-            {expanded ? "Show less" : `Show ${total - initialLimit} more`}
-          </Button>
-        )}
       </div>
+      {pagination}
     </div>
   );
 }

@@ -4,17 +4,37 @@ show_field_json = ->(json, field) do
   json.attribute field.attribute.to_s
   json.label field.attribute.to_s.humanize
   json.fieldType field.field_type
-  json.value field.serialize_value(:show)
+
+  value = field.serialize_value(:show)
+  json.value value
   json.options field.serializable_options
 
   if field.class.associative? && field.data.present?
     if field.is_a?(Terrazzo::Field::HasMany)
       render_actions = field.options.fetch(:render_actions, true)
-      json.hasManyRowExtras(field.data.each_with_object({}) do |record, hash|
+
+      json.hasManyRowExtras(field.page_records.each_with_object({}) do |record, hash|
         extras = { showPath: (polymorphic_path([namespace, record]) rescue nil) }
         extras[:collectionItemActions] = collection_item_actions(record) if render_actions
         hash[record.id.to_s] = extras
       end)
+
+      param_key = "hm_#{field.attribute}_page"
+      base = request.query_parameters.merge(only_path: true, controller: controller_path, action: :show, id: @resource.to_param)
+
+      json.paginationPaths do
+        if value[:currentPage] > 1
+          json.prevPagePath url_for(base.merge(param_key => value[:currentPage] - 1))
+        else
+          json.prevPagePath nil
+        end
+
+        if value[:currentPage] < value[:totalPages]
+          json.nextPagePath url_for(base.merge(param_key => value[:currentPage] + 1))
+        else
+          json.nextPagePath nil
+        end
+      end
     else
       json.showPath polymorphic_path([namespace, field.data]) rescue nil
     end

@@ -30,36 +30,51 @@ module Terrazzo
         opts
       end
 
-      class << self
-        def sortable?
-          false
-        end
-
-        def default_options
-          { limit: 5 }
-        end
-
-        def permitted_attribute(attr, _options = {})
-          { "#{attr.to_s.singularize}_ids" => [] }
+      def page_records
+        @page_records ||= begin
+          scope = apply_sorting(data)
+          if scope.respond_to?(:page)
+            scope.page(current_page).per(per_page).tap { |p| @_paginated = p }
+          else
+            arr = scope.to_a
+            @_total_count = arr.size
+            arr[(current_page - 1) * per_page, per_page] || []
+          end
         end
       end
 
       private
 
+      def per_page
+        (options[:per_page] || options[:limit] || 5).to_i
+      end
+
+      def current_page
+        p = options[:_page].to_i
+        p < 1 ? 1 : p
+      end
+
       def serialize_show_value
-        limit = options.fetch(:limit, 5)
-        records = apply_sorting(data)
-        all_records = records.to_a
-        total = all_records.size
+        records = page_records.to_a
+        total = @_paginated ? @_paginated.total_count : (@_total_count || records.size)
+        total_pages = (total.to_f / per_page).ceil
+        total_pages = 1 if total_pages < 1
+
         col_attrs = options[:collection_attributes] || resolve_default_collection_attributes
 
+        meta = {
+          total: total,
+          perPage: per_page,
+          currentPage: current_page,
+          totalPages: total_pages,
+        }
+
         if col_attrs
-          serialize_with_collection_attributes(all_records, col_attrs, total, limit)
+          { **serialize_with_collection_attributes(records, col_attrs), **meta }
         else
           {
-            items: all_records.map { |r| { id: r.id.to_s, display: display_name(r) } },
-            total: total,
-            initialLimit: limit
+            items: records.map { |r| { id: r.id.to_s, display: display_name(r) } },
+            **meta,
           }
         end
       end
@@ -71,7 +86,7 @@ module Terrazzo
         nil
       end
 
-      def serialize_with_collection_attributes(records, col_attrs, total, limit)
+      def serialize_with_collection_attributes(records, col_attrs)
         dashboard_class = find_associated_dashboard
 
         headers = col_attrs.map do |attr|
@@ -90,12 +105,7 @@ module Terrazzo
           { id: record.id.to_s, cells: cells }
         end
 
-        {
-          headers: headers,
-          rows: rows,
-          total: total,
-          initialLimit: limit
-        }
+        { headers: headers, rows: rows }
       end
 
       def resource_options
@@ -130,6 +140,20 @@ module Terrazzo
       def find_associated_dashboard
         klass = associated_class
         "#{klass.name}Dashboard".constantize
+      end
+
+      class << self
+        def sortable?
+          false
+        end
+
+        def default_options
+          {}
+        end
+
+        def permitted_attribute(attr, _options = {})
+          { "#{attr.to_s.singularize}_ids" => [] }
+        end
       end
     end
   end

@@ -3,9 +3,10 @@ module Terrazzo
     class Show < Base
       attr_reader :resource
 
-      def initialize(dashboard, resource)
+      def initialize(dashboard, resource, has_many_params: {})
         super(dashboard, resource.class)
         @resource = resource
+        @has_many_params = has_many_params || {}
       end
 
       def page_title
@@ -20,24 +21,29 @@ module Terrazzo
       def attributes
         attrs = dashboard.show_page_attributes
         dashboard.flatten_attributes(attrs).map do |attr|
-          dashboard.attribute_type_for(attr).new(attr, nil, :show, resource: resource)
+          build_field(attr, :show)
         end
       end
 
       private
+
+      def build_field(attr, mode)
+        extra = @has_many_params[attr.to_sym] || {}
+        dashboard.attribute_type_for(attr).new(attr, nil, mode, resource: resource, options: extra)
+      end
 
       def normalize_groups(attrs, mode)
         if attrs.is_a?(Hash)
           attrs.map do |group_name, fields|
             {
               name: group_name,
-              fields: fields.map { |attr| dashboard.attribute_type_for(attr).new(attr, nil, mode, resource: resource) }
+              fields: fields.map { |attr| build_field(attr, mode) }
             }
           end
         else
           [{
             name: "",
-            fields: attrs.map { |attr| dashboard.attribute_type_for(attr).new(attr, nil, mode, resource: resource) }
+            fields: attrs.map { |attr| build_field(attr, mode) }
           }]
         end
       end

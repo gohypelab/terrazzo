@@ -42,21 +42,39 @@ RSpec.describe Terrazzo::Field::HasMany do
       expect(result[:rows].first).to have_key(:id)
       expect(result[:rows].first).to have_key(:cells)
       expect(result[:total]).to eq(2)
-      expect(result[:initialLimit]).to eq(5)
+      expect(result[:currentPage]).to eq(1)
+      expect(result[:totalPages]).to eq(1)
+      expect(result[:perPage]).to eq(5)
     end
 
-    it "sends all items with initialLimit for frontend truncation" do
-      3.times { create_order(customer: customer) }
+    it "paginates to the requested page" do
+      6.times { create_order(customer: customer) }
+      field = described_class.new(:orders, nil, :show, resource: customer, options: { per_page: 3, _page: 2 })
+      result = field.serialize_value(:show)
+      expect(result[:rows].length).to eq(3)
+      expect(result[:total]).to eq(8)
+      expect(result[:currentPage]).to eq(2)
+      expect(result[:totalPages]).to eq(3)
+      expect(result[:perPage]).to eq(3)
+    end
+
+    it "honors legacy :limit option as per_page fallback" do
       field = described_class.new(:orders, nil, :show, resource: customer, options: { limit: 2 })
       result = field.serialize_value(:show)
-      expect(result[:rows].length).to eq(5)
-      expect(result[:total]).to eq(5)
-      expect(result[:initialLimit]).to eq(2)
-      expect(result[:headers]).to be_an(Array)
+      expect(result[:perPage]).to eq(2)
+      expect(result[:rows].length).to eq(2)
     end
 
-    it "uses default limit of 5" do
-      expect(described_class.default_options[:limit]).to eq(5)
+    it "clamps _page < 1 to 1" do
+      field = described_class.new(:orders, nil, :show, resource: customer, options: { _page: -5 })
+      result = field.serialize_value(:show)
+      expect(result[:currentPage]).to eq(1)
+    end
+
+    it "uses default per_page of 5" do
+      field = described_class.new(:orders, nil, :show, resource: customer)
+      result = field.serialize_value(:show)
+      expect(result[:perPage]).to eq(5)
     end
 
     it "returns array of selected IDs for :form" do
