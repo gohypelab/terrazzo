@@ -52,6 +52,7 @@ RSpec.describe Terrazzo::Field::HasMany do
       expect(result[:rows].length).to eq(2)
       expect(result[:total]).to eq(5)
       expect(result[:initialLimit]).to eq(2)
+      expect(result[:offset]).to eq(0)
       expect(result[:headers]).to be_an(Array)
     end
 
@@ -60,6 +61,26 @@ RSpec.describe Terrazzo::Field::HasMany do
       field = described_class.new(:orders, nil, :show, resource: customer, options: { limit: 2 })
       field.serialize_value(:show)
       expect(field.show_records.length).to eq(2)
+    end
+
+    it "paginates with show_offset" do
+      3.times { create_order(customer: customer) }
+      field = described_class.new(:orders, nil, :show, resource: customer, options: { limit: 2 })
+      field.show_offset = 2
+      result = field.serialize_value(:show)
+      expect(result[:rows].length).to eq(2)
+      expect(result[:total]).to eq(5)
+      expect(result[:offset]).to eq(2)
+    end
+
+    it "returns remaining records on the last page" do
+      3.times { create_order(customer: customer) }
+      field = described_class.new(:orders, nil, :show, resource: customer, options: { limit: 2 })
+      field.show_offset = 4
+      result = field.serialize_value(:show)
+      expect(result[:rows].length).to eq(1)
+      expect(result[:total]).to eq(5)
+      expect(result[:offset]).to eq(4)
     end
 
     it "loads all records when limit is 0" do

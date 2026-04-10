@@ -4,6 +4,11 @@ show_field_json = ->(json, field) do
   json.attribute field.attribute.to_s
   json.label field.attribute.to_s.humanize
   json.fieldType field.field_type
+
+  if field.is_a?(Terrazzo::Field::HasMany)
+    field.show_offset = params.dig(:offsets, field.attribute.to_s)&.to_i
+  end
+
   json.value field.serialize_value(:show)
   json.options field.serializable_options
 
