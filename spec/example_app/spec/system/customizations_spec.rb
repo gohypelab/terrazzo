@@ -185,4 +185,86 @@ RSpec.describe "Admin Customizations", type: :system do
       expect(release_row).to have_text("2024 AD")
     end
   end
+
+  describe "has_many pagination" do
+    let!(:customer) { create(:customer, name: "Paginate Customer", territory: country) }
+
+    before do
+      12.times { create(:order, customer: customer) }
+    end
+
+    it "shows 5 rows on page 1 with correct pagination info" do
+      visit admin_customer_path(customer)
+
+      orders_dd = find("dt", text: "Orders").find(:xpath, "..").find("dd")
+      within(orders_dd) do
+        expect(all("tbody tr").count).to eq(5)
+        expect(page).to have_text("Page 1 of 3")
+        expect(page).to have_text("12 total")
+      end
+    end
+
+    it "shows disabled Prev and enabled Next on page 1" do
+      visit admin_customer_path(customer)
+
+      orders_dd = find("dt", text: "Orders").find(:xpath, "..").find("dd")
+      within(orders_dd) do
+        expect(page).to have_button("Prev", disabled: true)
+        expect(page).to have_link("Next")
+      end
+    end
+
+    it "navigates to page 2 and updates URL" do
+      visit admin_customer_path(customer)
+
+      orders_dd = find("dt", text: "Orders").find(:xpath, "..").find("dd")
+      within(orders_dd) do
+        click_link "Next"
+      end
+
+      expect(page).to have_current_path(/hm_orders_page=2/)
+      orders_dd = find("dt", text: "Orders").find(:xpath, "..").find("dd")
+      within(orders_dd) do
+        expect(all("tbody tr").count).to eq(5)
+        expect(page).to have_text("Page 2 of 3")
+      end
+    end
+
+    it "shows disabled Next on the last page" do
+      visit admin_customer_path(customer, hm_orders_page: 3)
+
+      orders_dd = find("dt", text: "Orders").find(:xpath, "..").find("dd")
+      within(orders_dd) do
+        expect(all("tbody tr").count).to eq(2)
+        expect(page).to have_text("Page 3 of 3")
+        expect(page).to have_link("Prev")
+        expect(page).to have_button("Next", disabled: true)
+      end
+    end
+
+    it "does not show 'Show more' text" do
+      visit admin_customer_path(customer)
+      expect(page).not_to have_text("Show more")
+    end
+
+    it "paginates each has_many independently" do
+      8.times { create(:log_entry, loggable: customer, action: "login") }
+
+      visit admin_customer_path(customer, hm_orders_page: 2)
+
+      # Orders on page 2
+      orders_dd = find("dt", text: "Orders").find(:xpath, "..").find("dd")
+      within(orders_dd) { expect(page).to have_text("Page 2 of 3") }
+
+      # Navigate log_entries to page 2
+      log_entries_dd = find("dt", text: "Log entries").find(:xpath, "..").find("dd")
+      within(log_entries_dd) { click_link "Next" }
+
+      expect(page).to have_current_path(/hm_orders_page=2/)
+      expect(page).to have_current_path(/hm_log_entries_page=2/)
+
+      orders_dd = find("dt", text: "Orders").find(:xpath, "..").find("dd")
+      within(orders_dd) { expect(page).to have_text("Page 2 of 3") }
+    end
+  end
 end
