@@ -15,7 +15,8 @@ module Terrazzo
         only_path: true,
         controller: controller_path,
         action: :show,
-        id: resource.to_param
+        id: resource.to_param,
+        format: nil
       )
       {
         prevPagePath: (field.current_page > 1 ? url_for(base.merge(param_key => field.current_page - 1)) : nil),
