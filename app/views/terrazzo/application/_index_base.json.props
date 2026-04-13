@@ -60,12 +60,12 @@ json.pagination do
   if @resources.next_page
     json.nextPagePath url_for(
       _page: @resources.next_page,
+      per_page: params[:per_page],
       search: @search_term,
       order: params[:order],
       direction: params[:direction],
       filter: @active_filter,
       filter_value: @filter_value,
-      props_at: "data.pagination",
       only_path: true
     )
   else
@@ -74,12 +74,12 @@ json.pagination do
   if @resources.prev_page
     json.prevPagePath url_for(
       _page: @resources.prev_page,
+      per_page: params[:per_page],
       search: @search_term,
       order: params[:order],
       direction: params[:direction],
       filter: @active_filter,
       filter_value: @filter_value,
-      props_at: "data.pagination",
       only_path: true
     )
   else

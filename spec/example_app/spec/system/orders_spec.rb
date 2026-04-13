@@ -38,6 +38,18 @@ RSpec.describe "Admin Orders", type: :system do
       expect(page).to have_link("Previous")
       expect(page).to have_css('[aria-label="Go to next page"].pointer-events-none')
     end
+
+    it "navigates to page 2 by clicking Next" do
+      visit admin_orders_path
+
+      page1_rows = all("table tbody tr").count
+      click_link "Next"
+
+      expect(page).to have_link("Previous")
+      expect(page).to have_css('[aria-label="Go to next page"].pointer-events-none')
+      # Page 2 should have the remaining row (26 total - 25 on page 1 = 1)
+      expect(all("table tbody tr").count).to eq(1)
+    end
   end
 
   describe "show" do

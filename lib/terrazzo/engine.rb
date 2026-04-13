@@ -2,6 +2,14 @@ module Terrazzo
   class Engine < ::Rails::Engine
     isolate_namespace Terrazzo
 
+    initializer "terrazzo.props_searcher_partial" do
+      Props::Searcher.class_eval do
+        def partial!(**options)
+          @context.render options
+        end
+      end
+    end
+
     initializer "terrazzo.i18n" do
       Terrazzo::Engine.root.glob("config/locales/**/*.yml").each do |locale|
         I18n.load_path << locale unless I18n.load_path.include?(locale)
