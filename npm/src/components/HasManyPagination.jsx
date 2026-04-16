@@ -6,7 +6,9 @@ export function HasManyPagination({ currentPage, totalPages, total, nextPagePath
   if (totalPages <= 1) return null;
 
   const updateUrl = (path) => (event) => {
-    window.history.replaceState(window.history.state, "", path);
+    const url = new URL(path, window.location.origin);
+    url.searchParams.delete("props_at");
+    window.history.replaceState(window.history.state, "", url.pathname + url.search);
   };
 
   return (

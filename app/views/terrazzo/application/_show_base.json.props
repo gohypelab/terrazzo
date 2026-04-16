@@ -25,13 +25,17 @@ show_field_json = ->(json, field) do
 end
 
 json.attributes do
+  @page.grouped_attributes.flat_map { |g| g[:fields] }.each do |field|
+    json.set!(field.attribute.to_s) do
+      show_field_json.call(json, field)
+    end
+  end
+end
+
+json.attributeGroups do
   json.array! @page.grouped_attributes do |group|
     json.name group[:name]
-    json.attributes do
-      json.array! group[:fields] do |field|
-        show_field_json.call(json, field)
-      end
-    end
+    json.attributeKeys group[:fields].map { |f| f.attribute.to_s }
   end
 end
 

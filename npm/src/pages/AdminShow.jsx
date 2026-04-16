@@ -10,6 +10,7 @@ export default function AdminShow() {
   const {
     pageTitle,
     attributes,
+    attributeGroups,
     editPath,
     deletePath,
     indexPath,
@@ -54,7 +55,7 @@ export default function AdminShow() {
         </div>
       }>
 
-      {attributes.map((group, groupIndex) =>
+      {attributeGroups.map((group, groupIndex) =>
         <Card key={groupIndex}>
           {group.name && (
             <CardHeader>
@@ -63,22 +64,25 @@ export default function AdminShow() {
           )}
           <CardContent className={group.name ? "" : "pt-6"}>
             <dl className="divide-y">
-              {group.attributes.map((attr) =>
-              <div key={attr.attribute} className="py-4 grid grid-cols-3 gap-4">
-                  <dt className="text-sm font-medium text-muted-foreground">
-                    {attr.label}
-                  </dt>
-                  <dd className="col-span-2 text-sm">
-                    {attr.showPath ? (
-                      <a href={attr.showPath} data-sg-visit className="hover:underline">
+              {group.attributeKeys.map((key) => {
+                const attr = attributes[key];
+                return (
+                  <div key={key} className="py-4 grid grid-cols-3 gap-4">
+                    <dt className="text-sm font-medium text-muted-foreground">
+                      {attr.label}
+                    </dt>
+                    <dd className="col-span-2 text-sm">
+                      {attr.showPath ? (
+                        <a href={attr.showPath} data-sg-visit className="hover:underline">
+                          <FieldRenderer mode="show" {...attr} />
+                        </a>
+                      ) : (
                         <FieldRenderer mode="show" {...attr} />
-                      </a>
-                    ) : (
-                      <FieldRenderer mode="show" {...attr} />
-                    )}
-                  </dd>
-                </div>
-              )}
+                      )}
+                    </dd>
+                  </div>
+                );
+              })}
             </dl>
           </CardContent>
         </Card>

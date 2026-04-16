@@ -16,7 +16,8 @@ module Terrazzo
         controller: controller_path,
         action: :show,
         id: resource.to_param,
-        format: nil
+        format: nil,
+        props_at: "data.attributes.#{field.attribute}"
       )
       {
         prevPagePath: (field.current_page > 1 ? url_for(base.merge(param_key => field.current_page - 1)) : nil),
