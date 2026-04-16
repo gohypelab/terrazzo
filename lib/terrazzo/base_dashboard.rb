@@ -58,6 +58,10 @@ module Terrazzo
       attribute_types.select { |_attr, type| type.searchable? }.keys
     end
 
+    def has_many_attributes
+      attribute_types.select { |_attr, type| type.field_type == "has_many" }.keys
+    end
+
     def display_resource(resource)
       "#{resource.class.name} ##{resource.id}"
     end

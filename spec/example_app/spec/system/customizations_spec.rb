@@ -222,7 +222,7 @@ RSpec.describe "Admin Customizations", type: :system do
         click_link "Next"
       end
 
-      expect(page).to have_current_path(/hm_orders_page=2/)
+      expect(page).to have_current_path(/orders_page=2/)
       orders_dd = find("dt", text: "Orders").find(:xpath, "..").find("dd")
       within(orders_dd) do
         expect(all("tbody tr").count).to eq(5)
@@ -231,7 +231,7 @@ RSpec.describe "Admin Customizations", type: :system do
     end
 
     it "shows disabled Next on the last page" do
-      visit admin_customer_path(customer, hm_orders_page: 3)
+      visit admin_customer_path(customer, orders_page: 3)
 
       orders_dd = find("dt", text: "Orders").find(:xpath, "..").find("dd")
       within(orders_dd) do
@@ -250,7 +250,7 @@ RSpec.describe "Admin Customizations", type: :system do
     it "paginates each has_many independently" do
       8.times { create(:log_entry, loggable: customer, action: "login") }
 
-      visit admin_customer_path(customer, hm_orders_page: 2)
+      visit admin_customer_path(customer, orders_page: 2)
 
       # Orders on page 2
       orders_dd = find("dt", text: "Orders").find(:xpath, "..").find("dd")
@@ -260,8 +260,8 @@ RSpec.describe "Admin Customizations", type: :system do
       log_entries_dd = find("dt", text: "Log entries").find(:xpath, "..").find("dd")
       within(log_entries_dd) { click_link "Next" }
 
-      expect(page).to have_current_path(/hm_orders_page=2/)
-      expect(page).to have_current_path(/hm_log_entries_page=2/)
+      expect(page).to have_current_path(/orders_page=2/)
+      expect(page).to have_current_path(/log_entries_page=2/)
 
       orders_dd = find("dt", text: "Orders").find(:xpath, "..").find("dd")
       within(orders_dd) { expect(page).to have_text("Page 2 of 3") }

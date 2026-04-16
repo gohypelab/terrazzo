@@ -46,7 +46,7 @@ module Terrazzo
       @resource = find_resource(params[:id])
       @page = Terrazzo::Page::Show.new(
         dashboard, @resource,
-        has_many_params: Terrazzo::HasManyPagination.extract(params)
+        has_many_params: Terrazzo::HasManyPagination.extract(params, dashboard.has_many_attributes)
       )
     end
 
