@@ -12,7 +12,7 @@ module Terrazzo
       case column.type
       when :string
         if column.name.end_with?("_id")
-          "Field::Number"
+          "Field::String"
         elsif column.name.include?("email")
           "Field::Email"
         elsif column.name.include?("url") || column.name.include?("link")

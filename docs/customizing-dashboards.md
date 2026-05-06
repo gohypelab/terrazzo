@@ -8,7 +8,7 @@ Dashboards define which fields appear on each page of your admin panel. The DSL 
 # app/dashboards/product_dashboard.rb
 class ProductDashboard < Terrazzo::BaseDashboard
   ATTRIBUTE_TYPES = {
-    id: Field::Number,
+    id: Field::String,
     name: Field::String,
     price: Field::Number.with_options(prefix: "$", decimals: 2),
     description: Field::Text,
