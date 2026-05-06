@@ -58,6 +58,7 @@ Creates:
 - Appends entries to `page_to_page_mapping.js` (esbuild/Sprockets only)
 
 The generator inspects your model's columns and associations:
+- Primary key columns → `Field::String`
 - String columns → `Field::String`
 - Integer/float columns → `Field::Number`
 - Boolean columns → `Field::Boolean`
