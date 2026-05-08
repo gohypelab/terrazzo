@@ -3,7 +3,7 @@ require "spec_helper"
 # Dashboard with filters for testing
 class FilterTestDashboard < Terrazzo::BaseDashboard
   ATTRIBUTE_TYPES = {
-    id: Terrazzo::Field::Number,
+    id: Terrazzo::Field::String,
     name: Terrazzo::Field::String,
     email: Terrazzo::Field::Email,
   }.freeze
@@ -20,7 +20,7 @@ end
 
 class NoFilterDashboard < Terrazzo::BaseDashboard
   ATTRIBUTE_TYPES = {
-    id: Terrazzo::Field::Number,
+    id: Terrazzo::Field::String,
     name: Terrazzo::Field::String,
   }.freeze
 

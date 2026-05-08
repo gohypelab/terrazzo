@@ -61,7 +61,7 @@ module Terrazzo
         types = {}
 
         # ID first
-        types[:id] = "Field::Number"
+        types[:id] = "Field::String"
 
         # Columns
         columns.each do |col|

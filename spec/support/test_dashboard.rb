@@ -9,7 +9,7 @@ class CustomerDashboard < Terrazzo::BaseDashboard
   end
 
   ATTRIBUTE_TYPES = {
-    id: Terrazzo::Field::Number,
+    id: Terrazzo::Field::String,
     name: Terrazzo::Field::String.with_options(searchable: true),
     email: Terrazzo::Field::Email.with_options(searchable: true),
     created_at: Terrazzo::Field::DateTime,
@@ -64,7 +64,7 @@ end
 
 class OrderDashboard < Terrazzo::BaseDashboard
   ATTRIBUTE_TYPES = {
-    id: Terrazzo::Field::Number,
+    id: Terrazzo::Field::String,
     customer: Terrazzo::Field::BelongsTo,
     address_line_one: Terrazzo::Field::String,
     created_at: Terrazzo::Field::DateTime,

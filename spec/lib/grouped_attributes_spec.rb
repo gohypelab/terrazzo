@@ -2,7 +2,7 @@ require "spec_helper"
 
 class GroupedShowDashboard < Terrazzo::BaseDashboard
   ATTRIBUTE_TYPES = {
-    id: Terrazzo::Field::Number,
+    id: Terrazzo::Field::String,
     name: Terrazzo::Field::String,
     email: Terrazzo::Field::Email,
     created_at: Terrazzo::Field::DateTime,
@@ -25,7 +25,7 @@ end
 
 class FlatDashboard < Terrazzo::BaseDashboard
   ATTRIBUTE_TYPES = {
-    id: Terrazzo::Field::Number,
+    id: Terrazzo::Field::String,
     name: Terrazzo::Field::String,
     email: Terrazzo::Field::Email,
   }.freeze
