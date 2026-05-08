@@ -62,11 +62,7 @@ module Terrazzo
       end
 
       def page_records
-        @page_records ||= begin
-          records = paginated.to_a
-          preload_record_associations(records)
-          records
-        end
+        @page_records ||= paginated.to_a
       end
 
       private
@@ -79,43 +75,53 @@ module Terrazzo
         end
       end
 
-      def preload_record_associations(records, associations = options[:preload])
-        return unless associations.present? && records.any?
-
-        ActiveRecord::Associations::Preloader.new(records: records, associations: associations).call
-      end
-
       def serialize_show_value
-        col_attrs = options[:collection_attributes] || resolve_default_collection_attributes
+        col_attrs = collection_attributes_for_show
         records = page_records
 
-        meta = {
+        preload_records(records, preload_associations_for(col_attrs))
+
+        if col_attrs
+          { **serialize_with_collection_attributes(records, col_attrs), **pagination_meta }
+        else
+          {
+            items: records.map { |r| { id: r.id.to_s, display: display_name(r) } },
+            **pagination_meta,
+          }
+        end
+      end
+
+      def collection_attributes_for_show
+        return options[:collection_attributes] if options.key?(:collection_attributes)
+
+        associated_dashboard.collection_attributes
+      rescue NameError
+        nil
+      end
+
+      def pagination_meta
+        {
           total: total_count,
           perPage: per_page,
           currentPage: current_page,
           totalPages: total_pages,
         }
-
-        if col_attrs
-          preload_record_associations(records, collection_includes_for(col_attrs))
-          { **serialize_with_collection_attributes(records, col_attrs), **meta }
-        else
-          {
-            items: records.map { |r| { id: r.id.to_s, display: display_name(r) } },
-            **meta,
-          }
-        end
       end
 
-      def resolve_default_collection_attributes
-        dashboard_class = find_associated_dashboard
-        dashboard_class.new.collection_attributes
-      rescue NameError
-        nil
+      def preload_associations_for(collection_attributes)
+        inferred = collection_attributes ? collection_includes_for(collection_attributes) : []
+        [options[:preload], inferred].flatten.compact.uniq
+      end
+
+      def preload_records(records, associations)
+        associations = Array(associations).flatten.compact.uniq
+        return if records.empty? || associations.empty?
+
+        ActiveRecord::Associations::Preloader.new(records: records, associations: associations).call
       end
 
       def serialize_with_collection_attributes(records, col_attrs)
-        dashboard_class = find_associated_dashboard
+        dashboard = associated_dashboard
 
         headers = col_attrs.map do |attr|
           { attribute: attr.to_s, label: attr.to_s.humanize }
@@ -123,7 +129,7 @@ module Terrazzo
 
         rows = records.map do |record|
           cells = col_attrs.map do |attr|
-            field = dashboard_class.new.attribute_type_for(attr).new(attr, nil, :index, resource: record)
+            field = dashboard.attribute_type_for(attr).new(attr, nil, :index, resource: record)
             {
               attribute: attr.to_s,
               fieldType: field.field_type,
@@ -147,7 +153,11 @@ module Terrazzo
         end
         scope = scope.includes(*options[:includes]) if options.key?(:includes)
         pk = association_primary_key
-        dashboard = associated_dashboard
+        dashboard = begin
+          associated_dashboard
+        rescue NameError
+          nil
+        end
         scope.map { |r| [dashboard ? dashboard.display_resource(r) : display_name(r), r.public_send(pk).to_s] }
       end
 
@@ -170,8 +180,14 @@ module Terrazzo
         "#{klass.name}Dashboard".constantize
       end
 
+      def associated_dashboard
+        return @associated_dashboard if instance_variable_defined?(:@associated_dashboard)
+
+        @associated_dashboard = find_associated_dashboard.new
+      end
+
       def collection_includes_for(col_attrs)
-        find_associated_dashboard.new.includes_for_attributes(col_attrs)
+        associated_dashboard.includes_for_attributes(col_attrs)
       rescue NameError
         []
       end

@@ -69,6 +69,59 @@ RSpec.describe Terrazzo::Field::HasMany do
       expect(field.page_records.first.association(:line_items)).to be_loaded
     end
 
+    it "preloads explicit and inferred associations together" do
+      order = customer.orders.first
+      product = Product.create!(
+        name: "Widget",
+        price: 19.99,
+        description: "A test product",
+        image_url: "https://example.com/widget.png"
+      )
+      LineItem.create!(order: order, product: product, unit_price: 19.99, quantity: 1)
+      Payment.create!(order: order)
+
+      field = described_class.new(
+        :orders,
+        nil,
+        :show,
+        resource: customer,
+        options: { collection_attributes: [:id, :line_items], preload: :payments }
+      )
+      field.serialize_value(:show)
+
+      record = field.page_records.first
+      expect(record.association(:line_items)).to be_loaded
+      expect(record.association(:payments)).to be_loaded
+    end
+
+    it "falls back to simple items when no associated dashboard exists" do
+      hide_const("OrderDashboard")
+
+      field = described_class.new(:orders, nil, :show, resource: customer)
+      result = field.serialize_value(:show)
+
+      expect(result[:items]).to match_array(
+        customer.orders.map { |order| { id: order.id.to_s, display: "Order ##{order.id}" } }
+      )
+      expect(result).not_to have_key(:headers)
+      expect(result).not_to have_key(:rows)
+      expect(result[:total]).to eq(2)
+    end
+
+    it "does not preload empty page records" do
+      empty_customer = create_customer(name: "Empty")
+      field = described_class.new(
+        :orders,
+        nil,
+        :show,
+        resource: empty_customer,
+        options: { collection_attributes: [:id, :line_items], preload: :payments }
+      )
+
+      expect(ActiveRecord::Associations::Preloader).not_to receive(:new)
+      field.serialize_value(:show)
+    end
+
     it "paginates to the requested page" do
       6.times { create_order(customer: customer) }
       field = described_class.new(:orders, nil, :show, resource: customer, options: { per_page: 3, _page: 2 })
@@ -155,7 +208,7 @@ RSpec.describe Terrazzo::Field::HasMany do
   end
 
   describe "#page_records" do
-    it "preloads requested associations on the paginated records" do
+    it "materializes the paginated records without preloading" do
       customer = create_customer(name: "Alice")
       order = create_order(customer: customer)
       product = Product.create!(
@@ -170,7 +223,7 @@ RSpec.describe Terrazzo::Field::HasMany do
       records = field.page_records
 
       expect(records).to contain_exactly(order)
-      expect(records.first.association(:line_items)).to be_loaded
+      expect(records.first.association(:line_items)).not_to be_loaded
     end
   end
 
