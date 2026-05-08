@@ -20,5 +20,8 @@ docs/node_modules/
 docs/.vitepress/dist/
 docs/.vitepress/cache/
 .claude/
+.agents/
+AGENTS.md
+spec/example_app/AGENTS.md
 **/master.key
 .DS_Store
