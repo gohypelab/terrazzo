@@ -29,10 +29,40 @@ module Terrazzo
 
     def default_collection_item_actions(resource)
       actions = []
-      actions << { label: "Show", url: polymorphic_path([namespace, resource]) } rescue nil
-      actions << { label: "Edit", url: edit_polymorphic_path([namespace, resource]) } rescue nil
-      actions << { label: "Destroy", url: polymorphic_path([namespace, resource]), method: "delete", confirm: "Are you sure?" } rescue nil
-      actions.compact
+      if collection_action_route?(resource, :show)
+        actions << { label: "Show", url: polymorphic_path([namespace, resource]) }
+      end
+      if collection_action_route?(resource, :edit)
+        actions << { label: "Edit", url: edit_polymorphic_path([namespace, resource]) }
+      end
+      if collection_action_route?(resource, :destroy)
+        actions << {
+          label: "Destroy",
+          url: polymorphic_path([namespace, resource]),
+          method: "delete",
+          confirm: "Are you sure?"
+        }
+      end
+      actions
+    end
+
+    def collection_action_route?(resource, action)
+      path =
+        case action
+        when :edit
+          edit_polymorphic_path([namespace, resource])
+        else
+          polymorphic_path([namespace, resource])
+        end
+
+      recognized = Rails.application.routes.recognize_path(path, method: collection_action_http_method(action))
+      recognized[:action] == action.to_s
+    rescue ActionController::RoutingError, ActionController::UrlGenerationError, NoMethodError
+      false
+    end
+
+    def collection_action_http_method(action)
+      action == :destroy ? :delete : :get
     end
   end
 end

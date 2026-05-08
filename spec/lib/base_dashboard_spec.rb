@@ -127,6 +127,13 @@ RSpec.describe Terrazzo::BaseDashboard do
     end
   end
 
+  describe "#includes_for_attributes" do
+    it "returns eager-loadable attributes from the provided attributes" do
+      includes = dashboard.includes_for_attributes([:orders, :name])
+      expect(includes).to eq([:orders])
+    end
+  end
+
   describe ".model" do
     it "derives model class from dashboard name" do
       expect(CustomerDashboard.model).to eq(Customer)

@@ -62,7 +62,11 @@ module Terrazzo
       end
 
       def page_records
-        paginated.to_a
+        @page_records ||= begin
+          records = paginated.to_a
+          preload_record_associations(records)
+          records
+        end
       end
 
       private
@@ -75,8 +79,15 @@ module Terrazzo
         end
       end
 
+      def preload_record_associations(records, associations = options[:preload])
+        return unless associations.present? && records.any?
+
+        ActiveRecord::Associations::Preloader.new(records: records, associations: associations).call
+      end
+
       def serialize_show_value
         col_attrs = options[:collection_attributes] || resolve_default_collection_attributes
+        records = page_records
 
         meta = {
           total: total_count,
@@ -86,10 +97,11 @@ module Terrazzo
         }
 
         if col_attrs
-          { **serialize_with_collection_attributes(page_records, col_attrs), **meta }
+          preload_record_associations(records, collection_includes_for(col_attrs))
+          { **serialize_with_collection_attributes(records, col_attrs), **meta }
         else
           {
-            items: page_records.map { |r| { id: r.id.to_s, display: display_name(r) } },
+            items: records.map { |r| { id: r.id.to_s, display: display_name(r) } },
             **meta,
           }
         end
@@ -156,6 +168,12 @@ module Terrazzo
       def find_associated_dashboard
         klass = associated_class
         "#{klass.name}Dashboard".constantize
+      end
+
+      def collection_includes_for(col_attrs)
+        find_associated_dashboard.new.includes_for_attributes(col_attrs)
+      rescue NameError
+        []
       end
     end
   end

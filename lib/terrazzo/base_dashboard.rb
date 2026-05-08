@@ -67,10 +67,14 @@ module Terrazzo
     end
 
     def collection_includes
-      collection_attr_set = Set.new(collection_attributes)
+      includes_for_attributes(collection_attributes)
+    end
+
+    def includes_for_attributes(attributes)
+      attribute_set = Set.new(flatten_attributes(attributes))
       model = self.class.model
       attribute_types.each_with_object([]) do |(attr, type), includes|
-        next unless collection_attr_set.include?(attr)
+        next unless attribute_set.include?(attr)
         next unless type.eager_load?
         has_association = model.reflect_on_association(attr)
         has_attachment = model.respond_to?(:reflect_on_attachment) && model.reflect_on_attachment(attr)
