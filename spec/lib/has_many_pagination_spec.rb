@@ -39,9 +39,9 @@ RSpec.describe Terrazzo::HasManyPagination do
       expect(result).to eq({ orders: { _page: 4 } })
     end
 
-    it "accepts legacy <attr>_page keys" do
+    it "ignores unprefixed <attr>_page keys" do
       result = described_class.extract({ orders_page: "4" }, [:orders])
-      expect(result).to eq({ orders: { _page: 4 } })
+      expect(result).to eq({})
     end
   end
 
