@@ -12,6 +12,12 @@ RSpec.describe "Admin Payments", type: :system do
 
       expect(page).to have_content(payment.id)
     end
+
+    it "does not show destroy actions when the destroy route is unavailable" do
+      visit admin_payments_path
+
+      expect(page).not_to have_link("Destroy")
+    end
   end
 
   describe "show" do
@@ -19,6 +25,12 @@ RSpec.describe "Admin Payments", type: :system do
       visit admin_payment_path(payment)
 
       expect(page).to have_content(payment.id)
+    end
+
+    it "does not show a delete button when the destroy route is unavailable" do
+      visit admin_payment_path(payment)
+
+      expect(page).not_to have_button("Delete")
     end
   end
 end

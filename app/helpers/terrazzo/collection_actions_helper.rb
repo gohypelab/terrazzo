@@ -1,5 +1,17 @@
 module Terrazzo
   module CollectionActionsHelper
+    DEFAULT_COLLECTION_ACTIONS = [
+      { action: :show, label: "Show", route: :polymorphic_path },
+      { action: :edit, label: "Edit", route: :edit_polymorphic_path },
+      {
+        action: :destroy,
+        label: "Destroy",
+        route: :polymorphic_path,
+        method: "delete",
+        confirm: "Are you sure?"
+      }
+    ].freeze
+
     def collection_item_actions(resource)
       resource_dashboard = "#{resource.class.name}Dashboard".safe_constantize&.new
       if resource_dashboard&.respond_to?(:collection_item_actions)
@@ -28,11 +40,18 @@ module Terrazzo
     private
 
     def default_collection_item_actions(resource)
-      actions = []
-      actions << { label: "Show", url: polymorphic_path([namespace, resource]) } rescue nil
-      actions << { label: "Edit", url: edit_polymorphic_path([namespace, resource]) } rescue nil
-      actions << { label: "Destroy", url: polymorphic_path([namespace, resource]), method: "delete", confirm: "Are you sure?" } rescue nil
-      actions.compact
+      DEFAULT_COLLECTION_ACTIONS.filter_map do |action|
+        url = public_send(action[:route], [namespace, resource])
+        next unless route_resolves_to_action?(url, action[:action], action.fetch(:method, "get"))
+
+        action.except(:action, :route).merge(url: url)
+      rescue ActionController::RoutingError, ActionController::UrlGenerationError, NoMethodError
+        nil
+      end
+    end
+
+    def route_resolves_to_action?(path, action, method)
+      Rails.application.routes.recognize_path(path, method: method)[:action] == action.to_s
     end
   end
 end

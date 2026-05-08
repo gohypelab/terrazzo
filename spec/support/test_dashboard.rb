@@ -66,6 +66,7 @@ class OrderDashboard < Terrazzo::BaseDashboard
   ATTRIBUTE_TYPES = {
     id: Terrazzo::Field::Number,
     customer: Terrazzo::Field::BelongsTo,
+    line_items: Terrazzo::Field::HasMany,
     address_line_one: Terrazzo::Field::String,
     created_at: Terrazzo::Field::DateTime,
   }.freeze

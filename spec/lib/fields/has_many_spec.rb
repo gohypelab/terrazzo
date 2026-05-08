@@ -47,6 +47,28 @@ RSpec.describe Terrazzo::Field::HasMany do
       expect(result[:perPage]).to eq(5)
     end
 
+    it "preloads associative fields shown in collection_attributes" do
+      order = customer.orders.first
+      product = Product.create!(
+        name: "Widget",
+        price: 19.99,
+        description: "A test product",
+        image_url: "https://example.com/widget.png"
+      )
+      LineItem.create!(order: order, product: product, unit_price: 19.99, quantity: 1)
+
+      field = described_class.new(
+        :orders,
+        nil,
+        :show,
+        resource: customer,
+        options: { collection_attributes: [:id, :line_items] }
+      )
+      field.serialize_value(:show)
+
+      expect(field.page_records.first.association(:line_items)).to be_loaded
+    end
+
     it "paginates to the requested page" do
       6.times { create_order(customer: customer) }
       field = described_class.new(:orders, nil, :show, resource: customer, options: { per_page: 3, _page: 2 })
@@ -129,6 +151,26 @@ RSpec.describe Terrazzo::Field::HasMany do
       field = described_class.new(:orders, nil, :show, resource: customer)
       expect(field.serializable_options).to eq({})
       expect(field.serializable_options(:show)).to eq({})
+    end
+  end
+
+  describe "#page_records" do
+    it "preloads requested associations on the paginated records" do
+      customer = create_customer(name: "Alice")
+      order = create_order(customer: customer)
+      product = Product.create!(
+        name: "Widget",
+        price: 19.99,
+        description: "A test product",
+        image_url: "https://example.com/widget.png"
+      )
+      LineItem.create!(order: order, product: product, unit_price: 19.99, quantity: 1)
+
+      field = described_class.new(:orders, nil, :show, resource: customer, options: { preload: :line_items })
+      records = field.page_records
+
+      expect(records).to contain_exactly(order)
+      expect(records.first.association(:line_items)).to be_loaded
     end
   end
 
