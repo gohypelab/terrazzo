@@ -31,9 +31,8 @@ module Terrazzo
           key = "'#{namespace_name}/#{resource_path}/#{action}'"
 
           content = File.read(mapping_file)
-          return if content.include?(key)
-
           ensure_generated_mapping_loaded
+          return if content.include?(key)
 
           import_line = "import #{component_name} from \"#{import_path}\";\n"
           insert_generated_import(mapping_path, content, import_line, component_name)
