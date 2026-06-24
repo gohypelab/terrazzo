@@ -33,6 +33,26 @@ describe("collection action components", () => {
     expect(deleteForm.querySelector('input[value="DELETE"]')).not.toBeInTheDocument();
   });
 
+  it("confirms toolbar form actions before submitting", () => {
+    const confirmSpy = vi.spyOn(window, "confirm").mockReturnValue(false);
+    const { container } = render(
+      <CollectionToolbarActions
+        actions={[
+          { label: "Sync", url: "/sync", method: "POST", confirm: "Sync now?" },
+        ]}
+      />
+    );
+
+    const form = container.querySelector('form[action="/sync"]');
+    const event = new Event("submit", { bubbles: true, cancelable: true });
+    const allowed = form.dispatchEvent(event);
+
+    expect(confirmSpy).toHaveBeenCalledWith("Sync now?");
+    expect(allowed).toBe(false);
+
+    confirmSpy.mockRestore();
+  });
+
   it("normalizes row action methods before rendering dropdown forms", async () => {
     render(
       <CollectionItemActions

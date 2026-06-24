@@ -163,7 +163,7 @@ The `view` parameter provides access to route helpers. Each action hash supports
 | `label` | Yes | Button text |
 | `url` | Yes | Link URL |
 | `method` | No | HTTP method (e.g. `"delete"` or `:delete`; normalized case-insensitively) — renders as a form instead of a link |
-| `confirm` | No | Confirmation message shown before executing (only used with `method: "delete"`) |
+| `confirm` | No | Confirmation message shown before submitting non-GET form actions |
 | `sg_visit` | No | Set to `false` to bypass SPA navigation and perform a standard browser request (useful for actions that redirect outside the admin) |
 
 Custom actions also appear in has_many tables on show pages — for example, if a Customer has_many Orders, the orders table on the customer show page will use the OrderDashboard's custom actions.
