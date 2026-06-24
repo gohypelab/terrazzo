@@ -240,8 +240,8 @@ module Terrazzo
       end
 
       def tailwind_package_script?
-        package_json_scripts.any? do |name, command|
-          name.to_s.include?("css") && command.to_s.include?("tailwindcss")
+        package_json_scripts.any? do |_name, command|
+          command.to_s.include?("tailwindcss")
         end
       end
 

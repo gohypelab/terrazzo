@@ -195,6 +195,17 @@ RSpec.describe Terrazzo::Generators::InstallGenerator do
     expect(run_tailwind_pipeline_verifier).to eq("")
   end
 
+  it "does not require Tailwind package scripts to include css in the script name" do
+    create_file "package.json", JSON.pretty_generate({
+      dependencies: described_class::FRONTEND_DEPENDENCIES.to_h { |package_name| [package_name, "*"] },
+      scripts: {
+        "build" => "vite build && tailwindcss -i app/assets/stylesheets/admin.css -o app/assets/builds/admin.css --minify",
+      },
+    })
+
+    expect(run_tailwind_pipeline_verifier).to eq("")
+  end
+
   it "does not warn when Tailwind CLI package tooling is installed" do
     create_file "package.json", JSON.pretty_generate({
       dependencies: described_class::FRONTEND_DEPENDENCIES.to_h { |package_name| [package_name, "*"] },
