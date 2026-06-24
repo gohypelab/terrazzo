@@ -173,6 +173,39 @@ RSpec.describe Terrazzo::Generators::EjectGenerator do
     end
   end
 
+  it "builds standalone ejections by creating missing app-level barrels" do
+    {
+      "pages/index" => <<~JS,
+        import AdminIndex from "./app/views/admin/application/index.jsx";
+        import { AdminCollection } from "./app/views/admin/application/_collection.jsx";
+        import { FieldRenderer } from "./app/views/admin/fields/index.js";
+        import { ResourceTable } from "./app/views/admin/components/index.js";
+        import { Button } from "./app/views/admin/components/ui/index.js";
+
+        console.log(AdminIndex, AdminCollection, FieldRenderer, ResourceTable, Button);
+      JS
+      "components/SearchBar" => <<~JS,
+        import { SearchBar } from "./app/views/admin/components/index.js";
+        import { Input } from "./app/views/admin/components/ui/index.js";
+
+        console.log(SearchBar, Input);
+      JS
+      "fields/string" => <<~JS,
+        import { FieldRenderer, StringFormField } from "./app/views/admin/fields/index.js";
+        import { Input } from "./app/views/admin/components/ui/index.js";
+
+        console.log(FieldRenderer, StringFormField, Input);
+      JS
+    }.each do |target, entry|
+      reset_destination_root
+      run_generator(described_class, [target])
+      create_node_package_link
+      create_file "standalone_entry.jsx", entry
+
+      expect_bundle_to_succeed("standalone_entry.jsx")
+    end
+  end
+
   it "keeps ejected implementation files on app-owned UI and component imports" do
     run_generator(Terrazzo::Generators::ViewsGenerator, [])
 

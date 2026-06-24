@@ -62,6 +62,7 @@ module Terrazzo
             "app/views/#{namespace_name}/fields/shared/#{dependency}.jsx"
         end
 
+        ensure_ui_barrel
         update_fields_barrel(field_type)
       end
 
@@ -77,6 +78,7 @@ module Terrazzo
           copy_component_template(component)
         end
 
+        ensure_ui_barrel
         update_components_barrel(name)
       end
 
@@ -104,6 +106,7 @@ module Terrazzo
           return
         end
 
+        ensure_page_barrels
         copy_file source, "app/views/#{namespace_name}/application/#{name}.jsx"
         page_dependencies(name).each do |dependency|
           copy_file "pages/#{dependency}.jsx", "app/views/#{namespace_name}/application/#{dependency}.jsx"
@@ -118,8 +121,6 @@ module Terrazzo
       end
 
       def update_fields_barrel(field_type)
-        barrel_path = "app/views/#{namespace_name}/fields/index.js"
-
         type_label = field_type.split("_").map(&:capitalize).join("")
         register_name = "register#{type_label}FieldType"
         local_exports = <<~JS.strip
@@ -138,14 +139,12 @@ module Terrazzo
           export { #{type_label}IndexField, #{type_label}ShowField, #{type_label}FormField };
         JS
 
-        ensure_barrel(barrel_path, 'export * from "terrazzo/fields";')
-        append_to_barrel(barrel_path, local_exports, "./#{field_type}/IndexField")
+        ensure_fields_barrel
+        append_to_barrel(fields_barrel_path, local_exports, "./#{field_type}/IndexField")
       end
 
       def update_components_barrel(name)
-        barrel_path = "app/views/#{namespace_name}/components/index.js"
         export_name = component_export_name(name)
-        ensure_barrel(barrel_path, 'export * from "terrazzo/components";')
 
         local_exports = if name == "Layout"
           <<~JS.strip
@@ -169,14 +168,14 @@ module Terrazzo
           JS
         end
 
-        append_to_barrel(barrel_path, local_exports, "./#{name}")
+        ensure_components_barrel
+        append_to_barrel(components_barrel_path, local_exports, "./#{name}")
       end
 
       def update_ui_barrel(name)
-        barrel_path = "app/views/#{namespace_name}/components/ui/index.js"
-        ensure_barrel(barrel_path, 'export * from "terrazzo/ui";')
         local_exports = ui_component_exports(name)
-        append_to_barrel(barrel_path, "// #{name} - ejected\nexport { #{local_exports} } from \"./#{name}\";", "./#{name}")
+        ensure_ui_barrel
+        append_to_barrel(ui_barrel_path, "// #{name} - ejected\nexport { #{local_exports} } from \"./#{name}\";", "./#{name}")
       end
 
       def component_export_name(file_name)
@@ -287,6 +286,36 @@ module Terrazzo
         return if content.include?(package_export)
 
         prepend_to_file barrel_path, "#{package_export}\n"
+      end
+
+      def ensure_page_barrels
+        ensure_fields_barrel
+        ensure_components_barrel
+        ensure_ui_barrel
+      end
+
+      def ensure_fields_barrel
+        ensure_barrel(fields_barrel_path, 'export * from "terrazzo/fields";')
+      end
+
+      def ensure_components_barrel
+        ensure_barrel(components_barrel_path, 'export * from "terrazzo/components";')
+      end
+
+      def ensure_ui_barrel
+        ensure_barrel(ui_barrel_path, 'export * from "terrazzo/ui";')
+      end
+
+      def fields_barrel_path
+        "app/views/#{namespace_name}/fields/index.js"
+      end
+
+      def components_barrel_path
+        "app/views/#{namespace_name}/components/index.js"
+      end
+
+      def ui_barrel_path
+        "app/views/#{namespace_name}/components/ui/index.js"
       end
 
       def append_to_barrel(barrel_path, content, marker)
