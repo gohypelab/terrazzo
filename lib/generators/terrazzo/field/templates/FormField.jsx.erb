@@ -1,5 +1,5 @@
 import React from "react";
-import { Input, Label } from "terrazzo/ui";
+import { Input, Label } from "../../components/ui";
 
 export function FormField({ attribute, label, value, input, required }) {
   return (
@@ -9,9 +9,8 @@ export function FormField({ attribute, label, value, input, required }) {
       </Label>
       <Input
         type="text"
-        id={input.id}
-        name={input.name}
         defaultValue={value ?? ""}
+        {...input}
       />
     </div>
   );

@@ -1,4 +1,5 @@
 require "rails/generators"
+require "set"
 require "terrazzo/generator_helpers"
 
 module Terrazzo
@@ -11,7 +12,7 @@ module Terrazzo
       class_option :namespace, type: :string, default: "admin",
         desc: "Admin namespace"
       class_option :bundler, type: :string, default: "vite",
-        desc: "JavaScript bundler (vite or sprockets)"
+        desc: "JavaScript bundler (vite, esbuild, or sprockets)"
 
       def create_dashboard
         template "dashboard.rb.erb",
@@ -24,28 +25,10 @@ module Terrazzo
       end
 
       def update_page_to_page_mapping
-        return if options[:bundler] == "vite"
-
-        mapping_path = "app/javascript/#{options[:namespace]}/page_to_page_mapping.js"
-        return unless File.exist?(mapping_path)
-
-        namespace_name = options[:namespace]
-        action_to_component = {
-          "index" => "AdminIndex",
-          "show" => "AdminShow",
-          "new" => "AdminNew",
-          "edit" => "AdminEdit"
-        }
-
-        action_to_component.each do |action, component|
-          key = "'#{namespace_name}/application/#{action}'"
-          mapping_path_content = File.read(mapping_path)
-          next if mapping_path_content.include?(key)
-
-          inject_into_file mapping_path, before: "}" do
-            "  #{key}: #{component},\n"
-          end
-        end
+        # The generated page mapping falls back from resource identifiers
+        # (admin/posts/index) to shared application pages (admin/application/index).
+        # Resource-specific page generators register their own mappings in
+        # generated_page_mapping.js when needed.
       end
 
       private
@@ -77,11 +60,18 @@ module Terrazzo
         else
           Set.new
         end
+        rich_text_association_names = rich_text_internal_association_names
+
+        rich_text_attribute_names.each do |name|
+          types[name] = "Field::RichText"
+        end
 
         # Associations
         associations.each do |assoc|
           # Skip Active Storage internal associations (e.g., document_attachment, document_blob)
           next if active_storage_internal?(assoc.name, attachment_names)
+          # Skip Action Text internals (e.g., rich_text_description)
+          next if rich_text_association_names.include?(assoc.name)
 
           case assoc.macro
           when :belongs_to
@@ -129,6 +119,18 @@ module Terrazzo
           att_s = att.to_s
           name == "#{att_s}_attachment" || name == "#{att_s}_blob" ||
             name == "#{att_s}_attachments" || name == "#{att_s}_blobs"
+          end
+      end
+
+      def rich_text_internal_association_names
+        return Set.new unless model_class.respond_to?(:rich_text_association_names)
+
+        model_class.rich_text_association_names.map(&:to_sym).to_set
+      end
+
+      def rich_text_attribute_names
+        rich_text_internal_association_names.map do |name|
+          name.to_s.sub(/\Arich_text_/, "").to_sym
         end
       end
 

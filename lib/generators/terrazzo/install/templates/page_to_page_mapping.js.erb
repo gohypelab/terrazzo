@@ -2,12 +2,20 @@ import AdminIndex from "../../views/<%= namespace_name %>/application/index";
 import AdminShow from "../../views/<%= namespace_name %>/application/show";
 import AdminNew from "../../views/<%= namespace_name %>/application/new";
 import AdminEdit from "../../views/<%= namespace_name %>/application/edit";
+import { generatedPageMapping } from "./generated_page_mapping";
+import { customPageMapping } from "./custom_page_mapping";
 
-const pages = {
+const applicationPages = {
   '<%= namespace_name %>/application/index': AdminIndex,
   '<%= namespace_name %>/application/show': AdminShow,
   '<%= namespace_name %>/application/new': AdminNew,
   '<%= namespace_name %>/application/edit': AdminEdit,
+}
+
+const pages = {
+  ...applicationPages,
+  ...generatedPageMapping,
+  ...customPageMapping,
 }
 
 // Resolves resource-specific page identifiers (e.g. "admin/orders/index")

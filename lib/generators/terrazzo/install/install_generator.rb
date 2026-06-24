@@ -1,3 +1,4 @@
+require "json"
 require "rails/generators"
 
 module Terrazzo
@@ -5,10 +6,43 @@ module Terrazzo
     class InstallGenerator < Rails::Generators::Base
       source_root File.expand_path("templates", __dir__)
 
+      FRONTEND_DEPENDENCIES = %w[
+        terrazzo
+        react
+        react-dom
+        react-redux
+        @reduxjs/toolkit
+        @thoughtbot/superglue
+        @radix-ui/react-avatar
+        @radix-ui/react-dialog
+        @radix-ui/react-dropdown-menu
+        @radix-ui/react-label
+        @radix-ui/react-popover
+        @radix-ui/react-select
+        @radix-ui/react-separator
+        @radix-ui/react-slot
+        @radix-ui/react-tooltip
+        class-variance-authority
+        lucide-react
+        tailwindcss
+      ].freeze
+
       class_option :namespace, type: :string, default: "admin",
         desc: "Admin namespace"
       class_option :bundler, type: :string, default: "vite",
-        desc: "JavaScript bundler (vite or sprockets)"
+        desc: "JavaScript bundler (vite, esbuild, or sprockets)"
+
+      def verify_database_schema
+        missing_tables = application_models.reject { |model| table_exists_for?(model) }
+        return if missing_tables.empty?
+
+        model_names = missing_tables.map(&:name).join(", ")
+        raise Thor::Error, <<~MESSAGE
+          Terrazzo could not generate dashboards because these models do not have database tables: #{model_names}
+
+          Run `bin/rails db:prepare` first, then run `bin/rails generate terrazzo:install` again.
+        MESSAGE
+      end
 
       def create_application_controller
         template "application_controller.rb.erb",
@@ -40,6 +74,16 @@ module Terrazzo
           "app/javascript/#{namespace_name}/page_to_page_mapping.js"
       end
 
+      def create_generated_page_mapping
+        template "generated_page_mapping.js.erb",
+          "app/javascript/#{namespace_name}/generated_page_mapping.js"
+      end
+
+      def create_custom_page_mapping
+        template "custom_page_mapping.js.erb",
+          "app/javascript/#{namespace_name}/custom_page_mapping.js"
+      end
+
       def create_application_visit
         template "application_visit.js.erb",
           "app/javascript/#{namespace_name}/application_visit.js"
@@ -69,6 +113,25 @@ module Terrazzo
         end
       end
 
+      def verify_frontend_dependencies
+        missing = missing_frontend_dependencies
+        return if missing.empty?
+
+        say_status :warning, "Missing frontend dependencies required by Terrazzo:", :yellow
+        say "  #{missing.join(" ")}"
+        say "Run: #{frontend_install_command(missing)}"
+      end
+
+      def verify_tailwind_build_pipeline
+        return if tailwind_build_pipeline?
+
+        say_status :warning, "Terrazzo generated app/assets/stylesheets/#{namespace_name}.css but no Tailwind build pipeline was detected.", :yellow
+        say "Make sure your app compiles that file with Tailwind before serving the admin UI."
+        say "For package.json scripts, install the Tailwind CLI and add a build script:"
+        say "  #{package_manager_add_dev_command} @tailwindcss/cli"
+        say %(  "build:#{namespace_name}:css": "tailwindcss -i app/assets/stylesheets/#{namespace_name}.css -o app/assets/builds/#{namespace_name}.css --minify")
+      end
+
       private
 
       def namespace_name
@@ -77,6 +140,84 @@ module Terrazzo
 
       def vite?
         options[:bundler] == "vite"
+      end
+
+      def missing_frontend_dependencies
+        installed = package_json_dependencies
+        FRONTEND_DEPENDENCIES.reject { |package_name| installed.key?(package_name) }
+      end
+
+      def package_json_dependencies
+        package_json_path = File.join(destination_root, "package.json")
+        return {} unless File.exist?(package_json_path)
+
+        package_json = parsed_package_json
+        %w[dependencies devDependencies peerDependencies optionalDependencies]
+          .each_with_object({}) do |section, dependencies|
+            dependencies.merge!(package_json.fetch(section, {}))
+          end
+      rescue JSON::ParserError
+        {}
+      end
+
+      def package_json_scripts
+        parsed_package_json.fetch("scripts", {})
+      rescue JSON::ParserError
+        {}
+      end
+
+      def parsed_package_json
+        @package_json ||= begin
+          package_json_path = File.join(destination_root, "package.json")
+          File.exist?(package_json_path) ? JSON.parse(File.read(package_json_path)) : {}
+        end
+      end
+
+      def frontend_install_command(packages)
+        "#{package_manager_add_command} #{packages.join(" ")}"
+      end
+
+      def package_manager_add_command
+        return "pnpm add" if File.exist?(File.join(destination_root, "pnpm-lock.yaml"))
+        return "yarn add" if File.exist?(File.join(destination_root, "yarn.lock"))
+        return "bun add" if File.exist?(File.join(destination_root, "bun.lock")) ||
+          File.exist?(File.join(destination_root, "bun.lockb"))
+
+        "npm install"
+      end
+
+      def package_manager_add_dev_command
+        return "pnpm add -D" if File.exist?(File.join(destination_root, "pnpm-lock.yaml"))
+        return "yarn add -D" if File.exist?(File.join(destination_root, "yarn.lock"))
+        return "bun add -d" if File.exist?(File.join(destination_root, "bun.lock")) ||
+          File.exist?(File.join(destination_root, "bun.lockb"))
+
+        "npm install --save-dev"
+      end
+
+      def tailwind_build_pipeline?
+        tailwind_package_script? ||
+          tailwind_package_tooling? ||
+          tailwind_rails_gem?
+      end
+
+      def tailwind_package_script?
+        package_json_scripts.any? do |name, command|
+          name.to_s.include?("css") && command.to_s.include?("tailwindcss")
+        end
+      end
+
+      def tailwind_package_tooling?
+        dependencies = package_json_dependencies
+        dependencies.key?("@tailwindcss/cli") ||
+          dependencies.key?("@tailwindcss/vite")
+      end
+
+      def tailwind_rails_gem?
+        %w[Gemfile Gemfile.lock].any? do |file_name|
+          path = File.join(destination_root, file_name)
+          File.exist?(path) && File.read(path).include?("tailwindcss-rails")
+        end
       end
 
       def application_models
@@ -90,6 +231,14 @@ module Terrazzo
 
           relative.delete_suffix(".rb").camelize.safe_constantize
         end.select { |klass| klass < ApplicationRecord && !klass.abstract_class? }
+      end
+
+      def table_exists_for?(model)
+        model.table_exists?
+      rescue ActiveRecord::ConnectionNotEstablished,
+        ActiveRecord::NoDatabaseError,
+        ActiveRecord::StatementInvalid
+        false
       end
     end
   end

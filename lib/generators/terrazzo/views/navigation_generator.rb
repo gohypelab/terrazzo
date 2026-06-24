@@ -1,16 +1,20 @@
 require "rails/generators"
+require "generators/terrazzo/views/eject_compatibility"
 
 module Terrazzo
   module Generators
     module Views
       class NavigationGenerator < Rails::Generators::Base
+        include EjectCompatibility
+
         source_root File.expand_path("templates", __dir__)
 
         class_option :namespace, type: :string, default: "admin",
           desc: "Admin namespace"
 
         def copy_navigation
-          copy_file "components/app-sidebar.jsx", "app/views/#{namespace_name}/components/app-sidebar.jsx"
+          run_eject("navigation")
+          run_eject("components/app-sidebar")
         end
 
         private

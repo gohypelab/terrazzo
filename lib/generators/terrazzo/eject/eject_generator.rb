@@ -68,14 +68,16 @@ module Terrazzo
 
       def eject_component
         name = component_name
-        source = "components/#{name}.jsx"
 
-        unless File.exist?(File.join(self.class.source_root, source))
+        unless component_template_exists?(name)
           say_status :error, "Unknown component '#{name}'", :red
           return
         end
 
-        copy_file source, "app/views/#{namespace_name}/components/#{name}.jsx"
+        ([name] + component_dependencies(name)).uniq.each do |component|
+          copy_component_template(component)
+        end
+
         update_components_barrel(name)
       end
 
@@ -88,8 +90,10 @@ module Terrazzo
           return
         end
 
-        copy_file source, "app/views/#{namespace_name}/components/ui/#{name}.jsx"
-        update_ui_barrel(name)
+        ([name] + ui_dependencies(name)).uniq.each do |component|
+          copy_ui_template(component)
+          update_ui_barrel(component)
+        end
       end
 
       def eject_page
@@ -102,12 +106,14 @@ module Terrazzo
         end
 
         copy_file source, "app/views/#{namespace_name}/application/#{name}.jsx"
+        page_dependencies(name).each do |dependency|
+          copy_file "pages/#{dependency}.jsx", "app/views/#{namespace_name}/application/#{dependency}.jsx"
+        end
       end
 
       def eject_navigation
-        source = File.join(Terrazzo::Engine.root, "app/views/terrazzo/application/_navigation.json.props")
         dest = "app/views/#{namespace_name}/application/_navigation.json.props"
-        copy_file source, dest
+        copy_file "pages/_navigation.json.props", dest
         say "\nNavigation partial ejected to #{dest}.", :green
         say "Edit it to customize your admin navigation."
       end
@@ -118,113 +124,64 @@ module Terrazzo
 
       def update_fields_barrel(field_type)
         barrel_path = "app/views/#{namespace_name}/fields/index.js"
-        barrel_file = File.join(destination_root, barrel_path)
 
         type_label = field_type.split("_").map(&:capitalize).join("")
+        register_name = "register#{type_label}FieldType"
         local_exports = <<~JS.strip
           // #{type_label} - ejected
-          export { IndexField as #{type_label}IndexField } from "./#{field_type}/IndexField";
-          export { ShowField as #{type_label}ShowField } from "./#{field_type}/ShowField";
-          export { FormField as #{type_label}FormField } from "./#{field_type}/FormField";
+          import { registerFieldType as #{register_name} } from "terrazzo/fields";
+          import { IndexField as #{type_label}IndexField } from "./#{field_type}/IndexField";
+          import { ShowField as #{type_label}ShowField } from "./#{field_type}/ShowField";
+          import { FormField as #{type_label}FormField } from "./#{field_type}/FormField";
+
+          #{register_name}("#{field_type}", {
+            index: #{type_label}IndexField,
+            show: #{type_label}ShowField,
+            form: #{type_label}FormField,
+          });
+
+          export { #{type_label}IndexField, #{type_label}ShowField, #{type_label}FormField };
         JS
 
-        if File.exist?(barrel_file)
-          content = File.read(barrel_file)
-
-          # If barrel is still the default re-export-all, replace with explicit exports
-          if content.include?('export * from "terrazzo/fields"')
-            new_content = build_fields_barrel_with_ejection(field_type)
-            create_file barrel_path, new_content, force: true
-          else
-            # Barrel already has explicit exports; replace the terrazzo re-export
-            # for this field type with local imports
-            unless content.include?("./#{field_type}/")
-              # Remove the existing terrazzo re-export line for this field type
-              terrazzo_export = "export { #{type_label}IndexField, #{type_label}ShowField, #{type_label}FormField } from \"terrazzo/fields\";"
-              if content.include?(terrazzo_export)
-                new_content = content.sub(terrazzo_export, local_exports)
-                create_file barrel_path, new_content, force: true
-              else
-                append_to_file barrel_path, "\n#{local_exports}\n"
-              end
-            end
-          end
-        end
-      end
-
-      def build_fields_barrel_with_ejection(ejected_field_type)
-        all_field_types = %w[
-          string text number boolean date date_time time email url password
-          select rich_text belongs_to has_many has_one polymorphic hstore
-        ]
-
-        lines = ['export { FieldRenderer, registerFieldType } from "terrazzo/fields";', ""]
-
-        all_field_types.each do |ft|
-          label = ft.split("_").map(&:capitalize).join("")
-          if ft == ejected_field_type
-            lines << "// #{label} - ejected"
-            lines << "export { IndexField as #{label}IndexField } from \"./#{ft}/IndexField\";"
-            lines << "export { ShowField as #{label}ShowField } from \"./#{ft}/ShowField\";"
-            lines << "export { FormField as #{label}FormField } from \"./#{ft}/FormField\";"
-          else
-            lines << "export { #{label}IndexField, #{label}ShowField, #{label}FormField } from \"terrazzo/fields\";"
-          end
-        end
-
-        lines.join("\n") + "\n"
+        ensure_barrel(barrel_path, 'export * from "terrazzo/fields";')
+        append_to_barrel(barrel_path, local_exports, "./#{field_type}/IndexField")
       end
 
       def update_components_barrel(name)
         barrel_path = "app/views/#{namespace_name}/components/index.js"
-        barrel_file = File.join(destination_root, barrel_path)
+        export_name = component_export_name(name)
+        ensure_barrel(barrel_path, 'export * from "terrazzo/components";')
 
-        return unless File.exist?(barrel_file)
+        local_exports = if name == "Layout"
+          <<~JS.strip
+            // Layout - ejected
+            import { setLayout } from "terrazzo";
+            import { Layout } from "./Layout";
 
-        content = File.read(barrel_file)
-        if content.include?('export * from "terrazzo/components"')
-          export_name = component_export_name(name)
-          new_content = build_components_barrel_with_ejection(name, export_name)
-          create_file barrel_path, new_content, force: true
-        end
-      end
+            setLayout(Layout);
 
-      def build_components_barrel_with_ejection(ejected_name, export_name)
-        all_components = {
-          "Layout" => "Layout",
-          "app-sidebar" => "AppSidebar",
-          "site-header" => "SiteHeader",
-          "FlashMessages" => "FlashMessages",
-          "SearchBar" => "SearchBar",
-          "Pagination" => "Pagination",
-          "SortableHeader" => "SortableHeader",
-        }
+            export { Layout };
+          JS
+        else
+          <<~JS.strip
+            // #{export_name} - ejected
+            import { registerComponent as register#{export_name}Component } from "terrazzo/components";
+            import { #{export_name} } from "./#{name}";
 
-        lines = []
-        all_components.each do |file_name, export|
-          if file_name == ejected_name
-            lines << "export { #{export} } from \"./#{file_name}\"; // ejected"
-          else
-            lines << "export { #{export} } from \"terrazzo/components\";"
-          end
+            register#{export_name}Component("#{export_name}", #{export_name});
+
+            export { #{export_name} } from "./#{name}";
+          JS
         end
 
-        lines.join("\n") + "\n"
+        append_to_barrel(barrel_path, local_exports, "./#{name}")
       end
 
       def update_ui_barrel(name)
         barrel_path = "app/views/#{namespace_name}/components/ui/index.js"
-        barrel_file = File.join(destination_root, barrel_path)
-
-        return unless File.exist?(barrel_file)
-
-        content = File.read(barrel_file)
-        if content.include?('export * from "terrazzo/ui"')
-          new_content = "export * from \"terrazzo/ui\";\n"
-          new_content += "// Override ejected UI component:\n"
-          new_content += "export * from \"./#{name}\";\n"
-          create_file barrel_path, new_content, force: true
-        end
+        ensure_barrel(barrel_path, 'export * from "terrazzo/ui";')
+        local_exports = ui_component_exports(name)
+        append_to_barrel(barrel_path, "// #{name} - ejected\nexport { #{local_exports} } from \"./#{name}\";", "./#{name}")
       end
 
       def component_export_name(file_name)
@@ -233,6 +190,97 @@ module Terrazzo
         when "site-header" then "SiteHeader"
         else file_name
         end
+      end
+
+      def component_template_exists?(name)
+        File.exist?(File.join(self.class.source_root, "components/#{name}.jsx"))
+      end
+
+      def copy_component_template(name)
+        copy_file "components/#{name}.jsx", "app/views/#{namespace_name}/components/#{name}.jsx"
+      end
+
+      def copy_ui_template(name)
+        copy_file "components/ui/#{name}.jsx", "app/views/#{namespace_name}/components/ui/#{name}.jsx"
+      end
+
+      def component_dependencies(name)
+        case name
+        when "Layout"
+          %w[app-sidebar site-header FlashMessages]
+        when "CollectionItemActions", "CollectionToolbarActions"
+          []
+        when "ResourceTable"
+          %w[SortableHeader CollectionItemActions]
+        else
+          []
+        end
+      end
+
+      def page_dependencies(name)
+        case name
+        when "index"
+          %w[_collection]
+        when "edit", "new"
+          %w[_form]
+        else
+          []
+        end
+      end
+
+      def ui_dependencies(name)
+        case name
+        when "pagination"
+          %w[button]
+        when "sidebar"
+          %w[button input separator sheet skeleton tooltip]
+        else
+          []
+        end
+      end
+
+      def ui_component_exports(name)
+        {
+          "avatar" => "Avatar, AvatarImage, AvatarFallback",
+          "badge" => "Badge, badgeVariants",
+          "button" => "Button, buttonVariants",
+          "card" => "Card, CardHeader, CardFooter, CardTitle, CardDescription, CardContent",
+          "dropdown-menu" => "DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem, DropdownMenuCheckboxItem, DropdownMenuRadioItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuShortcut, DropdownMenuGroup, DropdownMenuPortal, DropdownMenuSub, DropdownMenuSubContent, DropdownMenuSubTrigger, DropdownMenuRadioGroup",
+          "field" => "Field, FieldLabel",
+          "input" => "Input",
+          "label" => "Label",
+          "pagination" => "Pagination, PaginationContent, PaginationItem, PaginationLink, PaginationPrevious, PaginationNext",
+          "popover" => "Popover, PopoverTrigger, PopoverContent",
+          "select" => "Select, SelectGroup, SelectValue, SelectTrigger, SelectContent, SelectLabel, SelectItem, SelectSeparator, SelectScrollUpButton, SelectScrollDownButton",
+          "separator" => "Separator",
+          "sheet" => "Sheet, SheetPortal, SheetOverlay, SheetTrigger, SheetClose, SheetContent, SheetHeader, SheetFooter, SheetTitle, SheetDescription",
+          "sidebar" => "Sidebar, SidebarContent, SidebarFooter, SidebarGroup, SidebarGroupAction, SidebarGroupContent, SidebarGroupLabel, SidebarHeader, SidebarInput, SidebarInset, SidebarMenu, SidebarMenuAction, SidebarMenuBadge, SidebarMenuButton, SidebarMenuItem, SidebarMenuSkeleton, SidebarMenuSub, SidebarMenuSubButton, SidebarMenuSubItem, SidebarProvider, SidebarRail, SidebarSeparator, SidebarTrigger, useSidebar",
+          "skeleton" => "Skeleton",
+          "table" => "Table, TableHeader, TableBody, TableFooter, TableHead, TableRow, TableCell, TableCaption",
+          "textarea" => "Textarea",
+          "tooltip" => "Tooltip, TooltipTrigger, TooltipContent, TooltipProvider",
+        }.fetch(name)
+      end
+
+      def ensure_barrel(barrel_path, package_export)
+        barrel_file = File.join(destination_root, barrel_path)
+
+        unless File.exist?(barrel_file)
+          create_file barrel_path, "#{package_export}\n"
+          return
+        end
+
+        content = File.read(barrel_file)
+        return if content.include?(package_export)
+
+        prepend_to_file barrel_path, "#{package_export}\n"
+      end
+
+      def append_to_barrel(barrel_path, content, marker)
+        barrel_file = File.join(destination_root, barrel_path)
+        return if File.exist?(barrel_file) && File.read(barrel_file).include?(marker)
+
+        append_to_file barrel_path, "\n#{content}\n"
       end
     end
   end

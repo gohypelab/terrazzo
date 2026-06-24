@@ -3,7 +3,8 @@ import { useContent } from "@thoughtbot/superglue";
 
 import { getLayout } from "terrazzo";
 import { AdminForm } from "./_form";
-import { Button, Card, CardContent } from "terrazzo/ui";
+import { CollectionToolbarActions } from "../components";
+import { Button, Card, CardContent } from "../components/ui";
 
 export default function AdminNew() {
   const Layout = getLayout();
@@ -11,6 +12,7 @@ export default function AdminNew() {
     pageTitle,
     form,
     errors,
+    layoutActions,
     indexPath,
     navigation,
     resourceName
@@ -21,9 +23,12 @@ export default function AdminNew() {
       navigation={navigation}
       title={pageTitle}
       actions={
-      <a href={indexPath} data-sg-visit>
+      <div className="flex flex-wrap items-center gap-2">
+        <CollectionToolbarActions actions={layoutActions} />
+        <a href={indexPath} data-sg-visit>
           <Button variant="outline" size="sm">Cancel</Button>
         </a>
+      </div>
       }>
 
       <Card>

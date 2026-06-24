@@ -1,7 +1,7 @@
 import React from "react";
 import { ChevronUp, ChevronDown, ChevronsUpDown } from "lucide-react";
 
-import { TableHead } from "terrazzo/ui";
+import { TableHead } from "./ui";
 
 export function SortableHeader({ label, sortable, sortUrl, sortDirection }) {
   if (!sortable) {
@@ -12,7 +12,7 @@ export function SortableHeader({ label, sortable, sortUrl, sortDirection }) {
     <TableHead>
       <a
         href={sortUrl}
-        data-sg-remote
+        data-sg-visit
         className="inline-flex items-center gap-1 hover:text-foreground">
 
         {label}

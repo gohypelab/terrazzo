@@ -1,6 +1,6 @@
 import React from "react";
 
-import { Label } from "terrazzo/ui";
+import { Label } from "../../components/ui";
 
 export function FormField({ value, label, input, options, required }) {
   const resourceOptions = options?.resourceOptions ?? [];

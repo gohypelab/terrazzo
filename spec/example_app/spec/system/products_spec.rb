@@ -14,7 +14,7 @@ RSpec.describe "Admin Products", type: :system do
 
   describe "show" do
     it "renders the product details" do
-      visit admin_product_path(product)
+      visit admin_product_path(product.id)
 
       expect(page).to have_content("Widget Pro")
       expect(page).to have_content("29.99")
@@ -38,6 +38,7 @@ RSpec.describe "Admin Products", type: :system do
       fill_in "Price", with: "49.99"
       fill_in "Description", with: "A brand new widget"
       fill_in "Image url", with: "https://picsum.photos/300"
+      fill_in "Slug", with: "new-widget"
       find("label", text: /Product meta tag/).find(:xpath, "..").find("select").select("ProductMetaTag ##{meta_tag.id}")
       click_button "Save"
 
@@ -47,7 +48,7 @@ RSpec.describe "Admin Products", type: :system do
 
   describe "file upload" do
     it "uploads a document and displays the filename" do
-      visit edit_admin_product_path(product)
+      visit edit_admin_product_path(product.id)
 
       attach_file "Document", Rails.root.join("spec/fixtures/files/test_document.txt")
       click_button "Save"
@@ -58,15 +59,16 @@ RSpec.describe "Admin Products", type: :system do
 
   describe "edit" do
     it "renders the edit product form" do
-      visit edit_admin_product_path(product)
+      visit edit_admin_product_path(product.id)
 
       expect(page).to have_field("Name", with: "Widget Pro")
     end
 
     it "updates the product" do
-      visit edit_admin_product_path(product)
+      visit edit_admin_product_path(product.id)
 
       fill_in "Name", with: "Widget Pro Updated"
+      fill_in "Slug", with: "widget-pro-updated"
       click_button "Save"
 
       expect(page).to have_content("Widget Pro Updated")
@@ -75,7 +77,7 @@ RSpec.describe "Admin Products", type: :system do
 
   describe "destroy" do
     it "deletes the product from the show page" do
-      visit admin_product_path(product)
+      visit admin_product_path(product.id)
 
       accept_confirm { click_button "Delete" }
 

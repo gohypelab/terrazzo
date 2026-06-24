@@ -1,6 +1,6 @@
 import React from "react";
 
-import { Badge } from "terrazzo/ui";
+import { Badge } from "../../components/ui";
 
 export function ShowField({ value }) {
   if (value == null || Object.keys(value).length === 0) {

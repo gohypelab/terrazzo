@@ -4,6 +4,9 @@ import { Application } from "@thoughtbot/superglue"
 import { buildVisitAndRemote } from "./application_visit"
 import { pageToPageMapping } from "./page_to_page_mapping"
 import { store } from "./store"
+import "../../views/<%= namespace_name %>/fields"
+import "../../views/<%= namespace_name %>/components"
+import "../../views/<%= namespace_name %>/components/ui"
 
 if (typeof window !== "undefined") {
   document.addEventListener("DOMContentLoaded", function () {

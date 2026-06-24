@@ -1,0 +1,36 @@
+import React from "react";
+import { ChevronLeft, ChevronRight } from "lucide-react";
+
+import { Button } from "./ui";
+
+export function HasManyPagination({ currentPage, totalPages, total, nextPagePath, prevPagePath }) {
+  if (totalPages <= 1) return null;
+
+  const updateUrl = (path) => () => {
+    const url = new URL(path, window.location.origin);
+    url.searchParams.delete("props_at");
+    window.history.replaceState(window.history.state, "", url.pathname + url.search);
+  };
+
+  return (
+    <div className="flex items-center justify-between gap-2 pt-2 text-sm text-muted-foreground">
+      <span>Page {currentPage} of {totalPages} &middot; {total} total</span>
+      <div className="flex items-center gap-1">
+        {prevPagePath ? (
+          <Button asChild variant="outline" size="sm">
+            <a href={prevPagePath} data-sg-remote onClick={updateUrl(prevPagePath)}><ChevronLeft className="h-4 w-4" /> Prev</a>
+          </Button>
+        ) : (
+          <Button variant="outline" size="sm" disabled><ChevronLeft className="h-4 w-4" /> Prev</Button>
+        )}
+        {nextPagePath ? (
+          <Button asChild variant="outline" size="sm">
+            <a href={nextPagePath} data-sg-remote onClick={updateUrl(nextPagePath)}>Next <ChevronRight className="h-4 w-4" /></a>
+          </Button>
+        ) : (
+          <Button variant="outline" size="sm" disabled>Next <ChevronRight className="h-4 w-4" /></Button>
+        )}
+      </div>
+    </div>
+  );
+}

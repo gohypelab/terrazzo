@@ -1,5 +1,15 @@
-json.array! Terrazzo::Namespace.new(namespace).resources_with_index_route do |nav_resource|
-  json.label nav_resource.resource_name.humanize.pluralize
-  json.path url_for(controller: "/#{nav_resource.controller_path}", action: :index, only_path: true)
-  json.active nav_resource.controller_path == controller_path
+resources = Terrazzo::Namespace.new(namespace).navigation_resources
+navigation_groups = resources.group_by(&:navigation_group).map do |label, items|
+  { label: label, items: items }
+end
+
+json.array! navigation_groups do |group|
+  json.label group[:label]
+  json.items do
+    json.array! group[:items] do |nav_resource|
+      json.label nav_resource.navigation_label
+      json.path url_for(controller: "/#{nav_resource.controller_path}", action: :index, only_path: true)
+      json.active nav_resource.controller_path == controller_path
+    end
+  end
 end

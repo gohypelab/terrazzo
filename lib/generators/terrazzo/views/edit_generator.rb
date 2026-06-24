@@ -14,6 +14,8 @@ module Terrazzo
 
         class_option :namespace, type: :string, default: "admin",
           desc: "Admin namespace"
+        class_option :with_counterpart, type: :boolean, default: nil,
+          desc: "Also eject the new view that shares this form partial"
 
         def copy_edit_template
           if resource.present?
@@ -46,6 +48,7 @@ module Terrazzo
             "app/views/#{namespace_name}/application/new.jsx"
           end
           return false if File.exist?(new_path)
+          return options[:with_counterpart] unless options[:with_counterpart].nil?
 
           yes?("Also eject the new view to share the custom form partial? (y/n)")
         end

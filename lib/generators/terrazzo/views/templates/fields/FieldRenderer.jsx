@@ -1,5 +1,10 @@
 import React from "react";
 
+import {
+  getFieldComponent,
+  registerFieldType as registerFieldTypeOverride,
+} from "terrazzo/fields";
+
 import { IndexField as StringIndex } from "./string/IndexField";
 import { ShowField as StringShow } from "./string/ShowField";
 import { FormField as StringForm } from "./string/FormField";
@@ -68,6 +73,10 @@ import { IndexField as PolymorphicIndex } from "./polymorphic/IndexField";
 import { ShowField as PolymorphicShow } from "./polymorphic/ShowField";
 import { FormField as PolymorphicForm } from "./polymorphic/FormField";
 
+import { IndexField as AssetIndex } from "./asset/IndexField";
+import { ShowField as AssetShow } from "./asset/ShowField";
+import { FormField as AssetForm } from "./asset/FormField";
+
 const fieldMap = {
   string: { index: StringIndex, show: StringShow, form: StringForm },
   text: { index: TextIndex, show: TextShow, form: TextForm },
@@ -85,7 +94,8 @@ const fieldMap = {
   belongs_to: { index: BelongsToIndex, show: BelongsToShow, form: BelongsToForm },
   has_many: { index: HasManyIndex, show: HasManyShow, form: HasManyForm },
   has_one: { index: HasOneIndex, show: HasOneShow, form: HasOneForm },
-  polymorphic: { index: PolymorphicIndex, show: PolymorphicShow, form: PolymorphicForm }
+  polymorphic: { index: PolymorphicIndex, show: PolymorphicShow, form: PolymorphicForm },
+  asset: { index: AssetIndex, show: AssetShow, form: AssetForm }
 };
 
 // Allow consumers to register custom field components
@@ -93,11 +103,11 @@ export function registerFieldType(
 fieldType,
 components)
 {
-  fieldMap[fieldType] = { ...fieldMap[fieldType], ...components };
+  registerFieldTypeOverride(fieldType, components);
 }
 
 export function FieldRenderer({ mode, fieldType, ...rest }) {
-  const Component = fieldMap[fieldType]?.[mode];
+  const Component = getFieldComponent(fieldType, mode) || fieldMap[fieldType]?.[mode];
   if (!Component) return <span>{String(rest.value ?? "")}</span>;
   return <Component {...rest} />;
 }

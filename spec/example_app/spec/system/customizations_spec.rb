@@ -3,6 +3,10 @@ require "rails_helper"
 RSpec.describe "Admin Customizations", type: :system do
   let!(:country) { Country.find_or_create_by!(code: "US", name: "United States") }
 
+  def open_first_row_actions(scope = page)
+    scope.find("button[aria-label='Open row actions']", match: :first).click
+  end
+
   describe "ejected customers index with custom _collection" do
     let!(:customer) { create(:customer, name: "Test Customer", territory: country) }
 
@@ -22,6 +26,14 @@ RSpec.describe "Admin Customizations", type: :system do
       expect(find('[data-testid="customer-count"]').text).to include("shown")
     end
 
+    it "reaches the ejected customer index through Superglue navigation" do
+      visit admin_products_path
+      click_link "Customers"
+
+      expect(page).to have_current_path(admin_customers_path)
+      expect(page).to have_css('[data-testid="customer-count"]')
+    end
+
     it "still uses the default table layout for other resources" do
       create(:order, customer: customer)
       visit admin_orders_path
@@ -39,6 +51,15 @@ RSpec.describe "Admin Customizations", type: :system do
 
       expect(page).to have_css('[data-testid="total-price"]')
       expect(find('[data-testid="total-price"]').text).to include("$")
+    end
+
+    it "reaches the ejected order show through Superglue navigation" do
+      visit admin_orders_path
+      open_first_row_actions
+      click_link "View Order"
+
+      expect(page).to have_current_path(admin_order_path(order))
+      expect(page).to have_css('[data-testid="total-price"]')
     end
   end
 
@@ -101,6 +122,7 @@ RSpec.describe "Admin Customizations", type: :system do
 
     it "shows custom action buttons on the orders index" do
       visit admin_orders_path
+      open_first_row_actions
 
       expect(page).to have_link("View Order")
       expect(page).to have_link("Edit")
@@ -111,15 +133,16 @@ RSpec.describe "Admin Customizations", type: :system do
 
     it "shows custom action buttons in the has_many orders table on customer#show" do
       visit admin_customer_path(customer)
+      orders_table = find("table", match: :first)
+      open_first_row_actions(orders_table)
 
-      within("table", match: :first) do
-        expect(page).to have_link("View Order")
-        expect(page).to have_link("Invoice")
-      end
+      expect(page).to have_link("View Order")
+      expect(page).to have_link("Invoice")
     end
 
     it "invoice action redirects with a flash notice" do
       visit admin_orders_path
+      open_first_row_actions
       click_link "Invoice", match: :first
 
       expect(page).to have_content("Printing invoice")
@@ -127,6 +150,7 @@ RSpec.describe "Admin Customizations", type: :system do
 
     it "renders Invoice link without data-sg-visit when sg_visit is false" do
       visit admin_orders_path
+      open_first_row_actions
 
       invoice_link = find("a", text: "Invoice", match: :first)
       expect(invoice_link["data-sg-visit"]).to be_nil
@@ -179,7 +203,7 @@ RSpec.describe "Admin Customizations", type: :system do
     let!(:product) { create(:product, name: "Widget", release_year: 2024) }
 
     it "renders the suffix next to the number value on the show page" do
-      visit admin_product_path(product)
+      visit admin_product_path(product.id)
 
       release_row = find("dt", text: "Release year").find(:xpath, "..").find("dd")
       expect(release_row).to have_text("2024 AD")

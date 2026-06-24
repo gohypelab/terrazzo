@@ -1,7 +1,7 @@
 import React from "react";
 
-import { Textarea } from "terrazzo/ui";
-import { Label } from "terrazzo/ui";
+import { Textarea } from "../../components/ui";
+import { Label } from "../../components/ui";
 
 export function FormField({ value, label, input, required }) {
   return (

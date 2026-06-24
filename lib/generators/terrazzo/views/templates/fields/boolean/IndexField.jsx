@@ -1,6 +1,6 @@
 import React from "react";
 
-import { Badge } from "terrazzo/ui";
+import { Badge } from "../../components/ui";
 
 export function IndexField({ value }) {
   if (value == null) return <span className="text-muted-foreground">-</span>;

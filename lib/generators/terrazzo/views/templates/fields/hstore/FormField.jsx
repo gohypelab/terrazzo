@@ -1,8 +1,8 @@
 import React, { useState, useRef, useEffect } from "react";
 
-import { Input } from "terrazzo/ui";
-import { Button } from "terrazzo/ui";
-import { Label } from "terrazzo/ui";
+import { Input } from "../../components/ui";
+import { Button } from "../../components/ui";
+import { Label } from "../../components/ui";
 
 export function FormField({ value, label, input, options, required }) {
   const initialPairs = () => {

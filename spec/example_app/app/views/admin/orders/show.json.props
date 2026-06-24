@@ -1,0 +1,2 @@
+json.partial! partial: "terrazzo/application/show_base"
+json.totalPrice number_to_currency(@resource.total_price)

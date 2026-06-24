@@ -53,82 +53,18 @@ Run this after a reset, or when you want to test the full install flow. The gene
 4. Run the routes generator (add admin namespace)
 5. Auto-discover models and generate a dashboard + controller for each
 
-## Post-install fixes required
+## Post-install state
 
-After running `terrazzo:install`, several things need manual correction before the system specs pass:
+`terrazzo:install` should leave the example app in a buildable, runnable state without hand repairs. The current generator flow handles:
 
-**Routes** — The install generator adds the admin namespace but not a root redirect. Add this to `config/routes.rb`:
-```ruby
-root to: redirect("/admin")
-```
+- Admin namespace routes and namespace root route
+- Enum-backed attributes as `Field::Select`
+- Active Storage and Action Text user-facing field types
+- Grouped navigation data through dashboard navigation hooks
+- App-level field/component/UI barrels for local overrides
+- Shared page mapping plus `generated_page_mapping.js` for resource-specific pages and `custom_page_mapping.js` for manual pages
 
-**Enum fields in dashboards** — The dashboard generator detects `collection:` options but uses `Field::String.with_options` instead of `Field::Select` for enum-backed attributes. Find any field like this:
-```ruby
-kind: Terrazzo::Field::String.with_options(collection: [...]),
-```
-and change it to:
-```ruby
-kind: Terrazzo::Field::Select.with_options(collection: [...]),
-```
-In this app, `CustomerDashboard#kind` needs this fix.
-
-**Auto-set fields in FORM_ATTRIBUTES** — The generator includes all attributes in `FORM_ATTRIBUTES`, but some should be excluded because they're managed by custom model setters. For example, `Product#name=` auto-sets `slug`, so including `slug` in `FORM_ATTRIBUTES` causes the empty slug field to overwrite it on submit, failing validation. Remove such fields from `FORM_ATTRIBUTES` (keep them in `SHOW_PAGE_ATTRIBUTES`).
-In this app, remove `slug` from `ProductDashboard::FORM_ATTRIBUTES`.
-
-**Custom grouped navigation** — The install generator creates a `_navigation.json.props` partial at `app/views/admin/application/_navigation.json.props` with a flat list of resource links. The system specs expect grouped navigation (a "Resources" group and a "Blog" group), so replace the generated partial with:
-
-```ruby
-resources = Terrazzo::Namespace.new(namespace).resources_with_index_route
-blog_resources, main_resources = resources.partition do |r|
-  r.controller_path.start_with?("admin/blog")
-end
-
-groups = [
-  { label: "Resources", resources: main_resources },
-  { label: "Blog", resources: blog_resources },
-]
-
-json.array! groups do |group|
-  json.label group[:label]
-  json.items do
-    json.array! group[:resources] do |r|
-      json.label r.resource_name.humanize.pluralize
-      json.path url_for(controller: "/#{r.controller_path}", action: :index, only_path: true)
-      json.active r.controller_path == controller_path
-    end
-  end
-end
-```
-
-Then update `app/views/admin/components/app-sidebar.jsx` to render grouped navigation. Change the `<SidebarContent>` section to iterate over groups:
-
-```jsx
-<SidebarContent>
-  {navigation.map((group) =>
-    <SidebarGroup key={group.label}>
-      <SidebarGroupLabel>{group.label}</SidebarGroupLabel>
-      <SidebarGroupContent>
-        <SidebarMenu>
-          {group.items.map((item) =>
-            <SidebarMenuItem key={item.path}>
-              <SidebarMenuButton
-                asChild
-                isActive={item.active}
-                tooltip={item.label}>
-                <a href={item.path} data-sg-visit>
-                  <span>{item.label}</span>
-                </a>
-              </SidebarMenuButton>
-            </SidebarMenuItem>
-          )}
-        </SidebarMenu>
-      </SidebarGroupContent>
-    </SidebarGroup>
-  )}
-</SidebarContent>
-```
-
-Also update the header link from `navigation[0]?.path` to `navigation[0]?.items?.[0]?.path`.
+System specs add deliberate customization coverage on top of that generated state. Those customizations include ejected pages, ejected fields, a custom layout, custom row/header/toolbar actions, custom navigation grouping, and custom dashboard hooks.
 
 ## When to change the gem source (`lib/`)
 

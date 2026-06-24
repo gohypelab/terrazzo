@@ -1,5 +1,7 @@
 require "capybara/rspec"
 
+Selenium::WebDriver.logger.level = :warn
+
 Capybara.default_max_wait_time = 10
 Capybara.server = :puma, {Silent: true}
 

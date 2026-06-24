@@ -38,7 +38,7 @@ module Terrazzo
           lines << "    end"
         end
 
-        first_resource = top_level.sort.first || namespaced.values.flatten.first || "dashboard"
+        first_resource = namespace_root_target(top_level, namespaced)
 
         route_block = <<~RUBY.indent(2)
           namespace :#{namespace_name} do
@@ -77,6 +77,15 @@ module Terrazzo
           relative.delete_suffix(".rb").camelize.safe_constantize
         end.select { |klass| klass < ApplicationRecord && !klass.abstract_class? }
          .sort_by { |klass| klass.name }
+      end
+
+      def namespace_root_target(top_level, namespaced)
+        return top_level.sort.first if top_level.any?
+
+        first_namespace, resources = namespaced.sort.first
+        return "#{first_namespace}/#{resources.sort.first}" if first_namespace
+
+        "dashboard"
       end
     end
   end

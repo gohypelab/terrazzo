@@ -27,20 +27,24 @@ module Terrazzo
       def create_ui_barrel
         create_file "app/views/#{namespace_name}/components/ui/index.js", <<~JS
           // Re-export all UI primitives from the terrazzo package.
-          // To customize, run: rails g terrazzo:eject ui/<component_name>
+          // Ejected pages, fields, and components import this barrel.
+          // To customize those app-owned files, run: rails g terrazzo:eject ui/<component_name>
           export * from "terrazzo/ui";
         JS
       end
 
       def create_navigation_partial
         create_file "app/views/#{namespace_name}/application/_navigation.json.props", <<~RUBY
-          resources = Terrazzo::Namespace.new(namespace).resources_with_index_route
+          resources = Terrazzo::Namespace.new(namespace).navigation_resources
+          navigation_groups = resources.group_by(&:navigation_group).map do |label, items|
+            { label: label, items: items }
+          end
 
-          json.array! [{ label: "Resources", resources: resources }] do |group|
+          json.array! navigation_groups do |group|
             json.label group[:label]
             json.items do
-              json.array! group[:resources] do |r|
-                json.label r.resource_name.humanize.pluralize
+              json.array! group[:items] do |r|
+                json.label r.navigation_label
                 json.path url_for(controller: "/\#{r.controller_path}", action: :index, only_path: true)
                 json.active r.controller_path == controller_path
               end
