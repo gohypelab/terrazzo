@@ -26,6 +26,7 @@ The base state does **not** include (these are all created by `terrazzo:install`
 - `app/views/admin/` — React page views, components, UI primitives, field renderers
 - `app/views/layouts/admin/` — admin layout (HTML + JSON props)
 - `app/javascript/admin/` — JS entry point, Redux store, slices, visit helper, page mapping
+- `app/javascript/admin.js` — esbuild root entrypoint
 - `app/assets/stylesheets/admin.css` — Tailwind CSS theme
 - Admin routes in `config/routes.rb`
 
@@ -35,7 +36,7 @@ From the repo root:
 
 ```bash
 cd spec/example_app
-bin/rails generate terrazzo:install admin --bundler=esbuild
+bin/rails generate terrazzo:install --namespace=admin --bundler=esbuild
 npm install && npm run build
 bin/dev
 ```

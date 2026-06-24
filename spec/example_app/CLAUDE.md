@@ -22,6 +22,7 @@ The app ships in a **base state** — a Rails app with models, build tooling, an
 - `app/views/admin/` — React views, components, fields, UI
 - `app/views/layouts/admin/` — admin layout
 - `app/javascript/admin/` — JS entry point, Redux store, slices
+- `app/javascript/admin.js` — esbuild root entrypoint
 - `app/assets/stylesheets/admin.css` — Tailwind theme
 - Admin routes in `config/routes.rb`
 
@@ -42,7 +43,7 @@ Do NOT reset when:
 
 ```bash
 cd spec/example_app
-bin/rails generate terrazzo:install admin --bundler=esbuild
+bin/rails generate terrazzo:install --namespace=admin --bundler=esbuild
 npm install && npm run build
 ```
 
@@ -63,6 +64,7 @@ Run this after a reset, or when you want to test the full install flow. The gene
 - Grouped navigation data through dashboard navigation hooks
 - App-level field/component/UI barrels for local overrides
 - Shared page mapping plus `generated_page_mapping.js` for resource-specific pages and `custom_page_mapping.js` for manual pages
+- `app/javascript/admin.js` for Rails esbuild builds
 
 System specs add deliberate customization coverage on top of that generated state. Those customizations include ejected pages, ejected fields, a custom layout, custom row/header/toolbar actions, custom navigation grouping, and custom dashboard hooks.
 
