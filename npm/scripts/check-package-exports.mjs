@@ -86,6 +86,7 @@ const expectedExports = {
     "AvatarFallback",
     "AvatarImage",
     "Badge",
+    "badgeVariants",
     "Button",
     "buttonVariants",
     "Card",
