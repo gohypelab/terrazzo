@@ -57,10 +57,9 @@ module Terrazzo
           copy_file source, "app/views/#{namespace_name}/fields/#{field_type}/#{file}"
         end
 
-        # Copy shared dependencies if needed
-        if field_uses_shared?(field_type)
-          copy_file "fields/shared/TextInputFormField.jsx",
-            "app/views/#{namespace_name}/fields/shared/TextInputFormField.jsx"
+        field_shared_dependencies(field_type).each do |dependency|
+          copy_file "fields/shared/#{dependency}.jsx",
+            "app/views/#{namespace_name}/fields/shared/#{dependency}.jsx"
         end
 
         update_fields_barrel(field_type)
@@ -116,10 +115,6 @@ module Terrazzo
         copy_file "pages/_navigation.json.props", dest
         say "\nNavigation partial ejected to #{dest}.", :green
         say "Edit it to customize your admin navigation."
-      end
-
-      def field_uses_shared?(field_type)
-        %w[string number email url password date date_time time].include?(field_type)
       end
 
       def update_fields_barrel(field_type)
@@ -204,39 +199,57 @@ module Terrazzo
         copy_file "components/ui/#{name}.jsx", "app/views/#{namespace_name}/components/ui/#{name}.jsx"
       end
 
+      def field_shared_dependencies(field_type)
+        field_template_paths(field_type).flat_map do |path|
+          relative_imports(File.read(path)).filter_map do |specifier|
+            next unless specifier.start_with?("../shared/")
+
+            dependency = File.basename(specifier, ".*")
+            next unless template_exists?("fields/shared/#{dependency}.jsx")
+
+            dependency
+          end
+        end.uniq
+      end
+
       def component_dependencies(name)
-        case name
-        when "Layout"
-          %w[app-sidebar site-header FlashMessages]
-        when "CollectionItemActions", "CollectionToolbarActions"
-          []
-        when "ResourceTable"
-          %w[SortableHeader CollectionItemActions]
-        else
-          []
-        end
+        template_dependencies("components/#{name}.jsx", "components")
       end
 
       def page_dependencies(name)
-        case name
-        when "index"
-          %w[_collection]
-        when "edit", "new"
-          %w[_form]
-        else
-          []
-        end
+        template_dependencies("pages/#{name}.jsx", "pages")
       end
 
       def ui_dependencies(name)
-        case name
-        when "pagination"
-          %w[button]
-        when "sidebar"
-          %w[button input separator sheet skeleton tooltip]
-        else
-          []
-        end
+        template_dependencies("components/ui/#{name}.jsx", "components/ui")
+      end
+
+      def template_dependencies(template, template_root, seen = [])
+        template_path = File.join(self.class.source_root, template)
+        return [] unless File.exist?(template_path)
+
+        relative_imports(File.read(template_path)).flat_map do |specifier|
+          next unless specifier.start_with?("./")
+
+          dependency = File.basename(specifier.delete_prefix("./"), ".*")
+          dependency_template = "#{template_root}/#{dependency}.jsx"
+          next unless template_exists?(dependency_template)
+          next if seen.include?(dependency)
+
+          [dependency, *template_dependencies(dependency_template, template_root, seen + [dependency])]
+        end.compact.uniq
+      end
+
+      def field_template_paths(field_type)
+        Dir[File.join(self.class.source_root, "fields", field_type, "*.jsx")]
+      end
+
+      def relative_imports(source)
+        source.scan(/from\s+["']([^"']+)["']/).flatten
+      end
+
+      def template_exists?(template)
+        File.exist?(File.join(self.class.source_root, template))
       end
 
       def ui_component_exports(name)
