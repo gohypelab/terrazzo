@@ -300,6 +300,7 @@ RSpec.describe Terrazzo::Generators::EjectGenerator do
     template_fields = field_component_directories("lib/generators/terrazzo/views/templates/fields")
 
     expect(template_fields).to eq(packaged_fields)
+    expect(field_top_level_template_files).to be_empty
 
     packaged_fields.each do |field_name|
       packaged_files = field_component_files("npm/src/fields", field_name)
@@ -473,6 +474,13 @@ RSpec.describe Terrazzo::Generators::EjectGenerator do
   def field_component_directories(relative_root)
     Dir[File.join(repo_root, relative_root, "*")]
       .select { |path| File.directory?(path) }
+      .map { |path| File.basename(path) }
+      .sort
+  end
+
+  def field_top_level_template_files
+    Dir[File.join(repo_root, "lib/generators/terrazzo/views/templates/fields/*")]
+      .select { |path| File.file?(path) }
       .map { |path| File.basename(path) }
       .sort
   end
