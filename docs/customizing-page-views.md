@@ -219,7 +219,7 @@ rails g terrazzo:eject components/SearchBar
 rails g terrazzo:eject components/CollectionToolbarActions
 ```
 
-The generated admin entrypoint imports the components barrel before rendering, so package pages will use registered local overrides for components such as `ResourceTable`, `SearchBar`, `CollectionFilters`, `Pagination`, `SortableHeader`, `CollectionItemActions`, `CollectionToolbarActions`, `HasManyPagination`, `AppSidebar`, `SiteHeader`, and `FlashMessages`.
+The generated admin entrypoint imports the components barrel before rendering, so package pages will use registered local overrides for components such as `ResourceTable`, `SearchBar`, `CollectionFilters`, `Pagination`, `SortableHeader`, `CollectionItemActions`, `CollectionToolbarActions`, `HasManyPagination`, `AppSidebar`, `SiteHeader`, and `FlashMessages`. `CollectionToolbarActions` renders dashboard-provided header actions and the default show-page Back/Edit/Delete actions.
 
 ## Customizing the Sidebar Navigation
 

@@ -4,13 +4,7 @@ import { useContent } from "@thoughtbot/superglue";
 import { getLayout } from "terrazzo";
 import { FieldRenderer } from "../fields";
 import { CollectionToolbarActions } from "../components";
-import { Button, Card, CardContent, CardHeader, CardTitle } from "../components/ui";
-
-function csrfToken() {
-  if (typeof document === "undefined") return "";
-
-  return document.querySelector('meta[name="csrf-token"]')?.content ?? "";
-}
+import { Card, CardContent, CardHeader, CardTitle } from "../components/ui";
 
 export default function AdminShow() {
   const Layout = getLayout();
@@ -26,6 +20,25 @@ export default function AdminShow() {
     pluralResourceName,
     navigation
   } = useContent();
+  const resourceActions = [
+    indexPath && {
+      label: `Back to ${pluralResourceName}`,
+      url: indexPath,
+      variant: "outline",
+    },
+    editPath && {
+      label: "Edit",
+      url: editPath,
+      variant: "outline",
+    },
+    deletePath && {
+      label: "Delete",
+      url: deletePath,
+      method: "delete",
+      confirm: "Are you sure?",
+      variant: "destructive",
+    },
+  ].filter(Boolean);
 
   return (
     <Layout
@@ -34,33 +47,7 @@ export default function AdminShow() {
       actions={
       <div className="flex flex-wrap items-center gap-2">
           <CollectionToolbarActions actions={layoutActions} />
-          <a href={indexPath} data-sg-visit>
-            <Button variant="outline" size="sm">Back to {pluralResourceName}</Button>
-          </a>
-          {editPath &&
-        <a href={editPath} data-sg-visit>
-              <Button variant="outline" size="sm">Edit</Button>
-            </a>
-        }
-          {deletePath &&
-        <form
-          action={deletePath}
-          method="post"
-          data-sg-visit
-          style={{ display: "inline" }}
-          onSubmit={(e) => {
-            if (!window.confirm("Are you sure?")) e.preventDefault();
-          }}>
-
-              <input type="hidden" name="_method" value="delete" />
-              <input
-            type="hidden"
-            name="authenticity_token"
-            value={csrfToken()} />
-
-              <Button type="submit" variant="destructive" size="sm">Delete</Button>
-            </form>
-        }
+          <CollectionToolbarActions actions={resourceActions} />
         </div>
       }>
 
