@@ -26,11 +26,23 @@ module Terrazzo
         lucide-react
         tailwindcss
       ].freeze
+      SUPPORTED_BUNDLERS = %w[vite esbuild].freeze
 
       class_option :namespace, type: :string, default: "admin",
         desc: "Admin namespace"
       class_option :bundler, type: :string, default: "vite",
-        desc: "JavaScript bundler (vite, esbuild, or sprockets)"
+        desc: "JavaScript bundler (vite or esbuild)"
+
+      def validate_bundler
+        return if SUPPORTED_BUNDLERS.include?(options[:bundler])
+
+        raise Thor::Error, <<~MESSAGE
+          Unsupported bundler '#{options[:bundler]}'.
+
+          Terrazzo generates React/JSX admin views and supports Vite or esbuild.
+          Re-run with `--bundler=vite` or `--bundler=esbuild`.
+        MESSAGE
+      end
 
       def verify_database_schema
         missing_tables = application_models.reject { |model| table_exists_for?(model) }
@@ -62,6 +74,13 @@ module Terrazzo
       def create_js_entry_point
         template "application.js.erb",
           "app/javascript/#{namespace_name}/application.jsx"
+      end
+
+      def create_esbuild_entry_point
+        return unless esbuild?
+
+        create_file "app/javascript/#{namespace_name}.js",
+          %(import "./#{namespace_name}/application.jsx"\n)
       end
 
       def create_store
@@ -140,6 +159,10 @@ module Terrazzo
 
       def vite?
         options[:bundler] == "vite"
+      end
+
+      def esbuild?
+        options[:bundler] == "esbuild"
       end
 
       def missing_frontend_dependencies

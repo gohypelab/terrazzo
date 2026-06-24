@@ -29,9 +29,29 @@ RSpec.describe Terrazzo::Generators::InstallGenerator do
     expect(File).to exist(File.join(destination_root, "app/javascript/admin/page_to_page_mapping.js"))
     expect(File).to exist(File.join(destination_root, "app/javascript/admin/generated_page_mapping.js"))
     expect(File).to exist(File.join(destination_root, "app/javascript/admin/custom_page_mapping.js"))
+    expect(File).not_to exist(File.join(destination_root, "app/javascript/admin.js"))
     expect(read("app/views/admin/application/index.jsx")).to include("terrazzo/pages")
 
     expect_bundle_to_succeed("app/javascript/admin/application.jsx")
+  end
+
+  it "builds a Rails esbuild-compatible root entrypoint" do
+    create_file "package.json", JSON.pretty_generate({
+      dependencies: described_class::FRONTEND_DEPENDENCIES.to_h { |package_name| [package_name, "*"] },
+    })
+
+    run_install_entrypoint_generators(bundler: "esbuild")
+    run_views_generator
+    create_node_package_link
+
+    expect(read("app/javascript/admin.js")).to eq(%(import "./admin/application.jsx"\n))
+    expect_bundle_to_succeed("app/javascript/admin.js")
+  end
+
+  it "rejects unsupported JavaScript bundlers" do
+    generator = described_class.new([], { bundler: "sprockets" }, destination_root: destination_root)
+
+    expect { generator.validate_bundler }.to raise_error(Thor::Error, /supports Vite or esbuild/)
   end
 
   it "fails before generation when application model tables are missing" do
@@ -177,12 +197,14 @@ RSpec.describe Terrazzo::Generators::InstallGenerator do
 
   private
 
-  def run_install_entrypoint_generators
-    generator = described_class.new([], {}, destination_root: destination_root)
+  def run_install_entrypoint_generators(options = {})
+    generator = described_class.new([], options, destination_root: destination_root)
     original_stdout = $stdout
     $stdout = StringIO.new
     %i[
+      validate_bundler
       create_js_entry_point
+      create_esbuild_entry_point
       create_store
       create_page_to_page_mapping
       create_generated_page_mapping

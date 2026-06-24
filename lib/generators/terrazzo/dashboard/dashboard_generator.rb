@@ -12,7 +12,7 @@ module Terrazzo
       class_option :namespace, type: :string, default: "admin",
         desc: "Admin namespace"
       class_option :bundler, type: :string, default: "vite",
-        desc: "JavaScript bundler (vite, esbuild, or sprockets)"
+        desc: "JavaScript bundler (vite or esbuild)"
 
       def create_dashboard
         template "dashboard.rb.erb",

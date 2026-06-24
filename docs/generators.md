@@ -13,7 +13,7 @@ rails g terrazzo:install
 | Option | Default | Description |
 |--------|---------|-------------|
 | `--namespace` | `admin` | Admin namespace (controller prefix, route scope, JS directory) |
-| `--bundler` | `vite` | JavaScript bundler. `vite` emits Vite asset tags; `esbuild` and `sprockets` use `javascript_include_tag`. Page mappings are explicit and can be extended through `custom_page_mapping.js`. |
+| `--bundler` | `vite` | JavaScript bundler. `vite` emits Vite asset tags; `esbuild` emits `javascript_include_tag` and a root `app/javascript/admin.js` entrypoint for Rails' default esbuild glob. Page mappings are explicit and can be extended through `custom_page_mapping.js`. |
 
 ```bash
 # Vite (default)
@@ -21,9 +21,6 @@ rails g terrazzo:install
 
 # esbuild
 rails g terrazzo:install --bundler=esbuild
-
-# Sprockets
-rails g terrazzo:install --bundler=sprockets
 
 # Custom namespace
 rails g terrazzo:install --namespace=backstage
@@ -57,7 +54,7 @@ rails g terrazzo:dashboard Blog::Post
 | Option | Default | Description |
 |--------|---------|-------------|
 | `--namespace` | `admin` | Admin namespace |
-| `--bundler` | `vite` | JavaScript bundler. Resource-specific view mappings are handled by `generated_page_mapping.js` when needed. |
+| `--bundler` | `vite` | JavaScript bundler (`vite` or `esbuild`). Resource-specific view mappings are handled by `generated_page_mapping.js` when needed. |
 
 Creates:
 - `app/dashboards/product_dashboard.rb`

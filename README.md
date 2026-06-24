@@ -22,8 +22,8 @@ npm install --save-dev @tailwindcss/cli # if your app does not already compile T
 # Install Superglue (if not already set up)
 rails g superglue:install
 
-# Install Terrazzo — generates admin namespace, app barrels, and dashboards
-# Uses Vite by default; for Sprockets pass --bundler=sprockets
+# Install Terrazzo — generates admin namespace, app barrels, and dashboards.
+# Uses Vite by default; for Rails esbuild pass --bundler=esbuild.
 rails g terrazzo:install
 
 # Make sure app/assets/stylesheets/admin.css is compiled by Tailwind.
@@ -45,7 +45,7 @@ Full docs at **[gohypelab.github.io/terrazzo](https://gohypelab.github.io/terraz
 - Ruby 3.1+
 - Rails 7.1+
 - Node.js 18+
-- A JS bundler (Vite recommended, esbuild and Sprockets also supported)
+- A JS bundler (Vite recommended, esbuild also supported)
 
 ## Customizing Per-Row Actions
 
