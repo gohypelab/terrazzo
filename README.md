@@ -49,25 +49,25 @@ Full docs at **[gohypelab.github.io/terrazzo](https://gohypelab.github.io/terraz
 
 ## Customizing Per-Row Actions
 
-Terrazzo generates Show, Edit, and Destroy action buttons for each row on index pages and has_many tables on show pages. These are driven by the `collection_item_actions(resource)` helper (defined in `Terrazzo::CollectionActionsHelper`).
+Terrazzo generates Show, Edit, and Destroy action buttons for each row on index pages and has_many tables on show pages.
 
-Override in your controller helper to customize actions per resource type:
+Override `collection_item_actions` in the resource dashboard to customize actions per resource type:
 
 ```ruby
-module Admin
-  module CollectionActionsHelper
-    def collection_item_actions(resource)
-      actions = super
-      if resource.is_a?(User)
-        actions << { label: "Ghost", url: admin_user_ghost_path(user_id: resource.id) }
-      end
-      actions
-    end
+class OrderDashboard < Terrazzo::BaseDashboard
+  # ...
+
+  def collection_item_actions(resource, view)
+    [
+      { label: "View Order", url: view.admin_order_path(resource) },
+      { label: "Edit", url: view.edit_admin_order_path(resource) },
+      { label: "Invoice", url: view.invoice_admin_order_path(resource) },
+    ]
   end
 end
 ```
 
-Each action hash supports `label` (String), `url` (String), `method` (optional, e.g. `"delete"`), `confirm` (optional confirmation message), and `sg_visit` (set to `false` to bypass SPA navigation).
+The `view` argument gives access to route helpers. Each action hash supports `label` (String), `url` (String), `method` (optional, e.g. `"delete"`), `confirm` (optional confirmation message for non-GET form actions), and `sg_visit` (set to `false` to bypass SPA navigation).
 
 ## License
 
