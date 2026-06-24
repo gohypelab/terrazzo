@@ -7,6 +7,12 @@ module Terrazzo
 
         private
 
+        def ensure_page_barrels
+          ensure_barrel("app/views/#{namespace_name}/fields/index.js", 'export * from "terrazzo/fields";')
+          ensure_barrel("app/views/#{namespace_name}/components/index.js", 'export * from "terrazzo/components";')
+          ensure_barrel("app/views/#{namespace_name}/components/ui/index.js", 'export * from "terrazzo/ui";')
+        end
+
         def register_page_mapping(action)
           mapping_path = "app/javascript/#{namespace_name}/generated_page_mapping.js"
           mapping_file = File.join(destination_root, mapping_path)
@@ -101,6 +107,20 @@ module Terrazzo
             raise Thor::Error,
               "#{mapping_path} must export generatedPageMapping so Terrazzo can register #{key}."
           end
+        end
+
+        def ensure_barrel(barrel_path, package_export)
+          barrel_file = File.join(destination_root, barrel_path)
+
+          unless File.exist?(barrel_file)
+            create_file barrel_path, "#{package_export}\n"
+            return
+          end
+
+          content = File.read(barrel_file)
+          return if content.include?(package_export)
+
+          prepend_to_file barrel_path, "#{package_export}\n"
         end
       end
     end

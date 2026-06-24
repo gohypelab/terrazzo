@@ -18,6 +18,8 @@ module Terrazzo
           desc: "Also eject the new view that shares this form partial"
 
         def copy_edit_template
+          ensure_page_barrels
+
           if resource.present?
             eject_json_props
             copy_file "pages/edit.jsx", "app/views/#{namespace_name}/#{resource_path}/edit.jsx"

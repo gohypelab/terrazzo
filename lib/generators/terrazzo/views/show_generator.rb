@@ -16,6 +16,8 @@ module Terrazzo
           desc: "Admin namespace"
 
         def copy_show_template
+          ensure_page_barrels
+
           if resource.present?
             eject_json_props
             copy_file "pages/show.jsx", "app/views/#{namespace_name}/#{resource_path}/show.jsx"

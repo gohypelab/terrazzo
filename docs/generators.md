@@ -111,6 +111,8 @@ Use this after upgrading the gem to refresh the default wiring. **This will over
 
 Ejects a view for customization. Without a resource argument, ejects the shared JSX page component. With a resource argument, ejects a complete resource-specific view: the page JSX, its associated partial (`_collection.jsx` or `_form.jsx`), and a `.json.props` that extends the base serialization.
 
+If the app-level field, component, or UI barrels are missing, these generators create the base package re-exports before writing the page files.
+
 ```bash
 # Eject the shared JSX page component
 rails g terrazzo:views:show

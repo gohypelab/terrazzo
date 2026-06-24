@@ -89,6 +89,28 @@ RSpec.describe Terrazzo::Generators::EjectGenerator do
     expect(manifest).to include("'admin/payments/edit': PaymentEdit,")
   end
 
+  it "builds JavaScript after standalone resource-specific view generation" do
+    run_generator(Terrazzo::Generators::Views::IndexGenerator, ["Order"])
+    run_generator(Terrazzo::Generators::Views::ShowGenerator, ["Order"])
+    run_generator(Terrazzo::Generators::Views::NewGenerator, ["Invoice", "--with-counterpart"])
+    run_generator(Terrazzo::Generators::Views::EditGenerator, ["Payment", "--no-with-counterpart"])
+
+    create_node_package_link
+    write_standalone_resource_view_entry
+
+    expect_bundle_to_succeed("standalone_resource_entry.jsx")
+    expect(read("app/views/admin/fields/index.js")).to include('export * from "terrazzo/fields";')
+    expect(read("app/views/admin/components/index.js")).to include('export * from "terrazzo/components";')
+    expect(read("app/views/admin/components/ui/index.js")).to include('export * from "terrazzo/ui";')
+
+    manifest = read("app/javascript/admin/generated_page_mapping.js")
+    expect(manifest).to include("'admin/orders/index': OrderIndex,")
+    expect(manifest).to include("'admin/orders/show': OrderShow,")
+    expect(manifest).to include("'admin/invoices/new': InvoiceNew,")
+    expect(manifest).to include("'admin/invoices/edit': InvoiceEdit,")
+    expect(manifest).to include("'admin/payments/edit': PaymentEdit,")
+  end
+
   it "builds JavaScript after ejecting every supported component" do
     run_generator(Terrazzo::Generators::ViewsGenerator, [])
 
@@ -440,6 +462,35 @@ RSpec.describe Terrazzo::Generators::EjectGenerator do
       import PaymentEdit from "./app/views/admin/payments/edit.jsx";
 
       console.log(generatedPageMapping, OrderIndex, OrderShow, OrderNew, PaymentEdit);
+    JS
+  end
+
+  def write_standalone_resource_view_entry
+    create_file "standalone_resource_entry.jsx", <<~JS
+      import "./app/views/admin/fields/index.js";
+      import "./app/views/admin/components/index.js";
+      import "./app/views/admin/components/ui/index.js";
+      import { FieldRenderer } from "./app/views/admin/fields/index.js";
+      import { ResourceTable } from "./app/views/admin/components/index.js";
+      import { Button } from "./app/views/admin/components/ui/index.js";
+      import { generatedPageMapping } from "./app/javascript/admin/generated_page_mapping.js";
+      import OrderIndex from "./app/views/admin/orders/index.jsx";
+      import OrderShow from "./app/views/admin/orders/show.jsx";
+      import InvoiceNew from "./app/views/admin/invoices/new.jsx";
+      import InvoiceEdit from "./app/views/admin/invoices/edit.jsx";
+      import PaymentEdit from "./app/views/admin/payments/edit.jsx";
+
+      console.log(
+        FieldRenderer,
+        ResourceTable,
+        Button,
+        generatedPageMapping,
+        OrderIndex,
+        OrderShow,
+        InvoiceNew,
+        InvoiceEdit,
+        PaymentEdit
+      );
     JS
   end
 
