@@ -97,7 +97,7 @@ This creates an isolated admin namespace alongside your existing app — it won'
 - `app/javascript/admin/application_visit.js` — visit/remote factory
 - `app/javascript/admin/slices/flash.js` — flash message Redux slice
 - `app/javascript/admin.js` — esbuild root entrypoint generated only with `--bundler=esbuild`
-- `app/views/layouts/admin/superglue.html.erb` — admin HTML layout
+- `app/views/layouts/admin/application.html.erb` — admin HTML layout
 - `app/views/layouts/admin/application.json.props` — admin JSON props layout
 
 **Admin controllers and routes:**

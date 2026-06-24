@@ -54,6 +54,19 @@ RSpec.describe Terrazzo::Generators::InstallGenerator do
     expect { generator.validate_bundler }.to raise_error(Thor::Error, /supports Vite or esbuild/)
   end
 
+  it "generates the namespaced admin HTML and JSON layouts" do
+    run_install_layout_generators
+
+    expect(File).to exist(File.join(destination_root, "app/views/layouts/admin/application.html.erb"))
+    expect(File).to exist(File.join(destination_root, "app/views/layouts/admin/application.json.props"))
+    expect(File).not_to exist(File.join(destination_root, "app/views/layouts/admin/superglue.html.erb"))
+
+    json_layout = read("app/views/layouts/admin/application.json.props")
+    expect(json_layout).to include('json.navigation(partial: ["admin/application/navigation"])')
+    expect(json_layout).to include("json.componentIdentifier terrazzo_page_identifier")
+    expect(json_layout).to include("json.slices")
+  end
+
   it "fails before generation when application model tables are missing" do
     generator = described_class.new([], {}, destination_root: destination_root)
     model = double("Blog::Post", name: "Blog::Post", table_exists?: false)
@@ -237,6 +250,16 @@ RSpec.describe Terrazzo::Generators::InstallGenerator do
     original_stdout = $stdout
     $stdout = StringIO.new
     generator.create_stylesheet
+  ensure
+    $stdout = original_stdout
+  end
+
+  def run_install_layout_generators
+    generator = described_class.new([], {}, destination_root: destination_root)
+    original_stdout = $stdout
+    $stdout = StringIO.new
+    generator.create_layout
+    generator.create_json_props_layout
   ensure
     $stdout = original_stdout
   end
