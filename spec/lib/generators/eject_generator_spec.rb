@@ -146,6 +146,8 @@ RSpec.describe Terrazzo::Generators::EjectGenerator do
 
       expect_bundle_to_succeed("ui_entry.jsx")
       expect(File).to exist(File.join(destination_root, "app/views/admin/components/ui/#{name}.jsx"))
+      expect(read("app/views/admin/components/ui/index.js"))
+        .to include(%(export { #{ui_exports_for(name)} } from "./#{name}";))
 
       ui_dependencies_for(name).each do |dependency|
         expect(File).to exist(File.join(destination_root, "app/views/admin/components/ui/#{dependency}.jsx"))
@@ -595,6 +597,14 @@ RSpec.describe Terrazzo::Generators::EjectGenerator do
       "pagination" => %w[button],
       "sidebar" => %w[button input separator sheet skeleton tooltip],
     }.fetch(name, [])
+  end
+
+  def ui_exports_for(name)
+    source = File.read(File.join(repo_root, "lib/generators/terrazzo/views/templates/components/ui/index.js"))
+    match = source.match(/^export\s*\{(?<exports>[^}]*)\}\s*from\s*["']\.\/#{Regexp.escape(name)}["'];/m)
+    raise "Missing UI export fixture for #{name}" unless match
+
+    match[:exports].split(",").map(&:strip).reject(&:empty?).join(", ")
   end
 
   def component_dependencies_for(name)

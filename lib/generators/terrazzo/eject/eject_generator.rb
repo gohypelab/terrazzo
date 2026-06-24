@@ -252,26 +252,11 @@ module Terrazzo
       end
 
       def ui_component_exports(name)
-        {
-          "avatar" => "Avatar, AvatarImage, AvatarFallback",
-          "badge" => "Badge, badgeVariants",
-          "button" => "Button, buttonVariants",
-          "card" => "Card, CardHeader, CardFooter, CardTitle, CardDescription, CardContent",
-          "dropdown-menu" => "DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem, DropdownMenuCheckboxItem, DropdownMenuRadioItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuShortcut, DropdownMenuGroup, DropdownMenuPortal, DropdownMenuSub, DropdownMenuSubContent, DropdownMenuSubTrigger, DropdownMenuRadioGroup",
-          "field" => "Field, FieldLabel",
-          "input" => "Input",
-          "label" => "Label",
-          "pagination" => "Pagination, PaginationContent, PaginationItem, PaginationLink, PaginationPrevious, PaginationNext",
-          "popover" => "Popover, PopoverTrigger, PopoverContent",
-          "select" => "Select, SelectGroup, SelectValue, SelectTrigger, SelectContent, SelectLabel, SelectItem, SelectSeparator, SelectScrollUpButton, SelectScrollDownButton",
-          "separator" => "Separator",
-          "sheet" => "Sheet, SheetPortal, SheetOverlay, SheetTrigger, SheetClose, SheetContent, SheetHeader, SheetFooter, SheetTitle, SheetDescription",
-          "sidebar" => "Sidebar, SidebarContent, SidebarFooter, SidebarGroup, SidebarGroupAction, SidebarGroupContent, SidebarGroupLabel, SidebarHeader, SidebarInput, SidebarInset, SidebarMenu, SidebarMenuAction, SidebarMenuBadge, SidebarMenuButton, SidebarMenuItem, SidebarMenuSkeleton, SidebarMenuSub, SidebarMenuSubButton, SidebarMenuSubItem, SidebarProvider, SidebarRail, SidebarSeparator, SidebarTrigger, useSidebar",
-          "skeleton" => "Skeleton",
-          "table" => "Table, TableHeader, TableBody, TableFooter, TableHead, TableRow, TableCell, TableCaption",
-          "textarea" => "Textarea",
-          "tooltip" => "Tooltip, TooltipTrigger, TooltipContent, TooltipProvider",
-        }.fetch(name)
+        ui_barrel_template = File.read(File.join(self.class.source_root, "components/ui/index.js"))
+        match = ui_barrel_template.match(/^export\s*\{(?<exports>[^}]*)\}\s*from\s*["']\.\/#{Regexp.escape(name)}["'];/m)
+        raise Thor::Error, "Could not find UI exports for '#{name}'" unless match
+
+        match[:exports].split(",").map(&:strip).reject(&:empty?).join(", ")
       end
 
       def ensure_barrel(barrel_path, package_export)
