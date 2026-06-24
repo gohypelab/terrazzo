@@ -28,6 +28,9 @@ module Terrazzo
       ].freeze
       SUPPORTED_BUNDLERS = %w[vite esbuild].freeze
 
+      argument :namespace_argument, type: :string, required: false,
+        desc: "Admin namespace. Prefer --namespace; this positional form is kept for compatibility."
+
       class_option :namespace, type: :string, default: "admin",
         desc: "Admin namespace"
       class_option :bundler, type: :string, default: "vite",
@@ -41,6 +44,18 @@ module Terrazzo
 
           Terrazzo generates React/JSX admin views and supports Vite or esbuild.
           Re-run with `--bundler=vite` or `--bundler=esbuild`.
+        MESSAGE
+      end
+
+      def validate_namespace
+        return if namespace_argument.blank?
+        return if options[:namespace] == "admin" || options[:namespace] == namespace_argument
+
+        raise Thor::Error, <<~MESSAGE
+          Conflicting admin namespaces: '#{namespace_argument}' and '#{options[:namespace]}'.
+
+          Use either `rails generate terrazzo:install #{namespace_argument}` or
+          `rails generate terrazzo:install --namespace=#{options[:namespace]}`, not both.
         MESSAGE
       end
 
@@ -154,7 +169,7 @@ module Terrazzo
       private
 
       def namespace_name
-        options[:namespace]
+        namespace_argument.presence || options[:namespace]
       end
 
       def vite?

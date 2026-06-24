@@ -40,7 +40,7 @@ RSpec.describe Terrazzo::Generators::InstallGenerator do
       dependencies: described_class::FRONTEND_DEPENDENCIES.to_h { |package_name| [package_name, "*"] },
     })
 
-    run_install_entrypoint_generators(bundler: "esbuild")
+    run_install_entrypoint_generators([], bundler: "esbuild")
     run_views_generator
     create_node_package_link
 
@@ -52,6 +52,29 @@ RSpec.describe Terrazzo::Generators::InstallGenerator do
     generator = described_class.new([], { bundler: "sprockets" }, destination_root: destination_root)
 
     expect { generator.validate_bundler }.to raise_error(Thor::Error, /supports Vite or esbuild/)
+  end
+
+  it "accepts the legacy positional namespace argument" do
+    create_file "package.json", JSON.pretty_generate({
+      dependencies: described_class::FRONTEND_DEPENDENCIES.to_h { |package_name| [package_name, "*"] },
+    })
+
+    run_install_entrypoint_generators(["backstage"], bundler: "esbuild")
+    run_views_generator(namespace: "backstage")
+    create_node_package_link
+
+    expect(File).to exist(File.join(destination_root, "app/javascript/backstage/application.jsx"))
+    expect(read("app/javascript/backstage.js")).to eq(%(import "./backstage/application.jsx"\n))
+    expect(read("app/javascript/backstage/page_to_page_mapping.js")).to include("'backstage/application/index'")
+    expect_bundle_to_succeed("app/javascript/backstage.js")
+  end
+
+  it "rejects conflicting namespace arguments" do
+    generator = described_class.new(["backstage"], { namespace: "admin" }, destination_root: destination_root)
+    expect { generator.validate_namespace }.not_to raise_error
+
+    generator = described_class.new(["backstage"], { namespace: "staff" }, destination_root: destination_root)
+    expect { generator.validate_namespace }.to raise_error(Thor::Error, /Conflicting admin namespaces/)
   end
 
   it "generates the namespaced admin HTML and JSON layouts" do
@@ -210,12 +233,13 @@ RSpec.describe Terrazzo::Generators::InstallGenerator do
 
   private
 
-  def run_install_entrypoint_generators(options = {})
-    generator = described_class.new([], options, destination_root: destination_root)
+  def run_install_entrypoint_generators(args = [], options = {})
+    generator = described_class.new(args, options, destination_root: destination_root)
     original_stdout = $stdout
     $stdout = StringIO.new
     %i[
       validate_bundler
+      validate_namespace
       create_js_entry_point
       create_esbuild_entry_point
       create_store
@@ -229,10 +253,10 @@ RSpec.describe Terrazzo::Generators::InstallGenerator do
     $stdout = original_stdout
   end
 
-  def run_views_generator
+  def run_views_generator(namespace: "admin")
     original_stdout = $stdout
     $stdout = StringIO.new
-    Terrazzo::Generators::ViewsGenerator.start([], destination_root: destination_root)
+    Terrazzo::Generators::ViewsGenerator.start(["--namespace=#{namespace}"], destination_root: destination_root)
   ensure
     $stdout = original_stdout
   end
