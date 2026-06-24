@@ -187,6 +187,24 @@ RSpec.describe "Admin Customizations", type: :system do
     end
   end
 
+  describe "local override registration" do
+    let!(:customer) { create(:customer, name: "Registry Customer", territory: country) }
+    let!(:order) { create(:order, customer: customer, address_line_one: "987 Registry Lane") }
+
+    it "uses app-owned component and field overrides in packaged pages" do
+      visit admin_orders_path
+
+      expect(page).to have_css('[data-testid="custom-search-bar"]')
+      expect(page).to have_css('[data-testid="custom-string-index-field"]', text: "987 Registry Lane")
+
+      visit admin_customer_path(customer)
+      expect(page).to have_css('[data-testid="custom-string-show-field"]', text: "Registry Customer")
+
+      visit edit_admin_customer_path(customer)
+      expect(page).to have_css('[data-testid="custom-string-form-field"]')
+    end
+  end
+
   describe "ejected boolean field with icons" do
     let!(:customer) { create(:customer, name: "Bool Test", hidden: false, territory: country) }
 

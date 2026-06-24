@@ -25,7 +25,7 @@ export function SearchBar({ searchTerm, searchPath }) {
   };
 
   return (
-    <form onSubmit={handleSubmit} className="max-w-sm">
+    <form data-testid="custom-search-bar" onSubmit={handleSubmit} className="max-w-sm">
       <div className="relative">
         <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
         <Input
