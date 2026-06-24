@@ -5,6 +5,7 @@ RSpec.describe "dashboard field metadata", type: :request do
     allow_any_instance_of(CustomerDashboard).to receive(:attribute_label).and_call_original
     allow_any_instance_of(CustomerDashboard).to receive(:attribute_hint).and_call_original
     allow_any_instance_of(CustomerDashboard).to receive(:collection_cell_options).and_call_original
+    allow_any_instance_of(CustomerDashboard).to receive(:collection_row_options).and_call_original
 
     allow_any_instance_of(CustomerDashboard).to receive(:attribute_label)
       .with(:name, :index)
@@ -24,9 +25,12 @@ RSpec.describe "dashboard field metadata", type: :request do
     allow_any_instance_of(CustomerDashboard).to receive(:collection_cell_options)
       .with(:name, kind_of(Customer))
       .and_return(class_name: "text-right", tone: "quiet")
+    allow_any_instance_of(CustomerDashboard).to receive(:collection_row_options)
+      .with(kind_of(Customer))
+      .and_return(class_name: "bg-muted/40", tone: "highlight")
   end
 
-  it "serializes index labels and cell options from the dashboard" do
+  it "serializes index labels, row options, and cell options from the dashboard" do
     create_customer(name: "Metadata Test")
 
     get "/admin/customers", headers: json_headers
@@ -34,9 +38,14 @@ RSpec.describe "dashboard field metadata", type: :request do
     expect(response).to have_http_status(:ok)
     data = JSON.parse(response.body).fetch("data")
     header = data.dig("table", "headers").find { |item| item.fetch("attribute") == "name" }
+    row = data.dig("table", "rows", 0)
     cell = data.dig("table", "rows", 0, "cells").find { |item| item.fetch("attribute") == "name" }
 
     expect(header.fetch("label")).to eq("Customer name")
+    expect(row.fetch("rowOptions")).to eq({
+      "className" => "bg-muted/40",
+      "meta" => { "tone" => "highlight" },
+    })
     expect(cell.fetch("cellOptions")).to eq({
       "className" => "text-right",
       "meta" => { "tone" => "quiet" },

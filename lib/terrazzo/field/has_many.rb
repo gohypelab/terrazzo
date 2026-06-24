@@ -133,10 +133,26 @@ module Terrazzo
             cell[:cellOptions] = cell_options if cell_options.present?
             cell
           end
-          { id: record.id.to_s, cells: cells }
+          row = { id: record.id.to_s, cells: cells }
+          row_options = serialized_row_options(dashboard, record)
+          row[:rowOptions] = row_options if row_options.present?
+          row
         end
 
         { headers: headers, rows: rows }
+      end
+
+      def serialized_row_options(dashboard, resource)
+        options = (dashboard.collection_row_options(resource) || {}).to_h
+        class_name = options.delete(:class_name) ||
+          options.delete("class_name") ||
+          options.delete(:className) ||
+          options.delete("className")
+
+        {
+          className: class_name,
+          meta: options.presence,
+        }.compact
       end
 
       def serialized_cell_options(dashboard, attribute, resource)

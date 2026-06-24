@@ -3,6 +3,7 @@ import { NavigationContext } from "@thoughtbot/superglue";
 
 import { SortableHeader } from "./SortableHeader";
 import { CollectionItemActions } from "./CollectionItemActions";
+import { cn } from "terrazzo";
 import { FieldRenderer } from "../fields";
 import {
   Table,
@@ -54,7 +55,10 @@ export function ResourceTable({ headers, rows, emptyState, showActions = true })
           ) : rows.map((row) => (
             <TableRow
               key={row.id}
-              className={row.showPath ? "cursor-pointer" : ""}
+              className={cn(
+                row.showPath && "cursor-pointer",
+                row.rowOptions?.className || row.rowOptions?.class_name
+              )}
               onClick={(e) => handleRowClick(e, row.showPath)}
             >
               {row.cells.map((cell) => {

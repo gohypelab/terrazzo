@@ -138,6 +138,23 @@ end
 
 The default table applies `class_name` / `className` to the `<td>`. Other keys are serialized under `cellOptions.meta` so custom index field components can use them.
 
+## Collection Row Options
+
+Use `collection_row_options` when an entire table row needs presentation metadata:
+
+```ruby
+def collection_row_options(resource)
+  return {} unless resource.overdue?
+
+  {
+    class_name: "bg-destructive/10",
+    tone: "danger",
+  }
+end
+```
+
+The default table applies `class_name` / `className` to the `<tr>`. Other keys are serialized under `rowOptions.meta` so an ejected or registered `ResourceTable` can use them.
+
 ## Custom Row Actions
 
 By default, each row on the index page shows Show, Edit, and Destroy buttons. Override `collection_item_actions` in your dashboard to customize these per resource type:
@@ -313,6 +330,7 @@ The generator inspects your model's columns and associations to produce a reason
 | `#attribute_label(attribute, context)` | Display label for an attribute on index, show, form, nested table, and CSV contexts |
 | `#attribute_hint(attribute, context)` | Supporting text for attributes on form and show contexts |
 | `#collection_cell_options(attribute, resource)` | Per-cell metadata for index and nested `has_many` tables |
+| `#collection_row_options(resource)` | Per-row metadata for index and nested `has_many` tables |
 | `#collection_filter_options(view)` | Index filter facets generated from `COLLECTION_FILTERS` |
 | `#collection_filter_label(filter_name)` | Label for an index filter facet |
 | `#collection_item_actions(resource, view)` | Per-row action buttons (default: Show/Edit/Destroy) |

@@ -47,7 +47,7 @@ RSpec.describe Terrazzo::Field::HasMany do
       expect(result[:perPage]).to eq(5)
     end
 
-    it "uses associated dashboard labels and cell metadata in nested tables" do
+    it "uses associated dashboard labels and row and cell metadata in nested tables" do
       allow_any_instance_of(OrderDashboard).to receive(:attribute_label).and_call_original
       allow_any_instance_of(OrderDashboard).to receive(:attribute_label)
         .with(:address_line_one, :index)
@@ -56,6 +56,10 @@ RSpec.describe Terrazzo::Field::HasMany do
       allow_any_instance_of(OrderDashboard).to receive(:collection_cell_options)
         .with(:address_line_one, kind_of(Order))
         .and_return(class_name: "font-medium", tone: "primary")
+      allow_any_instance_of(OrderDashboard).to receive(:collection_row_options).and_call_original
+      allow_any_instance_of(OrderDashboard).to receive(:collection_row_options)
+        .with(kind_of(Order))
+        .and_return(class_name: "bg-muted/40", tone: "highlight")
 
       field = described_class.new(
         :orders,
@@ -67,9 +71,14 @@ RSpec.describe Terrazzo::Field::HasMany do
 
       result = field.serialize_value(:show)
       street_header = result[:headers].find { |header| header[:attribute] == "address_line_one" }
+      first_row = result[:rows].first
       street_cell = result[:rows].first[:cells].find { |cell| cell[:attribute] == "address_line_one" }
 
       expect(street_header[:label]).to eq("Street")
+      expect(first_row[:rowOptions]).to eq({
+        className: "bg-muted/40",
+        meta: { tone: "highlight" },
+      })
       expect(street_cell[:cellOptions]).to eq({
         className: "font-medium",
         meta: { tone: "primary" },

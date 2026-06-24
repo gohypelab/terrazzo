@@ -138,6 +138,14 @@ RSpec.describe Terrazzo::BaseDashboard do
     end
   end
 
+  describe "#collection_row_options" do
+    it "returns no row metadata by default" do
+      customer = create_customer(name: "Alice")
+
+      expect(dashboard.collection_row_options(customer)).to eq({})
+    end
+  end
+
   describe "#collection_includes" do
     it "returns eager-loadable attributes that appear in COLLECTION_ATTRIBUTES" do
       includes = dashboard.collection_includes

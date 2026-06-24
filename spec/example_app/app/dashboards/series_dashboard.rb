@@ -46,6 +46,15 @@ class SeriesDashboard < Terrazzo::BaseDashboard
     ]
   end
 
+  def collection_row_options(resource)
+    return {} unless resource.name.start_with?("Alpha")
+
+    {
+      class_name: "bg-muted/40",
+      tone: "highlight",
+    }
+  end
+
   # Overwrite this method to customize how series are displayed
   # across all pages of the admin dashboard.
   #
