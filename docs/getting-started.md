@@ -19,7 +19,7 @@ yarn add terrazzo
 npm install terrazzo
 ```
 
-The `terrazzo` npm package provides the default React pages/components, utilities (`cn`, `truncate`, `formatDate/DateTime/Time`), hooks (`useIsMobile`), and the field registry API. The install generator creates app-level barrels that use those package defaults; eject a page, field, component, or UI primitive when you want app-owned source.
+The `terrazzo` npm package provides the default React pages/components, utilities (`cn`, `truncate`, `formatDate/DateTime/Time`, `csrfToken`), hooks (`useIsMobile`), and the field registry API. The install generator creates app-level barrels that use those package defaults; eject a page, field, component, or UI primitive when you want app-owned source.
 
 ## 3. Install frontend dependencies
 

@@ -421,6 +421,21 @@ RSpec.describe Terrazzo::Generators::EjectGenerator do
     end
   end
 
+  it "keeps component ejection templates aligned with packaged components" do
+    packaged_files = component_template_files("npm/src/components")
+    template_files = component_template_files("lib/generators/terrazzo/views/templates/components")
+
+    expect(template_files).to eq(packaged_files)
+
+    packaged_files.each do |file_name|
+      packaged_source = read_repo("npm/src/components/#{file_name}")
+      template_source = read_repo("lib/generators/terrazzo/views/templates/components/#{file_name}")
+
+      expect(normalize_ejected_component_source(template_source)).to eq(normalize_ejected_component_source(packaged_source)),
+        "expected components/#{file_name} to match the packaged component"
+    end
+  end
+
   private
 
   def run_generator(generator, args)
@@ -625,6 +640,13 @@ RSpec.describe Terrazzo::Generators::EjectGenerator do
       .sort
   end
 
+  def component_template_files(relative_root)
+    Dir[File.join(repo_root, relative_root, "*.jsx")]
+      .map { |path| File.basename(path) }
+      .reject { |name| name.end_with?(".test.jsx") }
+      .sort
+  end
+
   def normalize_ejected_field_source(source)
     source
       .gsub(
@@ -636,6 +658,20 @@ RSpec.describe Terrazzo::Generators::EjectGenerator do
       .gsub(/from "\.\.\/\.\.\/components\/ui"/, 'from "__TERRAZZO_UI__"')
       .gsub(/from "terrazzo\/components"/, 'from "__TERRAZZO_COMPONENTS__"')
       .gsub(/from "\.\.\/\.\.\/components"/, 'from "__TERRAZZO_COMPONENTS__"')
+      .gsub(/\n{2,}/, "\n")
+      .strip
+  end
+
+  def normalize_ejected_component_source(source)
+    source
+      .gsub(/import \{ getComponent \} from "\.\.\/componentRegistry";\n/, "")
+      .gsub(/ as Default([A-Za-z0-9_]+)/, "")
+      .gsub(/  const [A-Za-z0-9_]+ = getComponent\("[A-Za-z0-9_]+"\) \|\| Default[A-Za-z0-9_]+;\n/, "")
+      .gsub(/from "\.\.\/utils"/, 'from "terrazzo"')
+      .gsub(/from "terrazzo\/ui"/, 'from "__TERRAZZO_UI__"')
+      .gsub(/from "\.\/ui"/, 'from "__TERRAZZO_UI__"')
+      .gsub(/from "terrazzo\/fields"/, 'from "__TERRAZZO_FIELDS__"')
+      .gsub(/from "\.\.\/fields"/, 'from "__TERRAZZO_FIELDS__"')
       .gsub(/\n{2,}/, "\n")
       .strip
   end

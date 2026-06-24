@@ -1,12 +1,7 @@
 import React from "react";
 
 import { Button } from "./ui";
-
-function csrfToken() {
-  if (typeof document === "undefined") return "";
-
-  return document.querySelector('meta[name="csrf-token"]')?.content ?? "";
-}
+import { csrfToken } from "terrazzo";
 
 export function CollectionToolbarActions({ actions }) {
   if (!actions || actions.length === 0) return null;

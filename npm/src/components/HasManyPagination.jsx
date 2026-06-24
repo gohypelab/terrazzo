@@ -1,11 +1,12 @@
 import React from "react";
-import { Button } from "terrazzo/ui";
 import { ChevronLeft, ChevronRight } from "lucide-react";
+
+import { Button } from "terrazzo/ui";
 
 export function HasManyPagination({ currentPage, totalPages, total, nextPagePath, prevPagePath }) {
   if (totalPages <= 1) return null;
 
-  const updateUrl = (path) => (event) => {
+  const updateUrl = (path) => () => {
     const url = new URL(path, window.location.origin);
     url.searchParams.delete("props_at");
     window.history.replaceState(window.history.state, "", url.pathname + url.search);

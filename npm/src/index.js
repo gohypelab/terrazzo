@@ -1,5 +1,5 @@
 // Utilities
-export { cn, truncate, formatDate, formatDateTime, formatTime } from "./utils"
+export { cn, truncate, formatDate, formatDateTime, formatTime, csrfToken } from "./utils"
 
 // Hooks
 export { useIsMobile } from "./hooks/use-mobile"

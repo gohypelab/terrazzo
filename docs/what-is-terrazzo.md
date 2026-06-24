@@ -16,7 +16,7 @@ Administrate is great, but its ERB-based views can feel limiting when you want r
 Terrazzo is two packages:
 
 1. **`terrazzo` gem** — Provides the dashboard DSL, field types, generic `.json.props` templates, controllers, and Rails generators.
-2. **`terrazzo` npm package** — Provides the default React pages/components, utilities (`cn`, `truncate`, `formatDate`), hooks (`useIsMobile`), and the field registry API.
+2. **`terrazzo` npm package** — Provides the default React pages/components, utilities (`cn`, `truncate`, `formatDate`, `csrfToken`), hooks (`useIsMobile`), and the field registry API.
 
 When you run the install generator, it creates admin entrypoints, page mapping, shared page stubs, and app-level barrels for fields, components, and UI primitives. The default React implementation comes from the `terrazzo` package; ejection copies supported starter files into your app when you need local ownership.
 
