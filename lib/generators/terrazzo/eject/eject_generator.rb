@@ -63,6 +63,7 @@ module Terrazzo
         end
 
         ensure_ui_barrel
+        ensure_components_barrel
         update_fields_barrel(field_type)
       end
 

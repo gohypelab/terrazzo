@@ -197,6 +197,21 @@ RSpec.describe Terrazzo::Generators::EjectGenerator do
     end
   end
 
+  it "builds JavaScript after standalone ejection of each supported field type" do
+    field_names.each do |name|
+      reset_destination_root
+      run_generator(described_class, ["fields/#{name}"])
+
+      create_node_package_link
+      write_fields_entry
+
+      expect_bundle_to_succeed("fields_entry.jsx")
+      expect(read("app/views/admin/fields/index.js")).to include('export * from "terrazzo/fields";')
+      expect(read("app/views/admin/components/index.js")).to include('export * from "terrazzo/components";')
+      expect(read("app/views/admin/components/ui/index.js")).to include('export * from "terrazzo/ui";')
+    end
+  end
+
   it "builds standalone ejections by creating missing app-level barrels" do
     {
       "pages/index" => <<~JS,
