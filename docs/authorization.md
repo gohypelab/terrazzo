@@ -49,7 +49,7 @@ class Admin::ApplicationController < Terrazzo::ApplicationController
 end
 ```
 
-When this returns `false`, Terrazzo raises `Terrazzo::NotAuthorizedError`.
+When this returns `false`, Terrazzo raises `Terrazzo::NotAuthorizedError` for that controller action. The same hook is used when building page props, so unauthorized default actions such as New, Edit, Delete, and row Show links are hidden automatically.
 
 ## Using Pundit
 
@@ -89,4 +89,4 @@ namespace :admin do
 end
 ```
 
-Terrazzo automatically hides action buttons (New, Edit, Delete) when their routes don't exist.
+Terrazzo automatically hides action buttons (New, Edit, Delete) when their routes don't exist or when `authorized_action?` returns `false`.

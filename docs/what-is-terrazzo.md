@@ -9,16 +9,16 @@ Administrate is great, but its ERB-based views can feel limiting when you want r
 - **Same DSL** — `ATTRIBUTE_TYPES`, `COLLECTION_ATTRIBUTES`, `FORM_ATTRIBUTES`, `SHOW_PAGE_ATTRIBUTES` all work the same way.
 - **No separate API** — Superglue lets your Rails views serve both JSON props and React components. No GraphQL or REST API to maintain.
 - **Full SPA experience** — Search, sort, and paginate without full page reloads. Browser back/forward just works.
-- **Your code, your rules** — All generated views and components are copied into your app. Edit them directly — no monkey-patching or complex override systems.
+- **Your code, your rules** — Terrazzo installs app-level barrels and shared page stubs, then lets you eject supported starter files when you want to own and edit the React source directly.
 
 ## How It Works
 
 Terrazzo is two packages:
 
 1. **`terrazzo` gem** — Provides the dashboard DSL, field types, generic `.json.props` templates, controllers, and Rails generators.
-2. **`terrazzo` npm package** — A slim runtime with utilities (`cn`, `truncate`, `formatDate`), hooks (`useIsMobile`), and the field registry API.
+2. **`terrazzo` npm package** — Provides the default React pages/components, utilities (`cn`, `truncate`, `formatDate`), hooks (`useIsMobile`), and the field registry API.
 
-When you run the install generator, it copies all React components (UI primitives, page views, field renderers) into your app. From that point, they're yours to customize.
+When you run the install generator, it creates admin entrypoints, page mapping, shared page stubs, and app-level barrels for fields, components, and UI primitives. The default React implementation comes from the `terrazzo` package; ejection copies supported starter files into your app when you need local ownership.
 
 ## Architecture
 

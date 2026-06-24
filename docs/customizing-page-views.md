@@ -1,6 +1,6 @@
 # Customizing Page Views
 
-All generated views and components live in your app at `app/views/admin/` and can be edited directly.
+The install generator creates shared page stubs, navigation props, and app-level barrels under `app/views/admin/`. Default React pages, components, fields, and UI primitives come from the `terrazzo` package until you eject the files you want to own.
 
 ## File Structure
 
@@ -11,16 +11,16 @@ app/views/admin/
 │   ├── show.jsx                 # detail view
 │   ├── new.jsx                  # new form
 │   ├── edit.jsx                 # edit form
-│   ├── _collection.jsx          # shared collection table partial
-│   ├── _form.jsx                # shared form partial
+│   ├── _collection.jsx          # ejected shared collection table partial
+│   ├── _form.jsx                # ejected shared form partial
 │   └── _navigation.json.props   # sidebar navigation partial
 ├── components/
-│   ├── ui/            # shadcn UI primitives
-│   ├── Layout.jsx     # main layout wrapper
-│   ├── SearchBar.jsx
+│   ├── ui/            # UI barrel and ejected shadcn-style primitives
+│   ├── Layout.jsx     # ejected main layout wrapper
+│   ├── SearchBar.jsx  # ejected search component
 │   └── ...
 └── fields/
-    ├── string/        # each field type has Index, Show, and Form variants
+    ├── string/        # ejected field variants
     ├── boolean/
     └── ...
 ```
@@ -37,7 +37,7 @@ rails g terrazzo:views:index Product
 rails g terrazzo:views:edit Product
 ```
 
-Each generator ejects a `.json.props` that calls the gem's base partial, plus the associated JSX partial (`_collection.jsx` for index, `_form.jsx` for edit/new):
+Each generator ejects a page component and a `.json.props` that calls the gem's base partial. Index also copies `_collection.jsx`; edit and new also copy `_form.jsx`:
 
 ```ruby
 # app/views/admin/products/show.json.props
@@ -48,7 +48,7 @@ json.onSale @resource.on_sale?
 
 The base partials (`show_base`, `index_base`, `edit_base`, `new_base`) provide the standard Terrazzo serialization. Your file just adds to it.
 
-The ejected JSX partials let you customize the collection table or form for that resource — for example, adding custom columns, changing the row layout, or adding extra form fields.
+The ejected page and JSX partials let you customize the layout, collection table, or form for that resource — for example, adding custom columns, changing the row layout, or adding extra form fields.
 
 ### Overriding the React component
 
@@ -64,12 +64,22 @@ Your custom component receives the same props as the default (plus any custom pr
 ```jsx
 // app/views/admin/products/index.jsx
 import { useContent } from "@thoughtbot/superglue"
-import { Layout } from "../components/Layout"
+import { getLayout } from "terrazzo"
+import { CollectionToolbarActions } from "../components"
 
 export default function ProductsIndex() {
-  const { table, searchBar, pagination, navigation } = useContent()
+  const Layout = getLayout()
+  const { table, searchBar, filters, pagination, layoutActions, toolbarActions, emptyState, navigation } = useContent()
   return (
-    <Layout navigation={navigation} title="Products">
+    <Layout
+      navigation={navigation}
+      title="Products"
+      actions={
+        <div>
+          <CollectionToolbarActions actions={layoutActions} />
+          <CollectionToolbarActions actions={toolbarActions} />
+        </div>
+      }>
       {/* your custom layout */}
     </Layout>
   )
@@ -78,13 +88,13 @@ export default function ProductsIndex() {
 
 ## Re-generating Views
 
-To reset all generated components to their defaults (e.g., after upgrading the gem):
+To reset the shared page stubs, app barrels, and navigation props to their defaults:
 
 ```bash
 rails g terrazzo:views
 ```
 
-This will overwrite your local copies with the latest versions from the gem.
+This will overwrite those generated files. Use `rails g terrazzo:eject ...` for individual pages, components, fields, or UI primitives that you want to own locally.
 
 ## Custom Pages
 
@@ -120,9 +130,10 @@ json.data @data
 ```jsx
 // app/views/admin/reports/index.jsx
 import { useContent } from "@thoughtbot/superglue"
-import { Layout } from "../components/Layout"
+import { getLayout } from "terrazzo"
 
 export default function ReportsIndex() {
+  const Layout = getLayout()
   const { pageTitle, data, navigation } = useContent()
   return (
     <Layout navigation={navigation} title={pageTitle}>
@@ -141,20 +152,19 @@ namespace :admin do
 end
 ```
 
-### 5. Register the component (esbuild/Sprockets only)
+### 5. Register the component
 
-If you're using **Vite**, the component is auto-discovered via `import.meta.glob` — no extra step needed.
-
-If you're using **esbuild or Sprockets**, add an entry to `page_to_page_mapping.js`:
+Add an entry to `app/javascript/admin/custom_page_mapping.js`. Resource-specific Terrazzo generators use `generated_page_mapping.js`, so this manual manifest is safe to edit directly.
 
 ```javascript
 import ReportsIndex from "../../views/admin/reports/index"
 
-export const pageToPageMapping = {
-  // ... existing entries
+export const customPageMapping = {
   'admin/reports/index': ReportsIndex,
 }
 ```
+
+`page_to_page_mapping.js` imports both `generated_page_mapping.js` and `custom_page_mapping.js`, then merges them with the built-in application pages. Manual custom mappings win over generated mappings when keys overlap.
 
 ## Custom Layout
 
@@ -182,6 +192,8 @@ All page components — both the gem's built-in pages and ejected pages — will
 
 Ejected pages use `getLayout()` (also exported from `terrazzo`) to resolve the active Layout at render time, so they respect `setLayout` without any extra wiring.
 
+Running `rails g terrazzo:eject components/Layout` copies the default layout and its local dependencies, then updates `app/views/admin/components/index.js` to call `setLayout(Layout)` for you. The generated admin entrypoint imports that barrel before rendering.
+
 The default Layout is also available as `DefaultLayout` from `terrazzo/components`, so you can extend it:
 
 ```jsx
@@ -197,93 +209,72 @@ function CustomLayout(props) {
 }
 ```
 
+## Custom Components
+
+Default Terrazzo pages resolve overridable components through a component registry. Running a component ejection command copies the component source into your app and updates `app/views/admin/components/index.js` to register it:
+
+```bash
+rails g terrazzo:eject components/ResourceTable
+rails g terrazzo:eject components/SearchBar
+rails g terrazzo:eject components/CollectionToolbarActions
+```
+
+The generated admin entrypoint imports the components barrel before rendering, so package pages will use registered local overrides for components such as `ResourceTable`, `SearchBar`, `CollectionFilters`, `Pagination`, `SortableHeader`, `CollectionItemActions`, `CollectionToolbarActions`, `HasManyPagination`, `AppSidebar`, `SiteHeader`, and `FlashMessages`.
+
 ## Customizing the Sidebar Navigation
 
 The sidebar navigation is rendered by a shared partial at `app/views/admin/application/_navigation.json.props`. This partial is included automatically by the layout, so you don't need to add it to each page template.
 
-To customize the navigation (e.g., add custom links, reorder items, or group resources), edit the partial directly.
-
-### Adding custom links
-
-Build an array of items and pass it to `json.array!`:
+For resource labels, grouping, ordering, and hiding, prefer dashboard constants:
 
 ```ruby
-# app/views/admin/application/_navigation.json.props
-resources = Terrazzo::Namespace.new(namespace).resources_with_index_route
-
-items = [
-  { label: "Dashboard", path: admin_root_path, active: controller_path == "admin/dashboard" },
-]
-
-json.array! items do |item|
-  json.label item[:label]
-  json.path item[:path]
-  json.active item[:active]
-end
-
-json.array! resources do |nav_resource|
-  json.label nav_resource.resource_name.humanize.pluralize
-  json.path url_for(controller: "/#{nav_resource.controller_path}", action: :index, only_path: true)
-  json.active nav_resource.controller_path == controller_path
+class ProductDashboard < Terrazzo::BaseDashboard
+  NAVIGATION_LABEL = "Catalog"
+  NAVIGATION_GROUP = "Commerce"
+  NAVIGATION_GROUP_ORDER = 10
+  NAVIGATION_ORDER = 20
 end
 ```
 
-### Grouping resources into sections
+Set `SHOW_IN_NAVIGATION = false` to hide a resource from the generated sidebar.
 
-You can split navigation into groups by changing the partial to output grouped data, then updating the sidebar component to render each group separately.
+### Adding Custom Links
 
-**1. Update the navigation partial** to return groups with labels and items:
+Eject the navigation partial when you need non-resource links or fully custom sidebar data:
 
 ```ruby
 # app/views/admin/application/_navigation.json.props
-resources = Terrazzo::Namespace.new(namespace).resources_with_index_route
-blog_resources, main_resources = resources.partition do |r|
-  r.controller_path.start_with?("admin/blog")
-end
+resources = Terrazzo::Namespace.new(namespace).navigation_resources
 
 groups = [
-  { label: "Resources", resources: main_resources },
-  { label: "Blog", resources: blog_resources },
+  {
+    label: "Admin",
+    items: [
+      { label: "Dashboard", path: admin_root_path, active: controller_path == "admin/dashboard" },
+    ],
+  },
+  {
+    label: "Resources",
+    items: resources.map do |r|
+      {
+        label: r.navigation_label,
+        path: url_for(controller: "/#{r.controller_path}", action: :index, only_path: true),
+        active: r.controller_path == controller_path,
+      }
+    end,
+  },
 ]
 
 json.array! groups do |group|
   json.label group[:label]
   json.items do
-    json.array! group[:resources] do |r|
-      json.label r.resource_name.humanize.pluralize
-      json.path url_for(controller: "/#{r.controller_path}", action: :index, only_path: true)
-      json.active r.controller_path == controller_path
+    json.array! group[:items] do |item|
+      json.label item[:label]
+      json.path item[:path]
+      json.active item[:active]
     end
   end
 end
-```
-
-**2. Update `app-sidebar.jsx`** to render each group as a separate section:
-
-```jsx
-<SidebarContent>
-  {navigation.map((group) =>
-    <SidebarGroup key={group.label}>
-      <SidebarGroupLabel>{group.label}</SidebarGroupLabel>
-      <SidebarGroupContent>
-        <SidebarMenu>
-          {group.items.map((item) =>
-            <SidebarMenuItem key={item.path}>
-              <SidebarMenuButton
-                asChild
-                isActive={item.active}
-                tooltip={item.label}>
-                <a href={item.path} data-sg-visit>
-                  <span>{item.label}</span>
-                </a>
-              </SidebarMenuButton>
-            </SidebarMenuItem>
-          )}
-        </SidebarMenu>
-      </SidebarGroupContent>
-    </SidebarGroup>
-  )}
-</SidebarContent>
 ```
 
 ## SPA Navigation

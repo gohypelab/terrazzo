@@ -33,7 +33,7 @@ end
 
 ## Customizing `find_resource`
 
-Override `find_resource` when your model uses a non-id primary key or slug-based routing:
+Terrazzo's generated admin links use database ids, even when a model overrides `to_param` for public slug URLs. Override `find_resource` only when your admin routes intentionally use a non-id key, such as a custom slug route:
 
 ```ruby
 class Admin::ProductsController < Admin::ApplicationController

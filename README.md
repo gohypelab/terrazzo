@@ -4,8 +4,8 @@ A drop-in admin panel for Rails apps. Uses the [Administrate](https://github.com
 
 - **Familiar DSL** — same `ATTRIBUTE_TYPES`, `COLLECTION_ATTRIBUTES`, `FORM_ATTRIBUTES` you already know
 - **React SPA** — search, sort, and paginate without full page reloads, no separate API needed
-- **shadcn/ui + Tailwind** — every generated component lives in your app and is fully editable
-- **17 field types** — string, number, money, boolean, date/time, email, URL, select, rich text, belongs_to, has_many, has_one, polymorphic, and more
+- **shadcn/ui + Tailwind** — polished defaults with supported ejection when you want app-owned source
+- **19 field types** — string, text, number, money, boolean, date/time, email, URL, password, select, rich text, hstore, asset, belongs_to, has_many, has_one, polymorphic, and more
 
 ## Quick start
 
@@ -13,13 +13,22 @@ A drop-in admin panel for Rails apps. Uses the [Administrate](https://github.com
 # Add the gem and npm package
 bundle add terrazzo
 npm install terrazzo
+npm install @radix-ui/react-avatar @radix-ui/react-dialog @radix-ui/react-dropdown-menu \
+  @radix-ui/react-label @radix-ui/react-popover @radix-ui/react-select \
+  @radix-ui/react-separator @radix-ui/react-slot @radix-ui/react-tooltip \
+  class-variance-authority lucide-react tailwindcss
+npm install --save-dev @tailwindcss/cli # if your app does not already compile Tailwind
 
 # Install Superglue (if not already set up)
 rails g superglue:install
 
-# Install Terrazzo — generates admin namespace, UI components, and dashboards
+# Install Terrazzo — generates admin namespace, app barrels, and dashboards
 # Uses Vite by default; for Sprockets pass --bundler=sprockets
 rails g terrazzo:install
+
+# Make sure app/assets/stylesheets/admin.css is compiled by Tailwind.
+# The installer warns if it cannot detect a Tailwind build pipeline
+# and prints a working @tailwindcss/cli setup command.
 
 # Start the server
 bin/dev

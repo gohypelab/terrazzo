@@ -1,6 +1,6 @@
 # Customizing Fields
 
-Terrazzo ships with 17 field types. Each field knows how to serialize itself for JSON and has three display modes: **index** (table cell), **show** (detail view), and **form** (input).
+Terrazzo ships with 19 field types. Each field knows how to serialize itself for JSON and has three display modes: **index** (table cell), **show** (detail view), and **form** (input).
 
 ## Setting Options
 
@@ -65,7 +65,7 @@ price: Field::Money
 amount: Field::Money.with_options(prefix: "€", decimals: 2)
 ```
 
-Like `Number` but defaults to 2 decimal places. Options: `prefix`, `suffix`, `decimals`
+Like `Number` but defaults to 2 decimal places. Options: `prefix`, `suffix`, `decimals`. `Money` uses the `number` frontend renderer, so eject `fields/number` when you want to customize built-in money rendering.
 
 ### **Field::Boolean**
 
@@ -255,12 +255,12 @@ rails g terrazzo:field Gravatar
 
 This creates:
 
-- `app/fields/gravatar_field.rb` — Ruby field class
+- `app/fields/terrazzo/field/gravatar.rb` — Ruby field class
 - `app/views/admin/fields/gravatar/IndexField.jsx` — table cell component
 - `app/views/admin/fields/gravatar/ShowField.jsx` — detail view component
 - `app/views/admin/fields/gravatar/FormField.jsx` — form input component
 
-It also registers the components in `app/views/admin/fields/index.js` so the field renderer can find them.
+It also creates or updates the app-level field and UI barrels, then registers the components in `app/views/admin/fields/index.js` so both packaged pages and ejected pages can render the custom field. The generated admin entrypoint imports this barrel before Superglue renders.
 
 ### The Ruby class
 
@@ -309,7 +309,9 @@ end
 
 ### The JSX components
 
-Each component receives the serialized value and options as props. For example, `ShowField.jsx`:
+Each component receives the serialized value and options as props. Form components also receive `attribute`, `label`, `hint`, `input`, and `required`. Index components receive `cellOptions` when the dashboard returns metadata from `collection_cell_options`.
+
+For example, `ShowField.jsx`:
 
 ```jsx
 import React from "react";
