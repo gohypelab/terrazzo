@@ -1,5 +1,10 @@
 import React from "react";
 
+import {
+  getFieldComponent,
+  registerFieldType as registerFieldTypeOverride,
+} from "../fieldRegistry";
+
 import { IndexField as StringIndex } from "./string/IndexField";
 import { ShowField as StringShow } from "./string/ShowField";
 import { FormField as StringForm } from "./string/FormField";
@@ -93,16 +98,15 @@ const fieldMap = {
   asset: { index: AssetIndex, show: AssetShow, form: AssetForm }
 };
 
-// Allow consumers to register custom field components
 export function registerFieldType(
 fieldType,
 components)
 {
-  fieldMap[fieldType] = { ...fieldMap[fieldType], ...components };
+  registerFieldTypeOverride(fieldType, components);
 }
 
 export function FieldRenderer({ mode, fieldType, ...rest }) {
-  const Component = fieldMap[fieldType]?.[mode];
+  const Component = getFieldComponent(fieldType, mode) || fieldMap[fieldType]?.[mode];
   if (!Component) return <span>{String(rest.value ?? "")}</span>;
   return <Component {...rest} />;
 }

@@ -3,6 +3,7 @@ require "superglue"
 module Terrazzo
   class ApplicationController < ::ActionController::Base
     include Superglue::Controller
+    include Terrazzo::ResourcePathsHelper
 
     prepend_view_path(
       Superglue::Resolver.new(Terrazzo::Engine.root.join("app/views"))
@@ -16,21 +17,24 @@ module Terrazzo
 
     prepend Terrazzo::UsesSuperglue::TemplateLookupOverride
 
-    helper_method :namespace, :dashboard, :resource_name, :resource_class, :application_title, :terrazzo_page_identifier, :route_exists?
+    helper_method :namespace, :dashboard, :resource_name, :resource_class, :application_title, :terrazzo_page_identifier, :route_exists?, :authorized_action?
     helper Terrazzo::CollectionActionsHelper
+    helper Terrazzo::ResourcePathsHelper
 
     def index
-      search = Terrazzo::Search.new(scoped_resource, dashboard, params[:search])
-      resources = search.run
+      resources, order = index_resources_and_order
 
-      filter = Terrazzo::Filter.new(resources, dashboard, params[:filter], params[:filter_value])
-      resources = filter.run
+      if request.format.csv?
+        return head :not_acceptable unless dashboard.csv_export_enabled?
 
-      order = Terrazzo::Order.new(
-        attribute: params[:order] || default_sorting_attribute,
-        direction: params[:direction] || (params[:order] ? nil : default_sorting_direction)
-      )
-      resources = order.apply(resources, dashboard)
+        includes = dashboard.includes_for_attributes(dashboard.csv_attributes)
+        resources = resources.includes(*includes) if includes.any?
+
+        send_data Terrazzo::CsvExport.new(dashboard, resources).to_csv,
+          filename: dashboard.csv_filename,
+          type: "text/csv; charset=utf-8"
+        return
+      end
 
       includes = dashboard.collection_includes
       resources = resources.includes(*includes) if includes.any?
@@ -44,6 +48,7 @@ module Terrazzo
 
     def show
       @resource = find_resource(params[:id])
+      authorize_action!(@resource, :show)
       @page = Terrazzo::Page::Show.new(
         dashboard, @resource,
         has_many_params: Terrazzo::HasManyPagination.extract(params, dashboard.has_many_attributes)
@@ -52,16 +57,20 @@ module Terrazzo
 
     def new
       @resource = resource_class.new
+      authorize_action!(@resource, :new)
       @page = Terrazzo::Page::Form.new(dashboard, @resource)
     end
 
     def edit
       @resource = find_resource(params[:id])
+      authorize_action!(@resource, :edit)
       @page = Terrazzo::Page::Form.new(dashboard, @resource)
     end
 
     def create
-      @resource = resource_class.new(resource_params("create"))
+      @resource = resource_class.new
+      authorize_action!(@resource, :create)
+      @resource.assign_attributes(resource_params("create"))
       assign_has_one_associations(@resource)
 
       if @resource.save
@@ -76,6 +85,7 @@ module Terrazzo
 
     def update
       @resource = find_resource(params[:id])
+      authorize_action!(@resource, :update)
 
       rp = resource_params("update")
       assign_has_one_associations(@resource)
@@ -92,6 +102,7 @@ module Terrazzo
 
     def destroy
       @resource = find_resource(params[:id])
+      authorize_action!(@resource, :destroy)
       @resource.destroy
 
       redirect_to after_resource_destroyed_path,
@@ -114,11 +125,11 @@ module Terrazzo
     end
 
     def after_resource_created_path(resource)
-      [namespace, resource]
+      terrazzo_resource_member_path(resource) || after_resource_destroyed_path
     end
 
     def after_resource_updated_path(resource)
-      [namespace, resource]
+      terrazzo_resource_member_path(resource) || after_resource_destroyed_path
     end
 
     def after_resource_destroyed_path
@@ -129,6 +140,22 @@ module Terrazzo
 
     def scoped_resource
       resource_class.all
+    end
+
+    def index_resources_and_order
+      search = Terrazzo::Search.new(scoped_resource, dashboard, params[:search])
+      resources = search.run
+
+      filter = Terrazzo::Filter.new(resources, dashboard, params[:filter], params[:filter_value])
+      resources = filter.run
+
+      order = Terrazzo::Order.new(
+        attribute: params[:order] || default_sorting_attribute,
+        direction: params[:direction] || (params[:order] ? nil : default_sorting_direction)
+      )
+      resources = order.apply(resources, dashboard)
+
+      [resources, order]
     end
 
     def find_resource(id)
@@ -176,6 +203,12 @@ module Terrazzo
 
     def authorized_action?(resource, action)
       true
+    end
+
+    def authorize_action!(resource, action)
+      return if authorized_action?(resource, action)
+
+      raise Terrazzo::NotAuthorizedError
     end
 
     def namespace

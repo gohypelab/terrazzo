@@ -4,28 +4,31 @@ RSpec.describe Terrazzo::Order do
   let(:dashboard) { CustomerDashboard.new }
 
   before do
-    Customer.delete_all
-    create_customer(name: "Charlie", email: "c@test.com")
-    create_customer(name: "Alice", email: "a@test.com")
-    create_customer(name: "Bob", email: "b@test.com")
+    @customers = [
+      create_customer(name: "Charlie", email: "c@test.com"),
+      create_customer(name: "Alice", email: "a@test.com"),
+      create_customer(name: "Bob", email: "b@test.com")
+    ]
   end
+
+  let(:scope) { Customer.where(id: @customers.map(&:id)) }
 
   describe "#apply" do
     it "returns relation unchanged when no params" do
       order = described_class.new
-      result = order.apply(Customer.all, dashboard)
+      result = order.apply(scope, dashboard)
       expect(result.count).to eq(3)
     end
 
     it "applies ascending order" do
       order = described_class.new(attribute: :name, direction: "asc")
-      result = order.apply(Customer.all, dashboard)
+      result = order.apply(scope, dashboard)
       expect(result.map(&:name)).to eq(["Alice", "Bob", "Charlie"])
     end
 
     it "applies descending order" do
       order = described_class.new(attribute: :name, direction: "desc")
-      result = order.apply(Customer.all, dashboard)
+      result = order.apply(scope, dashboard)
       expect(result.map(&:name)).to eq(["Charlie", "Bob", "Alice"])
     end
   end

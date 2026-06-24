@@ -83,6 +83,10 @@ module Terrazzo
           false
         end
 
+        def eager_load_association(attr, _model_class = nil)
+          attr.to_sym
+        end
+
         def associative?
           false
         end

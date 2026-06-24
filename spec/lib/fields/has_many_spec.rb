@@ -47,6 +47,35 @@ RSpec.describe Terrazzo::Field::HasMany do
       expect(result[:perPage]).to eq(5)
     end
 
+    it "uses associated dashboard labels and cell metadata in nested tables" do
+      allow_any_instance_of(OrderDashboard).to receive(:attribute_label).and_call_original
+      allow_any_instance_of(OrderDashboard).to receive(:attribute_label)
+        .with(:address_line_one, :index)
+        .and_return("Street")
+      allow_any_instance_of(OrderDashboard).to receive(:collection_cell_options).and_call_original
+      allow_any_instance_of(OrderDashboard).to receive(:collection_cell_options)
+        .with(:address_line_one, kind_of(Order))
+        .and_return(class_name: "font-medium", tone: "primary")
+
+      field = described_class.new(
+        :orders,
+        nil,
+        :show,
+        resource: customer,
+        options: { collection_attributes: %i[id address_line_one] }
+      )
+
+      result = field.serialize_value(:show)
+      street_header = result[:headers].find { |header| header[:attribute] == "address_line_one" }
+      street_cell = result[:rows].first[:cells].find { |cell| cell[:attribute] == "address_line_one" }
+
+      expect(street_header[:label]).to eq("Street")
+      expect(street_cell[:cellOptions]).to eq({
+        className: "font-medium",
+        meta: { tone: "primary" },
+      })
+    end
+
     it "preloads associative fields shown in collection_attributes" do
       order = customer.orders.first
       product = Product.create!(

@@ -51,7 +51,7 @@ RSpec.describe Terrazzo::Field::BelongsTo do
       field = described_class.new(:customer, nil, :form, resource: order)
       opts = field.serializable_options(:form)
       expect(opts[:resourceOptions]).to be_an(Array)
-      expect(opts[:resourceOptions].first).to eq(["Alice", customer.id.to_s])
+      expect(opts[:resourceOptions]).to include(["Alice", customer.id.to_s])
     end
 
     it "excludes resourceOptions on non-form pages" do

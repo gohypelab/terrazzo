@@ -4,7 +4,7 @@ json.pageTitle t("terrazzo.actions.edit", resource_name: resource_name)
 
 json.form do
   json.props({
-    action: polymorphic_path([namespace, @resource]),
+    action: terrazzo_resource_member_path(@resource),
     method: "post",
     encType: "multipart/form-data"
   })
@@ -26,7 +26,8 @@ json.form do
   json.fields do
     json.array! @page.attributes("update") do |field|
       json.attribute field.attribute.to_s
-      json.label field.attribute.to_s.humanize
+      json.label dashboard.attribute_label(field.attribute, :form)
+      json.hint dashboard.attribute_hint(field.attribute, :form)
       json.fieldType field.field_type
       json.value field.serialize_value(:form)
       json.options field.serializable_options(:form)
@@ -40,7 +41,8 @@ json.form do
       json.fields do
         json.array! group[:fields] do |field|
           json.attribute field.attribute.to_s
-          json.label field.attribute.to_s.humanize
+          json.label dashboard.attribute_label(field.attribute, :form)
+          json.hint dashboard.attribute_hint(field.attribute, :form)
           json.fieldType field.field_type
           json.value field.serialize_value(:form)
           json.options field.serializable_options(:form)
@@ -54,7 +56,8 @@ end
 
 json.errors @resource.errors.full_messages
 
-json.showPath polymorphic_path([namespace, @resource])
+json.layoutActions Array(dashboard.layout_actions(:edit, self, resource: @resource))
+json.showPath route_exists?(:show) && authorized_action?(@resource, :show) ? terrazzo_resource_member_path(@resource) : nil
 json.indexPath begin
   url_for(controller: controller_path, action: :index, only_path: true)
 rescue ActionController::UrlGenerationError

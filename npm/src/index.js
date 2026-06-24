@@ -9,6 +9,7 @@ export { useAppSelector } from "./store"
 
 // Components
 export { CollectionItemActions } from "./components/CollectionItemActions"
+export { registerComponent, getComponent } from "./componentRegistry"
 
 // Field registry
 export { registerFieldType, getFieldComponent } from "./fieldRegistry"

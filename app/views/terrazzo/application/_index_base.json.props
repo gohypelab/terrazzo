@@ -1,19 +1,57 @@
+filter_url_for = ->(filter_name = nil) do
+  query = request.query_parameters.except("_page", "filter", "filter_value")
+  query["filter"] = filter_name if filter_name.present?
+  url_for(query.merge(only_path: true))
+end
+
+cell_options_for = ->(attribute, resource) do
+  options = (dashboard.collection_cell_options(attribute, resource) || {}).to_h
+  class_name = options.delete(:class_name) ||
+    options.delete("class_name") ||
+    options.delete(:className) ||
+    options.delete("className")
+
+  {
+    className: class_name,
+    meta: options.presence,
+  }.compact
+end
+
 json.searchBar do
   json.searchTerm @search_term
   json.searchPath request.path
+end
+
+json.layoutActions Array(dashboard.layout_actions(:index, self))
+json.toolbarActions Array(dashboard.collection_toolbar_actions(self))
+
+json.emptyState do
+  json.title "No #{resource_name.pluralize.downcase} found"
+  json.description dashboard.empty_collection_message
 end
 
 json.filters do
   json.available dashboard.collection_filters.keys.map(&:to_s)
   json.active @active_filter
   json.value @filter_value
+  json.allUrl filter_url_for.call
+  json.options do
+    json.array! dashboard.collection_filter_options(self) do |option|
+      value = (option[:value] || option["value"]).to_s
+      label = option[:label] || option["label"]
+      json.label label
+      json.value value
+      json.active @active_filter.to_s == value
+      json.url filter_url_for.call(value)
+    end
+  end
 end
 
 json.table do
   json.headers do
     json.array! @page.attribute_names do |attr|
       field_class = dashboard.attribute_type_for(attr)
-      json.label attr.to_s.humanize
+      json.label dashboard.attribute_label(attr, :index)
       json.attribute attr.to_s
       json.sortable field_class.sortable?
       json.sortDirection @page.sort_direction_for(attr)
@@ -32,19 +70,21 @@ json.table do
   json.rows do
     json.array! @resources do |resource|
       json.id resource.id
-      json.showPath polymorphic_path([namespace, resource]) rescue nil
+      json.showPath collection_action_path(resource, :show)
       json.collectionItemActions collection_item_actions(resource)
 
       json.cells do
         json.array! @page.attribute_names do |attr|
           field = dashboard.attribute_type_for(attr).new(attr, nil, :index, resource: resource)
+          cell_options = cell_options_for.call(attr, resource)
           json.attribute attr.to_s
           json.fieldType field.field_type
           json.value field.serialize_value(:index)
           json.options field.serializable_options
+          json.cellOptions cell_options if cell_options.present?
 
           if field.class.associative? && field.data.present?
-            json.showPath polymorphic_path([namespace, field.data]) rescue nil
+            json.showPath collection_action_path(field.data, :show)
           end
         end
       end
@@ -89,4 +129,4 @@ end
 
 json.resourceName resource_name.pluralize
 json.singularResourceName resource_name
-json.newResourcePath route_exists?(:new) ? (new_polymorphic_path([namespace, resource_class]) rescue nil) : nil
+json.newResourcePath route_exists?(:new) && authorized_action?(resource_class.new, :new) ? terrazzo_resource_new_path(resource_class) : nil

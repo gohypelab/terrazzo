@@ -31,3 +31,9 @@ export function formatTime(value) {
   if (!isISO(value)) return value;
   return new Date(value).toLocaleTimeString();
 }
+
+export function csrfToken() {
+  if (typeof document === "undefined") return "";
+
+  return document.querySelector('meta[name="csrf-token"]')?.content ?? "";
+}

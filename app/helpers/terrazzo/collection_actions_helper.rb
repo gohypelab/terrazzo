@@ -9,13 +9,20 @@ module Terrazzo
       end
     end
 
+    def collection_action_path(resource, action = :show)
+      return nil unless collection_action_route?(resource, action)
+      return nil unless collection_action_authorized?(resource, action)
+
+      terrazzo_resource_member_path(resource, action: action)
+    end
+
     def has_many_pagination_paths(field, resource)
       param_key = Terrazzo::HasManyPagination.param_key(field.attribute)
       base = request.query_parameters.merge(
         only_path: true,
         controller: controller_path,
         action: :show,
-        id: resource.to_param,
+        id: resource.id,
         format: nil,
         props_at: "data.attributes.#{field.attribute}"
       )
@@ -29,16 +36,16 @@ module Terrazzo
 
     def default_collection_item_actions(resource)
       actions = []
-      if collection_action_route?(resource, :show)
-        actions << { label: "Show", url: polymorphic_path([namespace, resource]) }
+      if (path = collection_action_path(resource, :show))
+        actions << { label: "Show", url: path }
       end
-      if collection_action_route?(resource, :edit)
-        actions << { label: "Edit", url: edit_polymorphic_path([namespace, resource]) }
+      if (path = collection_action_path(resource, :edit))
+        actions << { label: "Edit", url: path }
       end
-      if collection_action_route?(resource, :destroy)
+      if (path = collection_action_path(resource, :destroy))
         actions << {
           label: "Destroy",
-          url: polymorphic_path([namespace, resource]),
+          url: path,
           method: "delete",
           confirm: "Are you sure?"
         }
@@ -47,22 +54,24 @@ module Terrazzo
     end
 
     def collection_action_route?(resource, action)
-      path =
-        case action
-        when :edit
-          edit_polymorphic_path([namespace, resource])
-        else
-          polymorphic_path([namespace, resource])
-        end
+      path = terrazzo_resource_member_path(resource, action: action)
+      return false unless path
 
       recognized = Rails.application.routes.recognize_path(path, method: collection_action_http_method(action))
-      recognized[:action] == action.to_s
+      recognized[:controller] == terrazzo_resource_controller_path(resource) &&
+        recognized[:action] == action.to_s
     rescue ActionController::RoutingError, ActionController::UrlGenerationError, NoMethodError
       false
     end
 
     def collection_action_http_method(action)
       action == :destroy ? :delete : :get
+    end
+
+    def collection_action_authorized?(resource, action)
+      return true unless respond_to?(:authorized_action?, true)
+
+      authorized_action?(resource, action)
     end
   end
 end

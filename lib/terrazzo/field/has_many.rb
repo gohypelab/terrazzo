@@ -115,25 +115,41 @@ module Terrazzo
       end
 
       def serialize_with_collection_attributes(records, col_attrs)
-        dashboard_class = find_associated_dashboard
+        dashboard = find_associated_dashboard.new
 
         headers = col_attrs.map do |attr|
-          { attribute: attr.to_s, label: attr.to_s.humanize }
+          { attribute: attr.to_s, label: dashboard.attribute_label(attr, :index) }
         end
 
         rows = records.map do |record|
           cells = col_attrs.map do |attr|
-            field = dashboard_class.new.attribute_type_for(attr).new(attr, nil, :index, resource: record)
-            {
+            field = dashboard.attribute_type_for(attr).new(attr, nil, :index, resource: record)
+            cell = {
               attribute: attr.to_s,
               fieldType: field.field_type,
               value: field.serialize_value(:index)
             }
+            cell_options = serialized_cell_options(dashboard, attr, record)
+            cell[:cellOptions] = cell_options if cell_options.present?
+            cell
           end
           { id: record.id.to_s, cells: cells }
         end
 
         { headers: headers, rows: rows }
+      end
+
+      def serialized_cell_options(dashboard, attribute, resource)
+        options = (dashboard.collection_cell_options(attribute, resource) || {}).to_h
+        class_name = options.delete(:class_name) ||
+          options.delete("class_name") ||
+          options.delete(:className) ||
+          options.delete("className")
+
+        {
+          className: class_name,
+          meta: options.presence,
+        }.compact
       end
 
       def resource_options

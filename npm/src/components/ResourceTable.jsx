@@ -1,8 +1,9 @@
 import React, { useContext } from "react";
 import { NavigationContext } from "@thoughtbot/superglue";
 
-import { SortableHeader } from "./SortableHeader";
-import { CollectionItemActions } from "./CollectionItemActions";
+import { getComponent } from "../componentRegistry";
+import { SortableHeader as DefaultSortableHeader } from "./SortableHeader";
+import { CollectionItemActions as DefaultCollectionItemActions } from "./CollectionItemActions";
 import { FieldRenderer } from "terrazzo/fields";
 import {
   Table,
@@ -13,8 +14,11 @@ import {
   TableCell,
 } from "terrazzo/ui";
 
-export function ResourceTable({ headers, rows, showActions = true }) {
+export function ResourceTable({ headers, rows, emptyState, showActions = true }) {
   const { visit } = useContext(NavigationContext);
+  const SortableHeader = getComponent("SortableHeader") || DefaultSortableHeader;
+  const CollectionItemActions = getComponent("CollectionItemActions") || DefaultCollectionItemActions;
+  const columnCount = headers.length + (showActions ? 1 : 0);
 
   const handleRowClick = (e, showPath) => {
     if (!showPath) return;
@@ -31,31 +35,49 @@ export function ResourceTable({ headers, rows, showActions = true }) {
             {headers.map((header) => (
               <SortableHeader key={header.attribute} {...header} />
             ))}
-            {showActions && <TableHead className="w-[120px]">Actions</TableHead>}
+            {showActions && (
+              <TableHead className="w-10">
+                <span className="sr-only">Actions</span>
+              </TableHead>
+            )}
           </TableRow>
         </TableHeader>
         <TableBody>
-          {rows.map((row) => (
+          {rows.length === 0 ? (
+            <TableRow>
+              <TableCell colSpan={columnCount} className="h-32 text-center">
+                <div className="mx-auto flex max-w-sm flex-col items-center gap-1">
+                  <p className="text-sm font-medium">{emptyState?.title ?? "No records found"}</p>
+                  {emptyState?.description && (
+                    <p className="text-sm text-muted-foreground">{emptyState.description}</p>
+                  )}
+                </div>
+              </TableCell>
+            </TableRow>
+          ) : rows.map((row) => (
             <TableRow
               key={row.id}
               className={row.showPath ? "cursor-pointer" : ""}
               onClick={(e) => handleRowClick(e, row.showPath)}
             >
-              {row.cells.map((cell) => (
-                <TableCell key={cell.attribute}>
-                  {cell.showPath ? (
-                    <a
-                      href={cell.showPath}
-                      data-sg-visit
-                      className="hover:underline"
-                    >
+              {row.cells.map((cell) => {
+                const cellClassName = cell.cellOptions?.className || cell.cellOptions?.class_name;
+                return (
+                  <TableCell key={cell.attribute} className={cellClassName}>
+                    {cell.showPath ? (
+                      <a
+                        href={cell.showPath}
+                        data-sg-visit
+                        className="hover:underline"
+                      >
+                        <FieldRenderer mode="index" {...cell} />
+                      </a>
+                    ) : (
                       <FieldRenderer mode="index" {...cell} />
-                    </a>
-                  ) : (
-                    <FieldRenderer mode="index" {...cell} />
-                  )}
-                </TableCell>
-              ))}
+                    )}
+                  </TableCell>
+                );
+              })}
               {showActions && (
                 <TableCell>
                   <CollectionItemActions actions={row.collectionItemActions} />

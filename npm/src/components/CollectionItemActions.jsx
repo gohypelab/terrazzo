@@ -1,48 +1,67 @@
 import React from "react";
-import { Button } from "terrazzo/ui";
+import { MoreHorizontal } from "lucide-react";
+import {
+  Button,
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "terrazzo/ui";
+import { csrfToken } from "../utils";
 
 export function CollectionItemActions({ actions }) {
   if (!actions || actions.length === 0) return null;
 
   return (
-    <div className="flex gap-1">
+    <DropdownMenu>
+      <DropdownMenuTrigger asChild>
+        <Button variant="ghost" size="icon" className="h-8 w-8" aria-label="Open row actions">
+          <MoreHorizontal className="h-4 w-4" />
+        </Button>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent align="end">
       {actions.map((action, index) => {
-        if (action.method && action.method !== "get") {
-          const isDestructive = action.method === "delete";
+        const method = String(action.method || "get").toLowerCase();
+
+        if (method !== "get") {
+          const isDestructive = method === "delete";
           return (
-            <form
-              key={index}
-              action={action.url}
-              method="post"
-              {...(action.sg_visit !== false && { "data-sg-visit": true })}
-              style={{ display: "inline" }}
-              onSubmit={(e) => {
-                if (action.confirm && !window.confirm(action.confirm)) {
-                  e.preventDefault();
-                }
-              }}
-            >
-              {action.method !== "post" && (
-                <input type="hidden" name="_method" value={action.method} />
-              )}
-              <input
-                type="hidden"
-                name="authenticity_token"
-                value={document.querySelector('meta[name="csrf-token"]')?.content ?? ""}
-              />
-              <Button type="submit" variant="ghost" size="sm" className={isDestructive ? "text-destructive" : ""}>
-                {action.label}
-              </Button>
-            </form>
+            <DropdownMenuItem key={index} asChild>
+              <form
+                action={action.url}
+                method="post"
+                {...(action.sg_visit !== false && { "data-sg-visit": true })}
+                onSubmit={(e) => {
+                  if (action.confirm && !window.confirm(action.confirm)) {
+                    e.preventDefault();
+                  }
+                }}
+              >
+                {method !== "post" && (
+                  <input type="hidden" name="_method" value={method} />
+                )}
+                <input
+                  type="hidden"
+                  name="authenticity_token"
+                  value={csrfToken()}
+                />
+                <button type="submit" className={`w-full text-left ${isDestructive ? "text-destructive" : ""}`}>
+                  {action.label}
+                </button>
+              </form>
+            </DropdownMenuItem>
           );
         }
 
         return (
-          <a key={index} href={action.url} {...(action.sg_visit !== false && { "data-sg-visit": true })}>
-            <Button variant="ghost" size="sm">{action.label}</Button>
-          </a>
+          <DropdownMenuItem key={index} asChild>
+            <a href={action.url} {...(action.sg_visit !== false && { "data-sg-visit": true })}>
+              {action.label}
+            </a>
+          </DropdownMenuItem>
         );
       })}
-    </div>
+      </DropdownMenuContent>
+    </DropdownMenu>
   );
 }

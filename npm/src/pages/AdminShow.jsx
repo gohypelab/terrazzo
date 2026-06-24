@@ -1,16 +1,21 @@
 import React from "react";
 import { useContent } from "@thoughtbot/superglue";
 
+import { getComponent } from "../componentRegistry";
 import { getLayout } from "../layoutRegistry";
+import { CollectionToolbarActions as DefaultCollectionToolbarActions } from "../components/CollectionToolbarActions";
 import { FieldRenderer } from "terrazzo/fields";
 import { Button, Card, CardContent, CardHeader, CardTitle } from "terrazzo/ui";
+import { csrfToken } from "../utils";
 
 export default function AdminShow() {
   const Layout = getLayout();
+  const CollectionToolbarActions = getComponent("CollectionToolbarActions") || DefaultCollectionToolbarActions;
   const {
     pageTitle,
     attributes,
     attributeGroups,
+    layoutActions,
     editPath,
     deletePath,
     indexPath,
@@ -24,7 +29,8 @@ export default function AdminShow() {
       navigation={navigation}
       title={pageTitle}
       actions={
-      <div className="flex gap-2">
+      <div className="flex flex-wrap items-center gap-2">
+          <CollectionToolbarActions actions={layoutActions} />
           <a href={indexPath} data-sg-visit>
             <Button variant="outline" size="sm">Back to {pluralResourceName}</Button>
           </a>
@@ -47,7 +53,7 @@ export default function AdminShow() {
               <input
             type="hidden"
             name="authenticity_token"
-            value={document.querySelector('meta[name="csrf-token"]')?.content ?? ""} />
+            value={csrfToken()} />
 
               <Button type="submit" variant="destructive" size="sm">Delete</Button>
             </form>
@@ -69,7 +75,10 @@ export default function AdminShow() {
                 return (
                   <div key={key} className="py-4 grid grid-cols-3 gap-4">
                     <dt className="text-sm font-medium text-muted-foreground">
-                      {attr.label}
+                      <span>{attr.label}</span>
+                      {attr.hint && (
+                        <p className="mt-1 font-normal">{attr.hint}</p>
+                      )}
                     </dt>
                     <dd className="col-span-2 text-sm">
                       {attr.showPath ? (

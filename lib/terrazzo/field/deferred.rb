@@ -30,6 +30,10 @@ module Terrazzo
         deferred_class.eager_load?
       end
 
+      def eager_load_association(attr, model_class = nil)
+        deferred_class.eager_load_association(attr, model_class)
+      end
+
       def associative?
         deferred_class.associative?
       end

@@ -11,6 +11,7 @@ module Terrazzo
   autoload :Search, "terrazzo/search"
   autoload :Order, "terrazzo/order"
   autoload :Filter, "terrazzo/filter"
+  autoload :CsvExport, "terrazzo/csv_export"
   autoload :Namespace, "terrazzo/namespace"
   autoload :GeneratorHelpers, "terrazzo/generator_helpers"
   autoload :HasManyPagination, "terrazzo/has_many_pagination"

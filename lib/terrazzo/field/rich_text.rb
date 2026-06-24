@@ -21,6 +21,15 @@ module Terrazzo
           true
         end
 
+        def eager_load_association(attr, model_class = nil)
+          rich_text_association = :"rich_text_#{attr}"
+          if model_class&.reflect_on_association(rich_text_association)
+            rich_text_association
+          else
+            attr.to_sym
+          end
+        end
+
         def default_options
           { truncate: 100 }
         end

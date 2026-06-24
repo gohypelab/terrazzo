@@ -19,13 +19,13 @@ import {
 } from "terrazzo/ui";
 
 export function Pagination({ currentPage, totalPages, totalCount, perPage, nextPagePath, prevPagePath }) {
-  const { remote, pageKey } = useContext(NavigationContext);
+  const { visit } = useContext(NavigationContext);
 
   const handlePerPageChange = (value) => {
     const url = new URL(window.location.href);
     url.searchParams.set("per_page", value);
     url.searchParams.delete("_page");
-    remote(url.pathname + url.search, { pageKey });
+    visit(url.pathname + url.search, {});
   };
 
   return (
@@ -50,14 +50,14 @@ export function Pagination({ currentPage, totalPages, totalCount, perPage, nextP
         <PaginationContent>
           <PaginationItem>
             {prevPagePath ? (
-              <PaginationPrevious href={prevPagePath} data-sg-remote />
+              <PaginationPrevious href={prevPagePath} data-sg-visit />
             ) : (
               <PaginationPrevious className="pointer-events-none opacity-50" />
             )}
           </PaginationItem>
           <PaginationItem>
             {nextPagePath ? (
-              <PaginationNext href={nextPagePath} data-sg-remote />
+              <PaginationNext href={nextPagePath} data-sg-visit />
             ) : (
               <PaginationNext className="pointer-events-none opacity-50" />
             )}

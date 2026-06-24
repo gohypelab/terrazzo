@@ -1,4 +1,5 @@
 export { FieldRenderer, registerFieldType } from "./FieldRenderer";
+export { getFieldComponent } from "../fieldRegistry";
 
 // String
 export { IndexField as StringIndexField } from "./string/IndexField";
@@ -54,6 +55,11 @@ export { FormField as PasswordFormField } from "./password/FormField";
 export { IndexField as SelectIndexField } from "./select/IndexField";
 export { ShowField as SelectShowField } from "./select/ShowField";
 export { FormField as SelectFormField } from "./select/FormField";
+
+// Hstore
+export { IndexField as HstoreIndexField } from "./hstore/IndexField";
+export { ShowField as HstoreShowField } from "./hstore/ShowField";
+export { FormField as HstoreFormField } from "./hstore/FormField";
 
 // Rich Text
 export { IndexField as RichTextIndexField } from "./rich_text/IndexField";

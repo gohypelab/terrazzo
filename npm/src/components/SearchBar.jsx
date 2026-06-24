@@ -11,10 +11,17 @@ export function SearchBar({ searchTerm, searchPath }) {
   const handleSubmit = (e) => {
     e.preventDefault();
     const search = inputRef.current?.value ?? "";
-    const params = new URLSearchParams();
-    params.set("search", search);
-    const url = `${searchPath}?${params.toString()}`;
-    visit(url, {});
+    const url = new URL(window.location.href);
+    url.pathname = searchPath;
+    url.searchParams.delete("_page");
+
+    if (search.trim()) {
+      url.searchParams.set("search", search);
+    } else {
+      url.searchParams.delete("search");
+    }
+
+    visit(url.pathname + url.search, {});
   };
 
   return (

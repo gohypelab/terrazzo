@@ -16,6 +16,12 @@ RSpec.describe Terrazzo::Field::Deferred do
       expect(deferred.eager_load?).to eq(Terrazzo::Field::String.eager_load?)
     end
 
+    it "delegates eager_load_association to wrapped field class" do
+      rich_text = Terrazzo::Field::RichText.with_options(truncate: 80)
+
+      expect(rich_text.eager_load_association(:banner, Product)).to eq(:rich_text_banner)
+    end
+
     it "delegates associative? to wrapped field class" do
       expect(deferred.associative?).to eq(Terrazzo::Field::String.associative?)
     end

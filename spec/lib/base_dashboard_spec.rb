@@ -118,6 +118,26 @@ RSpec.describe Terrazzo::BaseDashboard do
     end
   end
 
+  describe "#attribute_label" do
+    it "humanizes the attribute by default" do
+      expect(dashboard.attribute_label(:email_subscriber)).to eq("Email subscriber")
+    end
+  end
+
+  describe "#attribute_hint" do
+    it "returns no hint by default" do
+      expect(dashboard.attribute_hint(:email, :form)).to be_nil
+    end
+  end
+
+  describe "#collection_cell_options" do
+    it "returns no cell metadata by default" do
+      customer = create_customer(name: "Alice")
+
+      expect(dashboard.collection_cell_options(:name, customer)).to eq({})
+    end
+  end
+
   describe "#collection_includes" do
     it "returns eager-loadable attributes that appear in COLLECTION_ATTRIBUTES" do
       includes = dashboard.collection_includes
@@ -131,6 +151,128 @@ RSpec.describe Terrazzo::BaseDashboard do
     it "returns eager-loadable attributes from the provided attributes" do
       includes = dashboard.includes_for_attributes([:orders, :name])
       expect(includes).to eq([:orders])
+    end
+
+    it "maps rich text fields to their Action Text association" do
+      rich_text_dashboard = Class.new(Terrazzo::BaseDashboard) do
+        def self.model
+          Product
+        end
+      end
+      rich_text_dashboard.const_set(:ATTRIBUTE_TYPES, {
+        banner: Terrazzo::Field::RichText.with_options(truncate: 80),
+      }.freeze)
+      rich_text_dashboard.const_set(:COLLECTION_ATTRIBUTES, %i[banner].freeze)
+      rich_text_dashboard.const_set(:SHOW_PAGE_ATTRIBUTES, %i[banner].freeze)
+      rich_text_dashboard.const_set(:FORM_ATTRIBUTES, %i[banner].freeze)
+
+      expect(rich_text_dashboard.new.includes_for_attributes([:banner])).to eq([:rich_text_banner])
+    end
+  end
+
+  describe "#collection_toolbar_actions" do
+    it "includes a CSV export action by default when a view context is available" do
+      request = double("request", query_parameters: { "search" => "alice", "_page" => "2" })
+      view = double("view", request: request)
+      allow(view).to receive(:url_for)
+        .with({ "search" => "alice", format: :csv, only_path: true })
+        .and_return("/admin/customers.csv?search=alice")
+
+      expect(dashboard.collection_toolbar_actions(view)).to eq([
+        {
+          label: "Export CSV",
+          url: "/admin/customers.csv?search=alice",
+          sg_visit: false,
+        },
+      ])
+    end
+
+    it "returns no toolbar actions without a view context" do
+      expect(dashboard.collection_toolbar_actions).to eq([])
+    end
+  end
+
+  describe "#layout_actions" do
+    it "returns no page header actions by default" do
+      customer = create_customer(name: "Alice")
+
+      expect(dashboard.layout_actions(:show, double("view"), resource: customer)).to eq([])
+    end
+  end
+
+  describe "#csv_export_enabled?" do
+    it "is enabled by default" do
+      expect(dashboard.csv_export_enabled?).to be true
+    end
+
+    it "removes the default toolbar action when disabled" do
+      disabled_dashboard = Class.new(SpecCustomerDashboard) do
+        def csv_export_enabled?
+          false
+        end
+      end.new
+
+      expect(disabled_dashboard.collection_toolbar_actions(double("view"))).to eq([])
+    end
+  end
+
+  describe "#csv_attributes" do
+    it "defaults to collection attributes" do
+      expect(dashboard.csv_attributes).to eq(dashboard.collection_attributes)
+    end
+  end
+
+  describe "#csv_filename" do
+    it "uses the plural resource name" do
+      expect(dashboard.csv_filename).to eq("customers.csv")
+    end
+  end
+
+  describe "#csv_value" do
+    it "formats associative display hashes" do
+      expect(dashboard.csv_value(:territory, { id: "CA", display: "Canada" }, nil)).to eq("Canada")
+    end
+
+    it "formats count and label hashes" do
+      expect(dashboard.csv_value(:orders, { count: 2, label: "orders" }, nil)).to eq("2 orders")
+    end
+  end
+
+  describe "#empty_collection_message" do
+    it "returns a default empty state message for the resource" do
+      expect(dashboard.empty_collection_message).to eq(
+        "No customers match the current view."
+      )
+    end
+  end
+
+  describe "navigation configuration" do
+    it "provides default navigation labels, groups, order, and visibility" do
+      expect(dashboard.navigation_label).to eq("Customers")
+      expect(dashboard.navigation_group).to eq("Resources")
+      expect(dashboard.navigation_order).to eq("Customers")
+      expect(dashboard.navigation_group_order).to eq("Resources")
+      expect(dashboard.show_in_navigation?).to be true
+    end
+
+    it "can be customized with dashboard constants" do
+      custom_dashboard_class = Class.new(SpecCustomerDashboard)
+      custom_dashboard_class.const_set(:NAVIGATION_LABEL, "People")
+      custom_dashboard_class.const_set(:NAVIGATION_GROUP, "CRM")
+      custom_dashboard_class.const_set(:NAVIGATION_GROUP_ORDER, 10)
+      custom_dashboard_class.const_set(:NAVIGATION_ORDER, 20)
+      custom_dashboard_class.const_set(:SHOW_IN_NAVIGATION, false)
+      custom_dashboard = custom_dashboard_class.new
+
+      expect(custom_dashboard.navigation_label).to eq("People")
+      expect(custom_dashboard.navigation_group).to eq("CRM")
+      expect(custom_dashboard.navigation_group_order).to eq(10)
+      expect(custom_dashboard.navigation_order).to eq(20)
+      expect(custom_dashboard.show_in_navigation?).to be false
+    end
+
+    it "groups namespaced models by namespace by default" do
+      expect(Blog::PostDashboard.new.navigation_group).to eq("Blog")
     end
   end
 

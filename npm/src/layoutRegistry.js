@@ -1,11 +1,12 @@
 import { Layout as DefaultLayout } from "./components/Layout"
 
-let customLayout = null
+const registryKey = "__terrazzoLayoutRegistry"
+const layoutRegistry = globalThis[registryKey] || (globalThis[registryKey] = {})
 
 export function setLayout(LayoutComponent) {
-  customLayout = LayoutComponent
+  layoutRegistry.Component = LayoutComponent
 }
 
 export function getLayout() {
-  return customLayout || DefaultLayout
+  return layoutRegistry.Component || DefaultLayout
 }

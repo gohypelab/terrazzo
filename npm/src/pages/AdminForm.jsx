@@ -6,6 +6,33 @@ import { Button } from "terrazzo/ui";
 export function AdminForm({ form, errors }) {
   const { props: formProps, extras, fieldGroups, fields } = form;
 
+  const renderField = (field) => {
+    const hintId = field.hint && field.input?.id ? `${field.input.id}_hint` : null;
+    const input = hintId ?
+      { ...field.input, "aria-describedby": hintId } :
+      field.input;
+
+    return (
+      <div key={field.attribute} className="space-y-2">
+        <FieldRenderer
+          mode="form"
+          fieldType={field.fieldType}
+          value={field.value}
+          options={field.options}
+          attribute={field.attribute}
+          label={field.label}
+          hint={field.hint}
+          input={input}
+          required={field.required} />
+        {field.hint && (
+          <p id={hintId ?? undefined} className="text-sm text-muted-foreground">
+            {field.hint}
+          </p>
+        )}
+      </div>
+    );
+  };
+
   return (
     <>
       {errors.length > 0 &&
@@ -34,36 +61,14 @@ export function AdminForm({ form, errors }) {
                   <legend className="text-lg font-semibold">{group.name}</legend>
                 )}
                 <div className="space-y-6">
-                  {group.fields.map((field) =>
-                    <FieldRenderer
-                      key={field.attribute}
-                      mode="form"
-                      fieldType={field.fieldType}
-                      value={field.value}
-                      options={field.options}
-                      attribute={field.attribute}
-                      label={field.label}
-                      input={field.input}
-                      required={field.required} />
-                  )}
+                  {group.fields.map((field) => renderField(field))}
                 </div>
               </fieldset>
             )}
           </div>
         ) : (
           <div className="space-y-6">
-            {fields.map((field) =>
-            <FieldRenderer
-              key={field.attribute}
-              mode="form"
-              fieldType={field.fieldType}
-              value={field.value}
-              options={field.options}
-              attribute={field.attribute}
-              label={field.label}
-              input={field.input}
-              required={field.required} />
-            )}
+            {fields.map((field) => renderField(field))}
           </div>
         )}
 

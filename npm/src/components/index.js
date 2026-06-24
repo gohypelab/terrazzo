@@ -1,10 +1,13 @@
+export { registerComponent, getComponent } from "../componentRegistry";
 export { Layout, Layout as DefaultLayout } from "./Layout";
 export { AppSidebar } from "./app-sidebar";
 export { SiteHeader } from "./site-header";
 export { FlashMessages } from "./FlashMessages";
 export { SearchBar } from "./SearchBar";
+export { CollectionFilters } from "./CollectionFilters";
 export { Pagination } from "./Pagination";
 export { SortableHeader } from "./SortableHeader";
 export { CollectionItemActions } from "./CollectionItemActions";
+export { CollectionToolbarActions } from "./CollectionToolbarActions";
 export { ResourceTable } from "./ResourceTable";
 export { HasManyPagination } from "./HasManyPagination";

@@ -18,13 +18,14 @@ RSpec.describe Terrazzo::Order, "default sorting" do
   end
 
   it "returns relation unchanged when attribute is nil" do
-    Customer.delete_all
-    create_customer(name: "Bob")
-    create_customer(name: "Alice")
+    customers = [
+      create_customer(name: "Bob"),
+      create_customer(name: "Alice")
+    ]
 
     dashboard = CustomerDashboard.new
     order = described_class.new(attribute: nil, direction: :asc)
-    result = order.apply(Customer.all, dashboard)
+    result = order.apply(Customer.where(id: customers.map(&:id)), dashboard)
     expect(result.count).to eq(2)
   end
 end

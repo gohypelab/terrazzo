@@ -1,10 +1,14 @@
 import React from "react";
-import { ResourceTable, HasManyPagination } from "terrazzo/components";
+import { getComponent } from "../../componentRegistry";
+import { ResourceTable as DefaultResourceTable } from "../../components/ResourceTable";
+import { HasManyPagination as DefaultHasManyPagination } from "../../components/HasManyPagination";
 import { Badge } from "terrazzo/ui";
 
 export function ShowField({ value, hasManyRowExtras, paginationPaths, options }) {
   if (!value) return <span className="text-muted-foreground">None</span>;
 
+  const ResourceTable = getComponent("ResourceTable") || DefaultResourceTable;
+  const HasManyPagination = getComponent("HasManyPagination") || DefaultHasManyPagination;
   const { rows, headers, items, total, currentPage, totalPages } = value;
 
   const pagination = (

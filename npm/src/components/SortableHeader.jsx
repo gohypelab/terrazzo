@@ -12,7 +12,7 @@ export function SortableHeader({ label, sortable, sortUrl, sortDirection }) {
     <TableHead>
       <a
         href={sortUrl}
-        data-sg-remote
+        data-sg-visit
         className="inline-flex items-center gap-1 hover:text-foreground">
 
         {label}
