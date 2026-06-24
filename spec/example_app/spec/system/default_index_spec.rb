@@ -55,10 +55,13 @@ RSpec.describe "Admin default index", type: :system do
 
     visit admin_series_index_path
 
+    expect(page).to have_text("Page 1 of 2 - 32 total")
+
     click_link "Next"
 
     expect(page).to have_current_path(/_page=2/)
     expect(page).not_to have_current_path(/\.json/)
+    expect(page).to have_text("Page 2 of 2 - 32 total")
     expect(page).to have_link("Previous")
   end
 end

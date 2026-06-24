@@ -177,7 +177,7 @@ Page ejection copies required partials with the page. For example, `pages/index`
 
 UI ejection copies required local primitive dependencies with the requested file. For example, `ui/pagination` also copies `ui/button`, and `ui/sidebar` also copies the primitives it imports locally. Ejected UI primitives are consumed by app-owned pages, fields, and components that import from `../components/ui`; packaged default pages continue using the package defaults until you eject or override the relevant page, field, or component.
 
-The default index already supports search, filter facets, sortable rows, row actions, toolbar actions, page header actions, CSV exports, empty states, cell metadata, and pagination. Prefer dashboard hooks such as `attribute_label`, `attribute_hint`, `collection_cell_options`, `collection_item_actions`, `collection_toolbar_actions`, `layout_actions`, `csv_attributes`, `empty_collection_message`, and the `NAVIGATION_*` constants before ejecting full pages or navigation.
+The default index already supports search, filter facets, sortable rows, row actions, toolbar actions, page header actions, CSV exports, empty states, cell metadata, and a pagination footer with page and total-count context. Prefer dashboard hooks such as `attribute_label`, `attribute_hint`, `collection_cell_options`, `collection_item_actions`, `collection_toolbar_actions`, `layout_actions`, `csv_attributes`, `empty_collection_message`, and the `NAVIGATION_*` constants before ejecting full pages or navigation.
 
 The older `terrazzo:views:field`, `terrazzo:views:layout`, and `terrazzo:views:navigation` commands remain as compatibility aliases for the ejection workflow. Prefer `terrazzo:eject` for new customization.
 
