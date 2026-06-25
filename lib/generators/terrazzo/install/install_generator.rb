@@ -10,6 +10,8 @@ module Terrazzo
 
       TAILWIND_PACKAGE_NAME = "tailwindcss"
       TAILWIND_CLI_PACKAGE_NAME = "@tailwindcss/cli"
+      TAILWIND_VITE_PACKAGE_NAME = "@tailwindcss/vite"
+      TAILWIND_RAILS_GEM_NAME = "tailwindcss-rails"
       TAILWIND_MINIMUM_VERSION = "4.0.0"
 
       FRONTEND_DEPENDENCIES = (
@@ -321,6 +323,20 @@ module Terrazzo
           return
         end
 
+        if tailwind_vite_plugin_package? && !tailwind_vite_plugin_supported?
+          say_status :warning, "Installed #{TAILWIND_VITE_PACKAGE_NAME} is below Terrazzo's supported version.", :yellow
+          say "Terrazzo generated app/assets/stylesheets/#{namespace_name}.css with Tailwind #{TAILWIND_MINIMUM_VERSION}+ syntax."
+          say "Run: #{package_manager_add_dev_command} #{TAILWIND_VITE_PACKAGE_NAME}@latest"
+          return
+        end
+
+        if tailwind_rails_gem? && !tailwind_rails_gem_supported?
+          say_status :warning, "Installed #{TAILWIND_RAILS_GEM_NAME} is below Terrazzo's supported version.", :yellow
+          say "Terrazzo generated app/assets/stylesheets/#{namespace_name}.css with Tailwind #{TAILWIND_MINIMUM_VERSION}+ syntax."
+          say "Update #{TAILWIND_RAILS_GEM_NAME} to #{TAILWIND_MINIMUM_VERSION} or newer, or install #{TAILWIND_CLI_PACKAGE_NAME}@latest."
+          return
+        end
+
         return if tailwind_build_pipeline?
 
         say_status :warning, "Terrazzo generated app/assets/stylesheets/#{namespace_name}.css but no Tailwind build pipeline was detected.", :yellow
@@ -615,8 +631,8 @@ module Terrazzo
 
       def tailwind_build_pipeline?
         tailwind_package_script? ||
-          tailwind_vite_plugin? ||
-          tailwind_rails_gem?
+          tailwind_vite_plugin_supported? ||
+          tailwind_rails_gem_supported?
       end
 
       def tailwind_cli_package?
@@ -643,9 +659,14 @@ module Terrazzo
         "tailwindcss -i #{admin_stylesheet_path} -o app/assets/builds/#{namespace_name}.css --minify"
       end
 
-      def tailwind_vite_plugin?
+      def tailwind_vite_plugin_package?
         dependencies = package_json_dependencies
-        dependencies.key?("@tailwindcss/vite")
+        dependencies.key?(TAILWIND_VITE_PACKAGE_NAME)
+      end
+
+      def tailwind_vite_plugin_supported?
+        requirement = package_json_dependencies[TAILWIND_VITE_PACKAGE_NAME]
+        requirement.present? && dependency_requirement_satisfies_minimum?(requirement, TAILWIND_MINIMUM_VERSION)
       end
 
       def admin_stylesheet_path
@@ -653,10 +674,35 @@ module Terrazzo
       end
 
       def tailwind_rails_gem?
-        %w[Gemfile Gemfile.lock].any? do |file_name|
-          path = File.join(destination_root, file_name)
-          File.exist?(path) && File.read(path).include?("tailwindcss-rails")
-        end
+        tailwind_rails_gem_requirement.present?
+      end
+
+      def tailwind_rails_gem_supported?
+        requirement = tailwind_rails_gem_requirement
+        requirement.present? && dependency_requirement_satisfies_minimum?(requirement, TAILWIND_MINIMUM_VERSION)
+      end
+
+      def tailwind_rails_gem_requirement
+        locked_gem_version(TAILWIND_RAILS_GEM_NAME) ||
+          gemfile_dependency_requirement(TAILWIND_RAILS_GEM_NAME)
+      end
+
+      def locked_gem_version(name)
+        path = File.join(destination_root, "Gemfile.lock")
+        return nil unless File.exist?(path)
+
+        match = File.read(path).match(/^\s{4}#{Regexp.escape(name)} \((?<version>[^)\s]+).*\)$/)
+        match && match[:version]
+      end
+
+      def gemfile_dependency_requirement(name)
+        path = File.join(destination_root, "Gemfile")
+        return nil unless File.exist?(path)
+
+        line = File.readlines(path).find { |candidate| candidate.match?(/^\s*gem\s+["']#{Regexp.escape(name)}["']/) }
+        return nil unless line
+
+        line.scan(/["']([^"']+)["']/).flatten[1] || "*"
       end
 
       def application_models

@@ -567,6 +567,26 @@ RSpec.describe Terrazzo::Generators::InstallGenerator do
     expect(scripts.fetch("build")).to eq("vite build")
   end
 
+  it "does not treat an old Tailwind Vite plugin as a supported build pipeline" do
+    create_file "package.json", JSON.pretty_generate({
+      dependencies: described_class::FRONTEND_DEPENDENCIES.to_h { |package_name| [package_name, "*"] },
+      devDependencies: {
+        "@tailwindcss/vite" => "^3.4.0",
+      },
+    })
+
+    run_install_build_script_generators
+
+    scripts = JSON.parse(read("package.json")).fetch("scripts")
+    expect(scripts).not_to have_key("build:admin:css")
+    expect(scripts.fetch("build")).to eq("vite build")
+
+    output = run_tailwind_pipeline_verifier
+    expect(output).to include("Installed @tailwindcss/vite is below Terrazzo's supported version")
+    expect(output).to include("Tailwind 4.0.0+ syntax")
+    expect(output).to include("Run: npm install --save-dev @tailwindcss/vite@latest")
+  end
+
   it "does not overwrite an existing Tailwind build script name" do
     create_file "package.json", JSON.pretty_generate({
       scripts: {
@@ -672,6 +692,28 @@ RSpec.describe Terrazzo::Generators::InstallGenerator do
     LOCK
 
     expect(run_tailwind_pipeline_verifier).to eq("")
+  end
+
+  it "does not treat old tailwindcss-rails as a supported build pipeline" do
+    create_file "Gemfile.lock", <<~LOCK
+      GEM
+        specs:
+          tailwindcss-rails (3.4.0)
+    LOCK
+
+    output = run_tailwind_pipeline_verifier
+
+    expect(output).to include("Installed tailwindcss-rails is below Terrazzo's supported version")
+    expect(output).to include("Tailwind 4.0.0+ syntax")
+    expect(output).to include("Update tailwindcss-rails to 4.0.0 or newer")
+  end
+
+  it "checks explicit Gemfile tailwindcss-rails requirements when no lockfile exists" do
+    create_file "Gemfile", %(gem "tailwindcss-rails", "~> 3.4"\n)
+
+    output = run_tailwind_pipeline_verifier
+
+    expect(output).to include("Installed tailwindcss-rails is below Terrazzo's supported version")
   end
 
   it "keeps the install verifier in sync with package peers and generated CSS dependencies" do

@@ -95,9 +95,10 @@ it in a new `build` script when the app does not already define one:
 ```
 
 The install generator warns when it cannot detect a Tailwind build script for
-`app/assets/stylesheets/admin.css`, the `@tailwindcss/vite` plugin, or
-`tailwindcss-rails`. For package.json script setups without the CLI package, it
-prints the matching install command for your package manager.
+`app/assets/stylesheets/admin.css`, a Tailwind 4-compatible `@tailwindcss/vite`
+plugin, or Tailwind 4-compatible `tailwindcss-rails`. For package.json script
+setups without compatible Tailwind tooling, it prints the matching install
+command for your package manager.
 
 ## 6. Run the Terrazzo install generator
 
