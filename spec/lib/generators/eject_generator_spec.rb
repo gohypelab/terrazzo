@@ -587,6 +587,16 @@ RSpec.describe Terrazzo::Generators::EjectGenerator do
     end
   end
 
+  it "keeps page ejection templates aligned with packaged pages" do
+    page_template_pairs.each do |packaged_page, template_page|
+      packaged_source = read_repo("npm/src/pages/#{packaged_page}")
+      template_source = read_repo("lib/generators/terrazzo/views/templates/pages/#{template_page}")
+
+      expect(normalize_ejected_page_source(template_source)).to eq(normalize_ejected_page_source(packaged_source)),
+        "expected pages/#{template_page} to match packaged #{packaged_page}"
+    end
+  end
+
   private
 
   def run_generator(generator, args)
@@ -843,6 +853,26 @@ RSpec.describe Terrazzo::Generators::EjectGenerator do
       .strip
   end
 
+  def normalize_ejected_page_source(source)
+    source
+      .gsub(/import \{ getComponent \} from "\.\.\/componentRegistry";\n/, "")
+      .gsub(/import \{ ([A-Za-z0-9_]+) as Default\1 \} from "\.\.\/components\/[A-Za-z0-9_-]+";\n/, "")
+      .gsub(/  const [A-Za-z0-9_]+ = getComponent\("[A-Za-z0-9_]+"\) \|\| Default[A-Za-z0-9_]+;\n/, "")
+      .gsub(/from "\.\.\/layoutRegistry"/, 'from "__TERRAZZO_LAYOUT__"')
+      .gsub(/from "terrazzo"/, 'from "__TERRAZZO_LAYOUT__"')
+      .gsub(/import \{ [A-Za-z0-9_, ]+ \} from "\.\.\/components";\n/, "")
+      .gsub(/from "\.\/AdminCollection"/, 'from "__ADMIN_COLLECTION__"')
+      .gsub(/from "\.\/_collection"/, 'from "__ADMIN_COLLECTION__"')
+      .gsub(/from "\.\/AdminForm"/, 'from "__ADMIN_FORM__"')
+      .gsub(/from "\.\/_form"/, 'from "__ADMIN_FORM__"')
+      .gsub(/from "terrazzo\/ui"/, 'from "__TERRAZZO_UI__"')
+      .gsub(/from "\.\.\/components\/ui"/, 'from "__TERRAZZO_UI__"')
+      .gsub(/from "terrazzo\/fields"/, 'from "__TERRAZZO_FIELDS__"')
+      .gsub(/from "\.\.\/fields"/, 'from "__TERRAZZO_FIELDS__"')
+      .gsub(/\n{2,}/, "\n")
+      .strip
+  end
+
   def component_names
     expected_component_exports.keys.sort
   end
@@ -897,6 +927,17 @@ RSpec.describe Terrazzo::Generators::EjectGenerator do
       "SortableHeader" => "SortableHeader",
       "app-sidebar" => "AppSidebar",
       "site-header" => "SiteHeader",
+    }
+  end
+
+  def page_template_pairs
+    {
+      "AdminIndex.jsx" => "index.jsx",
+      "AdminShow.jsx" => "show.jsx",
+      "AdminNew.jsx" => "new.jsx",
+      "AdminEdit.jsx" => "edit.jsx",
+      "AdminCollection.jsx" => "_collection.jsx",
+      "AdminForm.jsx" => "_form.jsx",
     }
   end
 
