@@ -1,4 +1,5 @@
 require "fileutils"
+require "open3"
 require "spec_helper"
 require "stringio"
 require "tmpdir"
@@ -30,6 +31,16 @@ RSpec.describe Terrazzo::Generators::DashboardGenerator do
     expect(customer_dashboard).not_to include("country_code:")
   end
 
+  it "generates conventional nested controllers for namespaced models" do
+    run_generator(["Blog::Post"])
+
+    controller = read("app/controllers/admin/blog/posts_controller.rb")
+    expect(controller).to include("module Admin\n  module Blog\n    class PostsController < ApplicationController")
+    expect(controller).not_to include("class Blog::PostsController")
+
+    expect_ruby_syntax_to_be_valid("app/controllers/admin/blog/posts_controller.rb")
+  end
+
   private
 
   def run_generator(args)
@@ -42,5 +53,11 @@ RSpec.describe Terrazzo::Generators::DashboardGenerator do
 
   def read(relative_path)
     File.read(File.join(destination_root, relative_path))
+  end
+
+  def expect_ruby_syntax_to_be_valid(relative_path)
+    _stdout, stderr, status = Open3.capture3("ruby", "-c", relative_path, chdir: destination_root)
+
+    expect(status).to be_success, stderr
   end
 end

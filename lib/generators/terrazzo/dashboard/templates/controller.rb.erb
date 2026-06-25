@@ -1,4 +1,8 @@
-module <%= options[:namespace].camelize %>
-  class <%= class_name.pluralize %>Controller < ApplicationController
-  end
-end
+<% controller_modules.each_with_index do |module_name, index| -%>
+<%= "  " * index %>module <%= module_name %>
+<% end -%>
+<%= "  " * controller_modules.size %>class <%= controller_class_name %> < ApplicationController
+<%= "  " * controller_modules.size %>end
+<% controller_modules.reverse.each_with_index do |_module_name, index| -%>
+<%= "  " * (controller_modules.size - index - 1) %>end
+<% end -%>

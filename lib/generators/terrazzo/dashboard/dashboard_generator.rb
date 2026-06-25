@@ -106,6 +106,14 @@ module Terrazzo
         attribute_types.keys.reject { |a| %i[id created_at updated_at].include?(a) }
       end
 
+      def controller_modules
+        [options[:namespace].camelize, *class_path.map(&:camelize)]
+      end
+
+      def controller_class_name
+        "#{file_name.pluralize.camelize}Controller"
+      end
+
       def association_foreign_key?(column_name, associations)
         associations.any? do |assoc|
           assoc.macro == :belongs_to &&
