@@ -7,15 +7,24 @@ Gem::Specification.new do |spec|
   spec.email = []
   spec.summary = "A Rails admin framework powered by Superglue and React"
   spec.description = "Drop-in admin panel for Rails apps using the Administrate dashboard DSL with a React SPA frontend powered by Superglue."
-  spec.homepage = "https://github.com/gohypelab/terrazzo"
+  spec.homepage = "https://gohypelab.github.io/terrazzo/"
   spec.license = "MIT"
   spec.required_ruby_version = ">= 3.1"
+  spec.metadata = {
+    "homepage_uri" => spec.homepage,
+    "source_code_uri" => "https://github.com/gohypelab/terrazzo",
+    "documentation_uri" => "https://gohypelab.github.io/terrazzo/getting-started",
+    "changelog_uri" => "https://github.com/gohypelab/terrazzo/releases",
+    "bug_tracker_uri" => "https://github.com/gohypelab/terrazzo/issues",
+    "rubygems_mfa_required" => "true",
+  }
 
   spec.files = Dir[
     "app/**/*",
     "config/**/*",
     "lib/**/*",
     "LICENSE",
+    "README.md",
     "Rakefile",
     "terrazzo.gemspec"
   ]
