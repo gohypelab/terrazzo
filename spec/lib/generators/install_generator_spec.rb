@@ -552,10 +552,11 @@ RSpec.describe Terrazzo::Generators::InstallGenerator do
       .to eq("tailwindcss -i app/assets/stylesheets/admin.css -o app/assets/builds/admin.css --minify")
   end
 
-  it "adds a JS-only Vite build script when Tailwind is handled elsewhere" do
+  it "adds a Vite build script with admin CSS when the Tailwind Vite plugin and CLI are installed" do
     create_file "package.json", JSON.pretty_generate({
       dependencies: described_class::FRONTEND_DEPENDENCIES.to_h { |package_name| [package_name, "*"] },
       devDependencies: {
+        "@tailwindcss/cli" => "^4.0.0",
         "@tailwindcss/vite" => "^4.0.0",
       },
     })
@@ -563,8 +564,10 @@ RSpec.describe Terrazzo::Generators::InstallGenerator do
     run_install_build_script_generators
 
     scripts = JSON.parse(read("package.json")).fetch("scripts")
-    expect(scripts).not_to have_key("build:admin:css")
-    expect(scripts.fetch("build")).to eq("vite build")
+    expect(scripts.fetch("build:admin:css"))
+      .to eq("tailwindcss -i app/assets/stylesheets/admin.css -o app/assets/builds/admin.css --minify")
+    expect(scripts.fetch("build"))
+      .to eq("vite build && tailwindcss -i app/assets/stylesheets/admin.css -o app/assets/builds/admin.css --minify")
   end
 
   it "does not treat an old Tailwind Vite plugin as a supported build pipeline" do
@@ -673,7 +676,7 @@ RSpec.describe Terrazzo::Generators::InstallGenerator do
     expect(output).to include("app/assets/stylesheets/admin.css")
   end
 
-  it "does not warn when the Tailwind Vite plugin is installed" do
+  it "warns when only the Tailwind Vite plugin is installed" do
     create_file "package.json", JSON.pretty_generate({
       dependencies: described_class::FRONTEND_DEPENDENCIES.to_h { |package_name| [package_name, "*"] },
       devDependencies: {
@@ -681,7 +684,11 @@ RSpec.describe Terrazzo::Generators::InstallGenerator do
       },
     })
 
-    expect(run_tailwind_pipeline_verifier).to eq("")
+    output = run_tailwind_pipeline_verifier
+
+    expect(output).to include("no Tailwind build pipeline was detected")
+    expect(output).to include("@tailwindcss/vite is installed")
+    expect(output).to include("app/assets/stylesheets/admin.css")
   end
 
   it "does not warn when tailwindcss-rails is installed" do

@@ -341,6 +341,9 @@ module Terrazzo
 
         say_status :warning, "Terrazzo generated app/assets/stylesheets/#{namespace_name}.css but no Tailwind build pipeline was detected.", :yellow
         say "Make sure your app compiles that file with Tailwind before serving the admin UI."
+        if tailwind_vite_plugin_supported?
+          say "#{TAILWIND_VITE_PACKAGE_NAME} is installed, but Terrazzo links #{admin_stylesheet_path} as a Rails stylesheet asset."
+        end
         say "For package.json scripts, install the Tailwind CLI and add a build script:"
         say "  #{package_manager_add_dev_command} #{TAILWIND_CLI_PACKAGE_NAME}@latest"
         say %(  "#{tailwind_build_script_name}": "#{tailwind_build_command}")
@@ -631,7 +634,6 @@ module Terrazzo
 
       def tailwind_build_pipeline?
         tailwind_package_script? ||
-          tailwind_vite_plugin_supported? ||
           tailwind_rails_gem_supported?
       end
 

@@ -72,9 +72,10 @@ yarn add @radix-ui/react-avatar @radix-ui/react-dialog @radix-ui/react-dropdown-
 
 The install generator also checks `package.json` and prints the exact package-manager command if any required frontend packages are missing or pinned below Terrazzo's supported versions.
 
-Terrazzo also generates `app/assets/stylesheets/admin.css`, which must be
-compiled by Tailwind before it is served. If your app does not already compile
-Tailwind CSS through Vite, cssbundling, or `tailwindcss-rails`, install the
+Terrazzo also generates `app/assets/stylesheets/admin.css`, which the generated
+layout links as a Rails stylesheet asset. That file must be compiled by Tailwind
+before it is served. If your app does not already compile that exact file through
+a package script or Tailwind 4-compatible `tailwindcss-rails`, install the
 Tailwind CLI before running the Terrazzo installer:
 
 ```bash
@@ -95,10 +96,11 @@ it in a new `build` script when the app does not already define one:
 ```
 
 The install generator warns when it cannot detect a Tailwind build script for
-`app/assets/stylesheets/admin.css`, a Tailwind 4-compatible `@tailwindcss/vite`
-plugin, or Tailwind 4-compatible `tailwindcss-rails`. For package.json script
-setups without compatible Tailwind tooling, it prints the matching install
-command for your package manager.
+`app/assets/stylesheets/admin.css` or Tailwind 4-compatible `tailwindcss-rails`.
+The `@tailwindcss/vite` plugin is useful for CSS imported through Vite, but by
+itself it does not compile Terrazzo's Rails-linked `admin.css` asset. For
+package.json script setups without compatible Tailwind tooling, the installer
+prints the matching install command for your package manager.
 
 ## 6. Run the Terrazzo install generator
 
