@@ -244,6 +244,10 @@ Set `SHOW_IN_NAVIGATION = false` to hide a resource from the generated sidebar.
 
 Eject the navigation partial when you need non-resource links or fully custom sidebar data:
 
+```bash
+rails g terrazzo:eject navigation
+```
+
 ```ruby
 # app/views/admin/application/_navigation.json.props
 resources = Terrazzo::Namespace.new(namespace).navigation_resources
