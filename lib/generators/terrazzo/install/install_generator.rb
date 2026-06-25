@@ -27,6 +27,10 @@ module Terrazzo
         lucide-react
         tailwindcss
       ].freeze
+      VITE_FRONTEND_DEPENDENCIES = %w[
+        vite
+        vite-plugin-ruby
+      ].freeze
       SUPPORTED_BUNDLERS = %w[vite esbuild].freeze
 
       argument :namespace_argument, type: :string, required: false,
@@ -62,12 +66,22 @@ module Terrazzo
 
       def verify_vite_bundler
         return unless vite?
-        return if vite_rails_installed? && parsed_vite_config
+
+        unless vite_rails_installed? && parsed_vite_config
+          raise Thor::Error, <<~MESSAGE
+            Terrazzo is configured for Vite, but vite_rails is not installed and configured.
+
+            Add `gem "vite_rails"` and run `bundle exec vite install` first, or re-run Terrazzo with `--bundler=esbuild`.
+          MESSAGE
+        end
+
+        missing = missing_vite_frontend_dependencies
+        return if missing.empty?
 
         raise Thor::Error, <<~MESSAGE
-          Terrazzo is configured for Vite, but vite_rails is not installed and configured.
+          Terrazzo is configured for Vite, but package.json is missing required Vite dependencies: #{missing.join(", ")}.
 
-          Add `gem "vite_rails"` and run `bundle exec vite install` first, or re-run Terrazzo with `--bundler=esbuild`.
+          Run `bundle exec vite install` successfully, install the generated package.json dependencies, or re-run Terrazzo with `--bundler=esbuild`.
         MESSAGE
       end
 
@@ -334,6 +348,11 @@ module Terrazzo
       def missing_frontend_dependencies
         installed = package_json_dependencies
         FRONTEND_DEPENDENCIES.reject { |package_name| installed.key?(package_name) }
+      end
+
+      def missing_vite_frontend_dependencies
+        installed = package_json_dependencies
+        VITE_FRONTEND_DEPENDENCIES.reject { |package_name| installed.key?(package_name) }
       end
 
       def package_json_dependencies

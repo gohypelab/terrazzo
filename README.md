@@ -22,6 +22,7 @@ npm install --save-dev @tailwindcss/cli # if your app does not already compile T
 # Install Vite Rails for the default Vite setup.
 bundle add vite_rails
 bundle exec vite install
+# Resolve any package-manager errors from Vite before continuing.
 
 # Install Superglue (if not already set up)
 rails g superglue:install

@@ -142,9 +142,24 @@ RSpec.describe Terrazzo::Generators::InstallGenerator do
       .to raise_error(Thor::Error, /bundle exec vite install/)
   end
 
+  it "fails vite installs when Vite package dependencies are missing" do
+    create_file "Gemfile", %(gem "vite_rails"\n)
+    create_default_vite_config
+    create_file "package.json", JSON.pretty_generate({
+      devDependencies: {
+        "vite" => "^8.0.0",
+      },
+    })
+    generator = described_class.new([], {}, destination_root: destination_root)
+
+    expect { generator.verify_vite_bundler }
+      .to raise_error(Thor::Error, /vite-plugin-ruby/)
+  end
+
   it "continues vite installs when vite_rails is installed" do
     create_file "Gemfile", %(gem "vite_rails"\n)
     create_default_vite_config
+    create_vite_package_json
     generator = described_class.new([], {}, destination_root: destination_root)
 
     expect { generator.verify_vite_bundler }.not_to raise_error
@@ -595,6 +610,12 @@ RSpec.describe Terrazzo::Generators::InstallGenerator do
         "publicOutputDir" => "vite-test",
         "port" => 3037,
       },
+    })
+  end
+
+  def create_vite_package_json
+    create_file "package.json", JSON.pretty_generate({
+      devDependencies: described_class::VITE_FRONTEND_DEPENDENCIES.to_h { |package_name| [package_name, "*"] },
     })
   end
 
