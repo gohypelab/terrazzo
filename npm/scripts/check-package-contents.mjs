@@ -1,4 +1,38 @@
 import { execFileSync } from "node:child_process";
+import { readFileSync } from "node:fs";
+
+const packageJson = JSON.parse(
+  readFileSync(new URL("../package.json", import.meta.url), "utf8")
+);
+
+const expectedMetadata = {
+  name: "terrazzo",
+  license: "MIT",
+  homepage: "https://gohypelab.github.io/terrazzo/",
+  repository: {
+    type: "git",
+    url: "git+https://github.com/gohypelab/terrazzo.git",
+    directory: "npm",
+  },
+  bugs: {
+    url: "https://github.com/gohypelab/terrazzo/issues",
+  },
+};
+
+for (const [key, expected] of Object.entries(expectedMetadata)) {
+  const actual = packageJson[key];
+  if (JSON.stringify(actual) !== JSON.stringify(expected)) {
+    throw new Error(
+      `package.json ${key} metadata is ${JSON.stringify(actual)}, expected ${JSON.stringify(expected)}`
+    );
+  }
+}
+
+for (const keyword of ["rails", "react", "superglue", "administrate"]) {
+  if (!packageJson.keywords?.includes(keyword)) {
+    throw new Error(`package.json keywords is missing ${keyword}`);
+  }
+}
 
 const output = execFileSync("npm", ["pack", "--dry-run", "--json", "--ignore-scripts"], {
   encoding: "utf8",
