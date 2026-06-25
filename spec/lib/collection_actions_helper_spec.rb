@@ -79,4 +79,37 @@ RSpec.describe Terrazzo::CollectionActionsHelper do
       expect(actions.last).to include(url: "/admin/countries/123/audit")
     end
   end
+
+  describe "#has_many_pagination_paths" do
+    it "replaces stale page params for the paginated field only" do
+      field = double("field", attribute: :orders, current_page: 2, total_pages: 4)
+      customer = Customer.new(id: 123)
+      allow(customer).to receive(:persisted?).and_return(true)
+      allow(self).to receive(:controller_path).and_return("admin/customers")
+      allow(self).to receive(:request).and_return(
+        double(
+          "request",
+          query_parameters: {
+            "orders_page" => "9",
+            "hm_orders_page" => "2",
+            "hm_log_entries_page" => "3",
+            "search" => "alice",
+          }
+        )
+      )
+
+      paths = has_many_pagination_paths(field, customer)
+      next_query = Rack::Utils.parse_nested_query(URI.parse(paths.fetch(:nextPagePath)).query)
+      prev_query = Rack::Utils.parse_nested_query(URI.parse(paths.fetch(:prevPagePath)).query)
+
+      expect(next_query).to include(
+        "hm_orders_page" => "3",
+        "hm_log_entries_page" => "3",
+        "search" => "alice",
+        "props_at" => "data.attributes.orders"
+      )
+      expect(next_query).not_to have_key("orders_page")
+      expect(prev_query).to include("hm_orders_page" => "1")
+    end
+  end
 end

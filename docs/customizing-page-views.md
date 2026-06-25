@@ -290,6 +290,6 @@ end
 Terrazzo uses [Superglue](https://github.com/thoughtbot/superglue) for client-side navigation:
 
 - **Full navigation** — links with `data-sg-visit` trigger a full page transition (e.g., sidebar links, show/edit links)
-- **Partial updates** — links with `data-sg-remote` update only part of the page (e.g., search, sort, pagination)
+- **Partial updates** — links with `data-sg-remote` update only part of the page. Terrazzo uses this for nested `has_many` pagination on show pages.
 
-Pagination and sort links include `props_at` parameters so the server only renders the relevant subtrees, keeping updates fast.
+Nested `has_many` pagination links include `props_at` parameters so the server only renders the relevant subtree, keeping updates fast.

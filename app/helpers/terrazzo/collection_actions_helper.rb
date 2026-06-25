@@ -16,7 +16,14 @@ module Terrazzo
 
     def has_many_pagination_paths(field, resource)
       param_key = Terrazzo::HasManyPagination.param_key(field.attribute)
-      base = request.query_parameters.merge(
+      legacy_param_key = Terrazzo::HasManyPagination.legacy_param_key(field.attribute)
+      query_parameters = request.query_parameters.except(
+        param_key,
+        param_key.to_sym,
+        legacy_param_key,
+        legacy_param_key.to_sym
+      )
+      base = query_parameters.merge(
         only_path: true,
         controller: controller_path,
         action: :show,
