@@ -104,8 +104,7 @@ module Terrazzo
         update_ui_barrel(name)
 
         ui_dependencies(name).each do |component|
-          copy_ui_template_unless_exists(component)
-          update_ui_barrel(component)
+          update_ui_barrel(component) if copy_ui_template_unless_exists(component)
         end
       end
 
@@ -218,7 +217,10 @@ module Terrazzo
       end
 
       def copy_ui_template_unless_exists(name)
-        copy_file_unless_exists "components/ui/#{name}.jsx", "app/views/#{namespace_name}/components/ui/#{name}.jsx"
+        destination = "app/views/#{namespace_name}/components/ui/#{name}.jsx"
+        existed = File.exist?(File.join(destination_root, destination))
+        copy_file_unless_exists "components/ui/#{name}.jsx", destination
+        !existed
       end
 
       def eject_generated_form_counterpart(name)

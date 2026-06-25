@@ -409,10 +409,6 @@ RSpec.describe Terrazzo::Generators::EjectGenerator do
       export function Button() {
         return "custom button";
       }
-
-      export function buttonVariants() {
-        return "custom variants";
-      }
     JS
     create_file "app/views/admin/fields/shared/TextInputFormField.jsx", <<~JS
       export function TextInputFormField() {
@@ -434,6 +430,17 @@ RSpec.describe Terrazzo::Generators::EjectGenerator do
     expect(File).to exist(File.join(destination_root, "app/views/admin/components/Layout.jsx"))
     expect(File).to exist(File.join(destination_root, "app/views/admin/components/ui/sidebar.jsx"))
     expect(File).to exist(File.join(destination_root, "app/views/admin/fields/string/FormField.jsx"))
+
+    create_node_package_link
+    create_file "dependency_entry.jsx", <<~JS
+      import { Layout } from "./app/views/admin/components/index.js";
+      import { SidebarProvider } from "./app/views/admin/components/ui/index.js";
+      import { StringFormField } from "./app/views/admin/fields/index.js";
+
+      console.log(Layout, SidebarProvider, StringFormField);
+    JS
+
+    expect_bundle_to_succeed("dependency_entry.jsx")
   end
 
   it "keeps ejected implementation files on app-owned UI and component imports" do

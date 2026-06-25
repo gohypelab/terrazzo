@@ -192,7 +192,7 @@ rails g terrazzo:eject navigation
 
 Unsupported targets fail the generator instead of silently doing nothing, so typos are safe to catch in scripts and CI.
 When a target path still contains Terrazzo's generated package stub, ejection replaces it without a conflict prompt. If the file has already become app-owned/customized, Rails' normal overwrite prompt still applies.
-Dependency files copied only to satisfy the requested target's imports are non-destructive: Terrazzo skips them when they already exist. Run `terrazzo:eject` for that dependency directly when you want Rails' overwrite prompt for it.
+Dependency files copied only to satisfy the requested target's imports are non-destructive: Terrazzo skips them when they already exist and leaves their barrel exports alone. Run `terrazzo:eject` for that dependency directly when you want Rails' overwrite prompt and registration for it.
 
 Ejected files import through app-level barrels:
 
