@@ -29,15 +29,11 @@ RSpec.describe Terrazzo::Generators::EjectGenerator do
       pages/index
       pages/edit
       fields/string
-      fields/asset
       components/Layout
-      components/ResourceTable
-      ui/button
       navigation
     ].each do |target|
       run_generator(described_class, [target])
     end
-    run_generator(Terrazzo::Generators::FieldGenerator, ["Rating"])
 
     create_node_package_link
     write_smoke_entry
@@ -49,12 +45,11 @@ RSpec.describe Terrazzo::Generators::EjectGenerator do
 
     expect(read("app/views/admin/fields/index.js")).to include('export * from "terrazzo/fields";')
     expect(read("app/views/admin/fields/index.js")).to include('registerStringFieldType("string"')
-    expect(read("app/views/admin/fields/index.js")).to include('registerAssetFieldType("asset"')
-    expect(read("app/views/admin/fields/index.js")).to include('registerRatingFieldType("rating"')
     expect(read("app/views/admin/components/index.js")).to include('export * from "terrazzo/components";')
     expect(read("app/views/admin/components/index.js")).to include("setLayout(Layout);")
-    expect(read("app/views/admin/components/index.js")).to include('registerResourceTableComponent("ResourceTable", ResourceTable);')
-    expect(read("app/views/admin/components/ui/index.js")).to include('export { Button, buttonVariants } from "./button";')
+    expect(read("app/views/admin/components/index.js")).not_to include("registerResourceTableComponent")
+    expect(read("app/views/admin/components/ui/index.js")).to include('export * from "terrazzo/ui";')
+    expect(File).not_to exist(File.join(destination_root, "app/views/admin/components/ResourceTable.jsx"))
     expect(read("app/views/admin/application/_navigation.json.props")).to include("navigation_resources")
     expect(read("app/views/admin/application/_navigation.json.props")).to include("navigation_groups")
     expect(read("app/views/admin/application/_navigation.json.props")).to include("json.items")
@@ -799,11 +794,10 @@ RSpec.describe Terrazzo::Generators::EjectGenerator do
       import AdminNew from "./app/views/admin/application/new.jsx";
       import AdminEdit from "./app/views/admin/application/edit.jsx";
       import { FieldRenderer } from "./app/views/admin/fields/index.js";
-      import { FormField as RatingFormField } from "./app/views/admin/fields/rating/FormField.jsx";
       import { Layout, ResourceTable } from "./app/views/admin/components/index.js";
       import { Button } from "./app/views/admin/components/ui/index.js";
 
-      console.log(AdminIndex, AdminShow, AdminNew, AdminEdit, FieldRenderer, RatingFormField, Layout, ResourceTable, Button);
+      console.log(AdminIndex, AdminShow, AdminNew, AdminEdit, FieldRenderer, Layout, ResourceTable, Button);
     JS
   end
 
