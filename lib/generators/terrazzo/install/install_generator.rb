@@ -133,6 +133,15 @@ module Terrazzo
           "app/assets/stylesheets/#{namespace_name}.css"
       end
 
+      def create_components_json
+        if File.exist?(File.join(destination_root, "components.json"))
+          say_status :skip, "components.json already exists", :yellow
+          return
+        end
+
+        template "components.json.erb", "components.json"
+      end
+
       def run_views_generator
         generate "terrazzo:views", "--namespace=#{namespace_name}"
       end

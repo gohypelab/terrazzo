@@ -106,6 +106,7 @@ This creates an isolated admin namespace alongside your existing app — it won'
 
 **Admin UI components and views:**
 - `app/assets/stylesheets/admin.css` — Tailwind theme that scans Terrazzo package defaults plus local admin views and JavaScript
+- `components.json` — shadcn CLI aliases for admin components and UI primitives; existing configs are left untouched
 - `app/views/admin/application/` — shared page stubs and navigation partial
 - `app/views/admin/components/` — app component barrel for package defaults and local overrides
 - `app/views/admin/components/ui/` — app UI barrel for package defaults and local shadcn-style primitives used by app-owned/ejected files

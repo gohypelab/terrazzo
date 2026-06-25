@@ -144,6 +144,34 @@ RSpec.describe Terrazzo::Generators::InstallGenerator do
     expect(stylesheet).to include('@source "../../../node_modules/terrazzo/dist";')
   end
 
+  it "generates shadcn metadata for app-owned admin primitives" do
+    run_install_components_json_generator(options: { namespace: "backstage" })
+
+    config = JSON.parse(read("components.json"))
+    expect(config.fetch("tailwind").fetch("css")).to eq("app/assets/stylesheets/backstage.css")
+    expect(config.fetch("aliases")).to include({
+      "components" => "app/views/backstage/components",
+      "ui" => "app/views/backstage/components/ui",
+      "utils" => "terrazzo",
+    })
+  end
+
+  it "does not overwrite an existing shadcn components config" do
+    create_file "components.json", JSON.pretty_generate({
+      "$schema" => "https://ui.shadcn.com/schema.json",
+      "aliases" => {
+        "components" => "app/frontend/components",
+        "ui" => "app/frontend/components/ui",
+      },
+    })
+
+    output = run_install_components_json_generator
+
+    config = JSON.parse(read("components.json"))
+    expect(config.fetch("aliases").fetch("components")).to eq("app/frontend/components")
+    expect(output).to include("components.json already exists")
+  end
+
   it "prints the package-manager command for missing frontend dependencies" do
     create_file "package.json", JSON.pretty_generate({
       dependencies: {
@@ -285,6 +313,16 @@ RSpec.describe Terrazzo::Generators::InstallGenerator do
     original_stdout = $stdout
     $stdout = StringIO.new
     generator.create_stylesheet
+  ensure
+    $stdout = original_stdout
+  end
+
+  def run_install_components_json_generator(options: {})
+    generator = described_class.new([], options, destination_root: destination_root)
+    original_stdout = $stdout
+    $stdout = StringIO.new
+    generator.create_components_json
+    $stdout.string
   ensure
     $stdout = original_stdout
   end
