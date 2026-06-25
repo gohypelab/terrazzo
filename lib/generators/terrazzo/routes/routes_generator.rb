@@ -30,18 +30,18 @@ module Terrazzo
         end
 
         lines = []
-        top_level.sort.each { |r| lines << "    resources :#{r}" }
+        top_level.sort.each { |r| lines << "  resources :#{r}" }
 
         namespaced.sort.each do |ns, resources|
-          lines << ""
-          lines << "    namespace :#{ns} do"
-          resources.sort.each { |r| lines << "      resources :#{r}" }
-          lines << "    end"
+          lines << "" if lines.any?
+          lines << "  namespace :#{ns} do"
+          resources.sort.each { |r| lines << "    resources :#{r}" }
+          lines << "  end"
         end
 
         first_resource = namespace_root_target(top_level, namespaced)
 
-        route_block = <<~RUBY.indent(2)
+        route_block = <<~RUBY
           namespace :#{namespace_name} do
           #{lines.join("\n")}
 
@@ -56,7 +56,7 @@ module Terrazzo
           say ""
           lines.each { |line| say line }
           say ""
-          say "    root to: \"#{first_resource}#index\"", :green if first_resource
+          say "  root to: \"#{first_resource}#index\"", :green if first_resource
           say ""
           return
         end

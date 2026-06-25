@@ -216,3 +216,5 @@ rails g terrazzo:routes
 Inserts a `namespace :admin` block with resource routes and a root route into your
 `config/routes.rb`. The generator fails if it cannot find any concrete `ApplicationRecord`
 models, because there would be no valid resource controller for the admin root.
+If the namespace already exists, it prints the cleanly indented routes to copy
+into that block instead of rewriting your existing route file.

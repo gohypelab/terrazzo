@@ -26,11 +26,44 @@ RSpec.describe Terrazzo::Generators::RoutesGenerator do
     end
 
     routes = read("config/routes.rb")
-    expect(routes).to include("namespace :blog do")
-    expect(routes).to include("resources :posts")
-    expect(routes).to include("resources :tags")
-    expect(routes).to include('root to: "blog/posts#index"')
+    expect(routes).to eq(<<~RUBY)
+      Rails.application.routes.draw do
+        namespace :admin do
+          namespace :blog do
+            resources :posts
+            resources :tags
+          end
+
+          root to: "blog/posts#index"
+        end
+      end
+    RUBY
     expect(routes).not_to include('root to: "posts#index"')
+  end
+
+  it "inserts a cleanly indented admin namespace for top-level models" do
+    create_file "config/routes.rb", <<~RUBY
+      Rails.application.routes.draw do
+      end
+    RUBY
+
+    with_destination_rails_root do
+      generator = routes_generator
+      allow(generator).to receive(:application_models).and_return([Customer])
+
+      capture_stdout { generator.insert_routes }
+    end
+
+    routes = read("config/routes.rb")
+    expect(routes).to eq(<<~RUBY)
+      Rails.application.routes.draw do
+        namespace :admin do
+          resources :customers
+
+          root to: "customers#index"
+        end
+      end
+    RUBY
   end
 
   it "prints the namespaced admin root target when the namespace already exists" do
@@ -49,6 +82,8 @@ RSpec.describe Terrazzo::Generators::RoutesGenerator do
     end
 
     expect(output).to include('root to: "blog/posts#index"')
+    expect(output).to include("  namespace :blog do")
+    expect(output).to include("    resources :posts")
     expect(output).not_to include('root to: "posts#index"')
   end
 
