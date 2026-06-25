@@ -1,6 +1,8 @@
 module Terrazzo
   module Field
     class HasMany < Associative
+      DEFAULT_PER_PAGE = 5
+
       def serialize_value(mode)
         return nil if data.nil?
 
@@ -45,7 +47,8 @@ module Terrazzo
       end
 
       def per_page
-        (options[:per_page] || options[:limit] || 5).to_i
+        requested = (options[:per_page] || options[:limit] || DEFAULT_PER_PAGE).to_i
+        requested.positive? ? requested : DEFAULT_PER_PAGE
       end
 
       def current_page

@@ -151,6 +151,18 @@ RSpec.describe Terrazzo::Field::HasMany do
       expect(result[:rows].length).to eq(2)
     end
 
+    it "falls back to the default per_page for invalid page-size options" do
+      [0, -2, "invalid"].each do |value|
+        field = described_class.new(:orders, nil, :show, resource: customer, options: { per_page: value })
+        result = field.serialize_value(:show)
+        expect(result[:perPage]).to eq(5)
+        expect(result[:rows].length).to eq(2)
+      end
+
+      field = described_class.new(:orders, nil, :show, resource: customer, options: { limit: 0 })
+      expect(field.serialize_value(:show)[:perPage]).to eq(5)
+    end
+
     it "clamps _page < 1 to 1" do
       field = described_class.new(:orders, nil, :show, resource: customer, options: { _page: -5 })
       result = field.serialize_value(:show)

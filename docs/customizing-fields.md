@@ -159,6 +159,7 @@ Options:
   )
   ```
 - `scope` — proc to filter records
+- `per_page` — number of rows per page in the nested show-page table. Defaults to `5`; invalid values fall back to `5`.
 - `sort_by` — attribute to sort related items on show page (e.g., `sort_by: :created_at`)
 - `direction` — sort direction, `:asc` (default) or `:desc`
 - `includes` — eager-load nested associations (e.g., `includes: [:author]`)
