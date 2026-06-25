@@ -54,6 +54,26 @@ RSpec.describe Terrazzo::Generators::InstallGenerator do
     expect { generator.validate_bundler }.to raise_error(Thor::Error, /supports Vite or esbuild/)
   end
 
+  it "fails vite installs when vite_rails is missing" do
+    generator = described_class.new([], {}, destination_root: destination_root)
+
+    expect { generator.verify_vite_bundler }
+      .to raise_error(Thor::Error, /vite_rails was not detected/)
+  end
+
+  it "continues vite installs when vite_rails is installed" do
+    create_file "Gemfile", %(gem "vite_rails"\n)
+    generator = described_class.new([], {}, destination_root: destination_root)
+
+    expect { generator.verify_vite_bundler }.not_to raise_error
+  end
+
+  it "skips vite verification for esbuild installs" do
+    generator = described_class.new([], { bundler: "esbuild" }, destination_root: destination_root)
+
+    expect { generator.verify_vite_bundler }.not_to raise_error
+  end
+
   it "accepts the legacy positional namespace argument" do
     create_file "package.json", JSON.pretty_generate({
       dependencies: described_class::FRONTEND_DEPENDENCIES.to_h { |package_name| [package_name, "*"] },

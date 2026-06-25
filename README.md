@@ -19,12 +19,17 @@ npm install @radix-ui/react-avatar @radix-ui/react-dialog @radix-ui/react-dropdo
   class-variance-authority lucide-react tailwindcss
 npm install --save-dev @tailwindcss/cli # if your app does not already compile Tailwind
 
+# Install Vite Rails for the default Vite setup.
+bundle add vite_rails
+bundle exec vite install
+
 # Install Superglue (if not already set up)
 rails g superglue:install
 
 # Install Terrazzo — generates admin namespace, app barrels,
 # shadcn metadata/path aliases, and dashboards.
-# Uses Vite by default; for Rails esbuild pass --bundler=esbuild.
+# Uses Vite by default and requires vite_rails.
+# For Rails esbuild pass --bundler=esbuild.
 rails g terrazzo:install
 
 # Make sure app/assets/stylesheets/admin.css is compiled by Tailwind.

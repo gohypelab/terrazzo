@@ -54,6 +54,14 @@ The install generator warns when it cannot detect a Tailwind build script for `a
 
 Terrazzo is built on top of [Superglue](https://github.com/thoughtbot/superglue). If your app already uses Superglue, skip to step 5.
 
+For the default Vite setup, install Vite Rails before running the Terrazzo
+installer:
+
+```bash
+bundle add vite_rails
+bundle exec vite install
+```
+
 ```bash
 rails g superglue:install
 ```
@@ -83,7 +91,9 @@ add a model first and run the installer afterwards.
 rails g terrazzo:install
 ```
 
-By default the generator assumes **Vite**. If your app uses Rails esbuild:
+By default the generator assumes **Vite** and requires `vite_rails`, because the
+generated admin layout uses Vite Rails asset helpers. If your app uses Rails
+esbuild instead:
 
 ```bash
 rails g terrazzo:install --bundler=esbuild

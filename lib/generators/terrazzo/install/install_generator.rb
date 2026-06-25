@@ -59,6 +59,17 @@ module Terrazzo
         MESSAGE
       end
 
+      def verify_vite_bundler
+        return unless vite?
+        return if vite_rails_installed?
+
+        raise Thor::Error, <<~MESSAGE
+          Terrazzo is configured for Vite, but vite_rails was not detected.
+
+          Add `gem "vite_rails"` and run `bundle exec vite install` first, or re-run Terrazzo with `--bundler=esbuild`.
+        MESSAGE
+      end
+
       def verify_database_schema
         models = application_models
         raise_no_models_error if models.empty?
@@ -204,6 +215,13 @@ module Terrazzo
 
       def esbuild?
         options[:bundler] == "esbuild"
+      end
+
+      def vite_rails_installed?
+        %w[Gemfile Gemfile.lock].any? do |file_name|
+          path = File.join(destination_root, file_name)
+          File.exist?(path) && File.read(path).include?("vite_rails")
+        end
       end
 
       def missing_frontend_dependencies
