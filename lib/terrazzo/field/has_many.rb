@@ -195,8 +195,7 @@ module Terrazzo
         end
         scope = scope.includes(*options[:includes]) if options.key?(:includes)
         pk = association_primary_key
-        dashboard = associated_dashboard
-        scope.map { |r| [dashboard ? dashboard.display_resource(r) : display_name(r), r.public_send(pk).to_s] }
+        scope.map { |r| [display_name(r), r.public_send(pk).to_s] }
       end
 
       def apply_sorting(records)

@@ -14,6 +14,13 @@ module Terrazzo
       private
 
       def display_name(record)
+        dashboard = dashboard_for(record.class)
+        return dashboard.display_resource(record) if dashboard && custom_display_resource?(dashboard)
+
+        fallback_display_name(record)
+      end
+
+      def fallback_display_name(record)
         if record.respond_to?(:display_name)
           record.display_name
         elsif record.respond_to?(:name)
@@ -44,14 +51,19 @@ module Terrazzo
           associated_class.all
         end
         pk = association_primary_key
-        dashboard = associated_dashboard
-        scope.map { |r| [dashboard ? dashboard.display_resource(r) : display_name(r), r.public_send(pk).to_s] }
+        scope.map { |r| [display_name(r), r.public_send(pk).to_s] }
       end
 
-      def associated_dashboard
-        "#{associated_class.name}Dashboard".constantize.new
+      def dashboard_for(klass)
+        return nil unless klass
+
+        "#{klass.name}Dashboard".constantize.new
       rescue NameError
         nil
+      end
+
+      def custom_display_resource?(dashboard)
+        dashboard.method(:display_resource).owner != Terrazzo::BaseDashboard
       end
 
       def association_primary_key

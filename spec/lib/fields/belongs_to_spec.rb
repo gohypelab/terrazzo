@@ -24,6 +24,27 @@ RSpec.describe Terrazzo::Field::BelongsTo do
       expect(result[:display]).to eq("Alice")
     end
 
+    it "uses the associated dashboard display_resource for display values" do
+      allow_any_instance_of(CustomerDashboard).to receive(:display_resource)
+        .with(customer)
+        .and_return("Customer display: Alice")
+
+      field = described_class.new(:customer, nil, :show, resource: order)
+      result = field.serialize_value(:show)
+
+      expect(result[:display]).to eq("Customer display: Alice")
+    end
+
+    it "uses the record display fallback when the associated dashboard does not override display_resource" do
+      stub_const("CountryDashboard", Class.new(Terrazzo::BaseDashboard))
+      country = create_country(code: "CA", name: "Canada")
+      customer = create_customer(name: "Alice", country: country)
+      field = described_class.new(:territory, nil, :show, resource: customer)
+      result = field.serialize_value(:show)
+
+      expect(result[:display]).to eq("Canada")
+    end
+
     it "returns { id, display } for :show" do
       field = described_class.new(:customer, nil, :show, resource: order)
       result = field.serialize_value(:show)

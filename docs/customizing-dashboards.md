@@ -94,7 +94,10 @@ def display_resource(resource)
 end
 ```
 
-The default is `"ClassName #id"`.
+The default resource title is `"ClassName #id"`. Association fields and form
+dropdowns use your `display_resource` override when you define one; otherwise
+they fall back to common model display methods such as `display_name`, `name`,
+or `title` so generated dashboards remain readable.
 
 ## Attribute Labels and Hints
 

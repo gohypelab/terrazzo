@@ -46,8 +46,7 @@ module Terrazzo
         end
         scope = scope.reorder(options[:order]) if options[:order]
         pk = association_primary_key
-        dashboard = associated_dashboard
-        scope.map { |r| [dashboard ? dashboard.display_resource(r) : display_name(r), r.public_send(pk).to_s] }
+        scope.map { |r| [display_name(r), r.public_send(pk).to_s] }
       end
 
       def foreign_key_value

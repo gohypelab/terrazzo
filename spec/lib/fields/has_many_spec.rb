@@ -93,6 +93,24 @@ RSpec.describe Terrazzo::Field::HasMany do
       })
     end
 
+    it "uses associated dashboard display_resource for associative cells in nested tables" do
+      allow_any_instance_of(CustomerDashboard).to receive(:display_resource)
+        .and_return("Buyer display")
+
+      field = described_class.new(
+        :orders,
+        nil,
+        :show,
+        resource: customer,
+        options: { collection_attributes: %i[customer] }
+      )
+
+      result = field.serialize_value(:show)
+      customer_cell = result[:rows].first[:cells].find { |cell| cell[:attribute] == "customer" }
+
+      expect(customer_cell[:value][:display]).to eq("Buyer display")
+    end
+
     it "preloads associative fields shown in collection_attributes" do
       order = customer.orders.first
       product = Product.create!(

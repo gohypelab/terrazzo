@@ -13,6 +13,17 @@ RSpec.describe Terrazzo::Field::Polymorphic do
       expect(result[:display]).to eq("Alice")
     end
 
+    it "uses the associated dashboard display_resource for display values" do
+      allow_any_instance_of(CustomerDashboard).to receive(:display_resource)
+        .with(customer)
+        .and_return("Customer display: Alice")
+
+      field = described_class.new(:loggable, nil, :show, resource: log_entry)
+      result = field.serialize_value(:show)
+
+      expect(result[:display]).to eq("Customer display: Alice")
+    end
+
     it "returns { type, id } for :form" do
       field = described_class.new(:loggable, nil, :form, resource: log_entry)
       result = field.serialize_value(:form)
@@ -51,6 +62,27 @@ RSpec.describe Terrazzo::Field::Polymorphic do
       opts = field.serializable_options(:form)
       names = opts[:groupedOptions]["Customer"].map(&:first)
       expect(names).to eq(names.sort)
+    end
+  end
+
+  describe "#serializable_options with dashboard display names" do
+    it "uses each candidate class dashboard display_resource" do
+      allow_any_instance_of(CustomerDashboard).to receive(:display_resource) do |_dashboard, resource|
+        "Customer display: #{resource.name}"
+      end
+
+      customer = create_customer(name: "Dashboard Alice")
+      log_entry = LogEntry.create!(action: "test", loggable: customer)
+      field = described_class.new(:loggable, nil, :form, resource: log_entry, options: {
+        classes: ["Customer"],
+      })
+
+      options = field.serializable_options(:form)
+
+      expect(options[:groupedOptions]["Customer"]).to include([
+        "Customer display: Dashboard Alice",
+        customer.id.to_s,
+      ])
     end
   end
 

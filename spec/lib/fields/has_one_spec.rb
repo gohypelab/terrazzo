@@ -21,6 +21,32 @@ RSpec.describe Terrazzo::Field::HasOne do
       expect(result[:display]).to be_present
     end
 
+    it "uses the associated dashboard display_resource for display values" do
+      stub_const("ProductMetaTagDashboard", Class.new(Terrazzo::BaseDashboard) do
+        def display_resource(resource)
+          "Meta display: #{resource.meta_title}"
+        end
+      end)
+
+      product = Product.create!(
+        name: "Widget",
+        price: 9.99,
+        description: "A widget",
+        image_url: "https://example.com/img.png"
+      )
+      meta_tag = ProductMetaTag.create!(
+        product: product,
+        meta_title: "Widget SEO",
+        meta_description: "Buy a widget"
+      )
+
+      field = described_class.new(:product_meta_tag, nil, :show, resource: product)
+      result = field.serialize_value(:show)
+
+      expect(result[:id]).to eq(meta_tag.id.to_s)
+      expect(result[:display]).to eq("Meta display: Widget SEO")
+    end
+
     it "excludes resourceOptions on non-form pages" do
       product = Product.create!(
         name: "Widget",
