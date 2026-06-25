@@ -167,6 +167,8 @@ rails g terrazzo:eject ui/button
 rails g terrazzo:eject navigation
 ```
 
+Unsupported targets fail the generator instead of silently doing nothing, so typos are safe to catch in scripts and CI.
+
 Ejected files import through app-level barrels:
 
 - `app/views/admin/fields/index.js` keeps `export * from "terrazzo/fields"` and registers local field overrides.

@@ -22,9 +22,11 @@ module Terrazzo
         when "pages"
           eject_page
         when "navigation"
+          raise_unknown_target unless target == "navigation"
+
           eject_navigation
         else
-          say_status :error, "Unknown category '#{category}'. Use fields/, components/, ui/, pages/, or navigation", :red
+          raise_unknown_target
         end
       end
 
@@ -42,13 +44,17 @@ module Terrazzo
         options[:namespace]
       end
 
+      def raise_unknown_target
+        raise Thor::Error,
+          "Unknown ejection target '#{target}'. Use fields/, components/, ui/, pages/, or navigation"
+      end
+
       def eject_field
         field_type = component_name
         source_dir = "fields/#{field_type}"
 
         unless File.directory?(File.join(self.class.source_root, source_dir))
-          say_status :error, "Unknown field type '#{field_type}'", :red
-          return
+          raise Thor::Error, "Unknown field type '#{field_type}'"
         end
 
         %w[IndexField.jsx ShowField.jsx FormField.jsx].each do |file|
@@ -71,8 +77,7 @@ module Terrazzo
         name = component_name
 
         unless component_template_exists?(name)
-          say_status :error, "Unknown component '#{name}'", :red
-          return
+          raise Thor::Error, "Unknown component '#{name}'"
         end
 
         ([name] + component_dependencies(name)).uniq.each do |component|
@@ -88,8 +93,7 @@ module Terrazzo
         source = "components/ui/#{name}.jsx"
 
         unless File.exist?(File.join(self.class.source_root, source))
-          say_status :error, "Unknown UI component '#{name}'", :red
-          return
+          raise Thor::Error, "Unknown UI component '#{name}'"
         end
 
         ([name] + ui_dependencies(name)).uniq.each do |component|
@@ -103,8 +107,7 @@ module Terrazzo
         source = "pages/#{name}.jsx"
 
         unless File.exist?(File.join(self.class.source_root, source))
-          say_status :error, "Unknown page template '#{name}'", :red
-          return
+          raise Thor::Error, "Unknown page template '#{name}'"
         end
 
         ensure_page_barrels

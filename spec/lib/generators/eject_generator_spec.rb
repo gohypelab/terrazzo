@@ -60,6 +60,19 @@ RSpec.describe Terrazzo::Generators::EjectGenerator do
     expect(read("app/views/admin/application/_navigation.json.props")).to include("json.items")
   end
 
+  it "fails loudly for unsupported ejection targets" do
+    {
+      "widgets/button" => /Unknown ejection target 'widgets\/button'/,
+      "fields/nope" => /Unknown field type 'nope'/,
+      "components/Nope" => /Unknown component 'Nope'/,
+      "ui/nope" => /Unknown UI component 'nope'/,
+      "pages/nope" => /Unknown page template 'nope'/,
+      "navigation/sidebar" => /Unknown ejection target 'navigation\/sidebar'/,
+    }.each do |target, message|
+      expect { eject_directly(target) }.to raise_error(Thor::Error, message)
+    end
+  end
+
   it "builds JavaScript after resource-specific view generation" do
     run_generator(Terrazzo::Generators::ViewsGenerator, [])
     create_file "app/views/admin/orders/edit.jsx", "export default function PlaceholderOrderEdit() { return null; }\n"
@@ -612,6 +625,10 @@ RSpec.describe Terrazzo::Generators::EjectGenerator do
 
   def read(relative_path)
     File.read(File.join(destination_root, relative_path))
+  end
+
+  def eject_directly(target)
+    described_class.new([target], {}, destination_root: destination_root).eject
   end
 
   def read_repo(relative_path)
