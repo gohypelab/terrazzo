@@ -190,6 +190,16 @@ rails g terrazzo:eject ui/button
 rails g terrazzo:eject navigation
 ```
 
+For custom namespaces, pass the same namespace you used at install time:
+
+```bash
+rails g terrazzo:eject pages/index --namespace=backstage
+```
+
+| Option | Default | Description |
+|--------|---------|-------------|
+| `--namespace` | `admin` | Admin namespace whose app-owned files should receive the ejected source |
+
 Unsupported targets fail the generator instead of silently doing nothing, so typos are safe to catch in scripts and CI.
 When a target path still contains Terrazzo's generated package stub, ejection replaces it without a conflict prompt. If the file has already become app-owned/customized, Rails' normal overwrite prompt still applies.
 Dependency files copied only to satisfy the requested target's imports are non-destructive: Terrazzo skips them when they already exist and leaves their barrel exports alone. Run `terrazzo:eject` for that dependency directly when you want Rails' overwrite prompt and registration for it.
