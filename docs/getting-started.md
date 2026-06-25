@@ -105,6 +105,7 @@ This creates an isolated admin namespace alongside your existing app — it won'
 
 **Admin Superglue infrastructure** (namespaced under `admin/`):
 - `app/javascript/admin/application.jsx` — separate Superglue entry point for the admin
+- `app/frontend/entrypoints/admin/application.jsx` — default Vite entrypoint shim generated only with `--bundler=vite`; custom Vite `sourceCodeDir` / `entrypointsDir` settings are respected
 - `app/javascript/admin/page_to_page_mapping.js` — maps admin pages to React components with shared-page fallbacks
 - `app/javascript/admin/generated_page_mapping.js` — resource-specific page manifest maintained by Terrazzo generators
 - `app/javascript/admin/custom_page_mapping.js` — manual custom page manifest you own

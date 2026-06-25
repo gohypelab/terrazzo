@@ -26,12 +26,16 @@ RSpec.describe Terrazzo::Generators::InstallGenerator do
     create_node_package_link
 
     expect(File).to exist(File.join(destination_root, "app/javascript/admin/application.jsx"))
+    expect(File).to exist(File.join(destination_root, "app/frontend/entrypoints/admin/application.jsx"))
     expect(File).to exist(File.join(destination_root, "app/javascript/admin/page_to_page_mapping.js"))
     expect(File).to exist(File.join(destination_root, "app/javascript/admin/generated_page_mapping.js"))
     expect(File).to exist(File.join(destination_root, "app/javascript/admin/custom_page_mapping.js"))
     expect(File).not_to exist(File.join(destination_root, "app/javascript/admin.js"))
+    expect(read("app/frontend/entrypoints/admin/application.jsx"))
+      .to eq(%(import "../../../javascript/admin/application.jsx"\n))
     expect(read("app/views/admin/application/index.jsx")).to include("terrazzo/pages")
 
+    expect_bundle_to_succeed("app/frontend/entrypoints/admin/application.jsx")
     expect_bundle_to_succeed("app/javascript/admin/application.jsx")
   end
 
@@ -45,7 +49,48 @@ RSpec.describe Terrazzo::Generators::InstallGenerator do
     create_node_package_link
 
     expect(read("app/javascript/admin.js")).to eq(%(import "./admin/application.jsx"\n))
+    expect(File).not_to exist(File.join(destination_root, "app/frontend/entrypoints/admin/application.jsx"))
     expect_bundle_to_succeed("app/javascript/admin.js")
+  end
+
+  it "uses configured Vite entrypoint directories" do
+    create_file "config/vite.json", JSON.pretty_generate({
+      "all" => {
+        "sourceCodeDir" => "app/javascript",
+        "entrypointsDir" => "entrypoints",
+      },
+    })
+    create_file "package.json", JSON.pretty_generate({
+      dependencies: described_class::FRONTEND_DEPENDENCIES.to_h { |package_name| [package_name, "*"] },
+    })
+
+    run_install_entrypoint_generators
+    run_views_generator
+    create_node_package_link
+
+    expect(read("app/javascript/entrypoints/admin/application.jsx"))
+      .to eq(%(import "../../admin/application.jsx"\n))
+    expect_bundle_to_succeed("app/javascript/entrypoints/admin/application.jsx")
+  end
+
+  it "does not create a self-importing shim when the admin app is already a Vite entrypoint" do
+    create_file "config/vite.json", JSON.pretty_generate({
+      "all" => {
+        "sourceCodeDir" => "app/javascript",
+        "entrypointsDir" => ".",
+      },
+    })
+    create_file "package.json", JSON.pretty_generate({
+      dependencies: described_class::FRONTEND_DEPENDENCIES.to_h { |package_name| [package_name, "*"] },
+    })
+
+    run_install_entrypoint_generators
+    run_views_generator
+    create_node_package_link
+
+    expect(read("app/javascript/admin/application.jsx")).to include("createRoot")
+    expect(read("app/javascript/admin/application.jsx")).not_to include('import "./application.jsx"')
+    expect_bundle_to_succeed("app/javascript/admin/application.jsx")
   end
 
   it "rejects unsupported JavaScript bundlers" do
@@ -160,6 +205,7 @@ RSpec.describe Terrazzo::Generators::InstallGenerator do
     expect(read("app/views/admin/components/index.js")).to include("setLayout(Layout);")
     expect(read("app/views/admin/application/_navigation.json.props")).to include("navigation_groups")
 
+    expect_bundle_to_succeed("app/frontend/entrypoints/admin/application.jsx")
     expect_bundle_to_succeed("app/javascript/admin/application.jsx")
   end
 
@@ -375,6 +421,7 @@ RSpec.describe Terrazzo::Generators::InstallGenerator do
       validate_bundler
       validate_namespace
       create_js_entry_point
+      create_vite_entry_point
       create_esbuild_entry_point
       create_store
       create_page_to_page_mapping

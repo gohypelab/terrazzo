@@ -1,4 +1,5 @@
 require "json"
+require "pathname"
 require "rails/generators"
 
 module Terrazzo
@@ -101,8 +102,15 @@ module Terrazzo
       end
 
       def create_js_entry_point
-        template "application.js.erb",
-          "app/javascript/#{namespace_name}/application.jsx"
+        template "application.js.erb", js_entry_point_path
+      end
+
+      def create_vite_entry_point
+        return unless vite?
+        return if vite_entry_point_path == js_entry_point_path
+
+        create_file vite_entry_point_path,
+          %(import "#{relative_import_path(vite_entry_point_directory, js_entry_point_path)}"\n)
       end
 
       def create_esbuild_entry_point
@@ -215,6 +223,61 @@ module Terrazzo
 
       def esbuild?
         options[:bundler] == "esbuild"
+      end
+
+      def js_entry_point_path
+        "app/javascript/#{namespace_name}/application.jsx"
+      end
+
+      def vite_entry_point_path
+        clean_relative_path(File.join(vite_source_code_dir, vite_entrypoints_dir, namespace_name, "application.jsx"))
+      end
+
+      def vite_entry_point_directory
+        File.dirname(vite_entry_point_path)
+      end
+
+      def vite_source_code_dir
+        vite_config.fetch("sourceCodeDir", "app/frontend")
+      end
+
+      def vite_entrypoints_dir
+        vite_config.fetch("entrypointsDir", "entrypoints")
+      end
+
+      def vite_config
+        @vite_config ||= begin
+          raw_config = parsed_vite_config
+          raw_config
+            .merge(raw_config.fetch("all", {}))
+            .merge(raw_config.fetch(vite_environment, {}))
+        end
+      end
+
+      def vite_environment
+        ENV["RAILS_ENV"].presence || ENV["RACK_ENV"].presence || "development"
+      end
+
+      def parsed_vite_config
+        path = File.join(destination_root, "config/vite.json")
+        return {} unless File.exist?(path)
+
+        JSON.parse(File.read(path))
+      rescue JSON::ParserError
+        {}
+      end
+
+      def relative_import_path(from_directory, to_path)
+        relative_path = Pathname
+          .new(File.join(destination_root, to_path))
+          .relative_path_from(Pathname.new(File.join(destination_root, from_directory)))
+          .to_s
+
+        relative_path.start_with?(".") ? relative_path : "./#{relative_path}"
+      end
+
+      def clean_relative_path(path)
+        Pathname.new(path).cleanpath.to_s
       end
 
       def vite_rails_installed?
