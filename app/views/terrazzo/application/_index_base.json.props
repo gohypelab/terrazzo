@@ -123,14 +123,15 @@ json.table do
 end
 
 json.pagination do
+  per_page = @resources.limit_value
   json.currentPage @resources.current_page
   json.totalPages @resources.total_pages
   json.totalCount @resources.total_count
-  json.perPage @resources.limit_value
+  json.perPage per_page
   if @resources.next_page
     json.nextPagePath url_for(
       _page: @resources.next_page,
-      per_page: params[:per_page],
+      per_page: per_page,
       search: @search_term,
       order: params[:order],
       direction: params[:direction],
@@ -144,7 +145,7 @@ json.pagination do
   if @resources.prev_page
     json.prevPagePath url_for(
       _page: @resources.prev_page,
-      per_page: params[:per_page],
+      per_page: per_page,
       search: @search_term,
       order: params[:order],
       direction: params[:direction],

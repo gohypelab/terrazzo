@@ -39,7 +39,7 @@ module Terrazzo
       includes = dashboard.collection_includes
       resources = resources.includes(*includes) if includes.any?
 
-      @resources = resources.page(params[:_page]).per(params[:per_page] || 25)
+      @resources = resources.page(params[:_page]).per(index_per_page)
       @page = Terrazzo::Page::Collection.new(dashboard, resource_class, order: order)
       @search_term = params[:search]
       @active_filter = params[:filter]
@@ -122,6 +122,22 @@ module Terrazzo
 
     def default_sorting_direction
       :asc
+    end
+
+    def default_per_page
+      25
+    end
+
+    def max_per_page
+      100
+    end
+
+    def index_per_page
+      requested = params[:per_page].presence || default_per_page
+      requested = requested.to_i
+      requested = default_per_page if requested <= 0
+
+      [requested, max_per_page].min
     end
 
     def after_resource_created_path(resource)

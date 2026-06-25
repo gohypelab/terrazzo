@@ -45,6 +45,24 @@ class Admin::ProductsController < Admin::ApplicationController
 end
 ```
 
+## Pagination Limits
+
+Index pages show 25 rows by default and clamp `per_page` query params to 100 rows. Override `default_per_page` or `max_per_page` in an admin controller when a resource needs a different limit:
+
+```ruby
+class Admin::ProductsController < Admin::ApplicationController
+  private
+
+  def default_per_page
+    50
+  end
+
+  def max_per_page
+    200
+  end
+end
+```
+
 ## How It Works
 
 `Terrazzo::ApplicationController` provides standard CRUD actions:
