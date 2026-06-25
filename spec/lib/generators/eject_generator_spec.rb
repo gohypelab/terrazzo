@@ -680,6 +680,21 @@ RSpec.describe Terrazzo::Generators::EjectGenerator do
     end
   end
 
+  it "keeps UI ejection templates aligned with packaged UI primitives" do
+    packaged_files = ui_template_files("npm/src/ui")
+    template_files = ui_template_files("lib/generators/terrazzo/views/templates/components/ui")
+
+    expect(template_files).to eq(packaged_files)
+
+    packaged_files.each do |file_name|
+      packaged_source = read_repo("npm/src/ui/#{file_name}")
+      template_source = read_repo("lib/generators/terrazzo/views/templates/components/ui/#{file_name}")
+
+      expect(template_source).to eq(packaged_source),
+        "expected components/ui/#{file_name} to match the packaged UI primitive"
+    end
+  end
+
   it "keeps page ejection templates aligned with packaged pages" do
     page_template_pairs.each do |packaged_page, template_page|
       packaged_source = read_repo("npm/src/pages/#{packaged_page}")
@@ -914,6 +929,12 @@ RSpec.describe Terrazzo::Generators::EjectGenerator do
     Dir[File.join(repo_root, relative_root, "*.jsx")]
       .map { |path| File.basename(path) }
       .reject { |name| name.end_with?(".test.jsx") }
+      .sort
+  end
+
+  def ui_template_files(relative_root)
+    Dir[File.join(repo_root, relative_root, "*.{js,jsx}")]
+      .map { |path| File.basename(path) }
       .sort
   end
 
