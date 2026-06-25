@@ -19,6 +19,9 @@
     "url": "https://github.com/gohypelab/terrazzo/issues"
   },
   "type": "module",
+  "engines": {
+    "node": ">=18"
+  },
   "main": "./dist/index.cjs",
   "module": "./dist/index.js",
   "exports": {

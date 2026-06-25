@@ -17,6 +17,9 @@ const expectedMetadata = {
   bugs: {
     url: "https://github.com/gohypelab/terrazzo/issues",
   },
+  engines: {
+    node: ">=18",
+  },
 };
 
 for (const [key, expected] of Object.entries(expectedMetadata)) {
