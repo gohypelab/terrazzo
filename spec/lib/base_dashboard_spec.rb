@@ -138,6 +138,12 @@ RSpec.describe Terrazzo::BaseDashboard do
     end
   end
 
+  describe "#collection_header_options" do
+    it "returns no header metadata by default" do
+      expect(dashboard.collection_header_options(:name)).to eq({})
+    end
+  end
+
   describe "#collection_row_options" do
     it "returns no row metadata by default" do
       customer = create_customer(name: "Alice")

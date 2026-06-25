@@ -4,6 +4,19 @@ filter_url_for = ->(filter_name = nil) do
   url_for(query.merge(only_path: true))
 end
 
+header_options_for = ->(attribute) do
+  options = (dashboard.collection_header_options(attribute) || {}).to_h
+  class_name = options.delete(:class_name) ||
+    options.delete("class_name") ||
+    options.delete(:className) ||
+    options.delete("className")
+
+  {
+    className: class_name,
+    meta: options.presence,
+  }.compact
+end
+
 cell_options_for = ->(attribute, resource) do
   options = (dashboard.collection_cell_options(attribute, resource) || {}).to_h
   class_name = options.delete(:class_name) ||
@@ -64,10 +77,12 @@ json.table do
   json.headers do
     json.array! @page.attribute_names do |attr|
       field_class = dashboard.attribute_type_for(attr)
+      header_options = header_options_for.call(attr)
       json.label dashboard.attribute_label(attr, :index)
       json.attribute attr.to_s
       json.sortable field_class.sortable?
       json.sortDirection @page.sort_direction_for(attr)
+      json.headerOptions header_options if header_options.present?
       json.sortUrl url_for(
         @page.order_params_for(attr).merge(
           search: @search_term,

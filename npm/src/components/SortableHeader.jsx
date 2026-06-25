@@ -3,13 +3,15 @@ import { ChevronUp, ChevronDown, ChevronsUpDown } from "lucide-react";
 
 import { TableHead } from "terrazzo/ui";
 
-export function SortableHeader({ label, sortable, sortUrl, sortDirection }) {
+export function SortableHeader({ label, sortable, sortUrl, sortDirection, headerOptions }) {
+  const headerClassName = headerOptions?.className || headerOptions?.class_name;
+
   if (!sortable) {
-    return <TableHead>{label}</TableHead>;
+    return <TableHead className={headerClassName}>{label}</TableHead>;
   }
 
   return (
-    <TableHead>
+    <TableHead className={headerClassName}>
       <a
         href={sortUrl}
         data-sg-visit

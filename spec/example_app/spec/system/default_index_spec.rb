@@ -13,6 +13,7 @@ RSpec.describe "Admin default index", type: :system do
     expect(find_link("Series guide")["data-sg-visit"]).to be_nil
     expect(find_link("Series audit")["data-sg-visit"]).to be_nil
     expect(page).to have_link("Starts with alpha")
+    expect(find("th", text: "Name")[:class]).to include("w-64")
     expect(find("table tbody tr", text: "Alpha Series")[:class]).to include("bg-muted/40")
     within(find("table tbody tr", text: "Beta Series")) do
       find("button").click

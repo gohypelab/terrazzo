@@ -55,6 +55,15 @@ class SeriesDashboard < Terrazzo::BaseDashboard
     }
   end
 
+  def collection_header_options(attribute)
+    return {} unless attribute == :name
+
+    {
+      class_name: "w-64",
+      priority: "primary",
+    }
+  end
+
   # Overwrite this method to customize how series are displayed
   # across all pages of the admin dashboard.
   #

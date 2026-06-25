@@ -80,6 +80,10 @@ module Terrazzo
       {}
     end
 
+    def collection_header_options(_attribute)
+      {}
+    end
+
     def collection_row_options(_resource)
       {}
     end

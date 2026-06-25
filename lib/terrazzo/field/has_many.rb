@@ -118,7 +118,10 @@ module Terrazzo
         dashboard = find_associated_dashboard.new
 
         headers = col_attrs.map do |attr|
-          { attribute: attr.to_s, label: dashboard.attribute_label(attr, :index) }
+          header = { attribute: attr.to_s, label: dashboard.attribute_label(attr, :index) }
+          header_options = serialized_header_options(dashboard, attr)
+          header[:headerOptions] = header_options if header_options.present?
+          header
         end
 
         rows = records.map do |record|
@@ -140,6 +143,19 @@ module Terrazzo
         end
 
         { headers: headers, rows: rows }
+      end
+
+      def serialized_header_options(dashboard, attribute)
+        options = (dashboard.collection_header_options(attribute) || {}).to_h
+        class_name = options.delete(:class_name) ||
+          options.delete("class_name") ||
+          options.delete(:className) ||
+          options.delete("className")
+
+        {
+          className: class_name,
+          meta: options.presence,
+        }.compact
       end
 
       def serialized_row_options(dashboard, resource)
