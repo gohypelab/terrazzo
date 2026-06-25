@@ -10,22 +10,24 @@ A drop-in admin panel for Rails apps. Uses the [Administrate](https://github.com
 ## Quick start
 
 ```bash
-# Add the gem and npm package
+# Add the gem
 bundle add terrazzo
-npm install terrazzo
-npm install @radix-ui/react-avatar @radix-ui/react-dialog @radix-ui/react-dropdown-menu \
-  @radix-ui/react-label @radix-ui/react-popover @radix-ui/react-select \
-  @radix-ui/react-separator @radix-ui/react-slot @radix-ui/react-tooltip \
-  class-variance-authority lucide-react tailwindcss
-npm install --save-dev @tailwindcss/cli # if your app does not already compile Tailwind
+
+# Install Superglue (if not already set up)
+rails g superglue:install
 
 # Install Vite Rails for the default Vite setup.
 bundle add vite_rails
 bundle exec vite install
 # Resolve any package-manager errors from Vite before continuing.
 
-# Install Superglue (if not already set up)
-rails g superglue:install
+# Add the npm package and frontend dependencies
+npm install terrazzo
+npm install @radix-ui/react-avatar @radix-ui/react-dialog @radix-ui/react-dropdown-menu \
+  @radix-ui/react-label @radix-ui/react-popover @radix-ui/react-select \
+  @radix-ui/react-separator @radix-ui/react-slot @radix-ui/react-tooltip \
+  class-variance-authority lucide-react tailwindcss
+npm install --save-dev @tailwindcss/cli # if your app does not already compile Tailwind
 
 # Install Terrazzo — generates admin namespace, app barrels,
 # shadcn metadata/path aliases, and dashboards.
