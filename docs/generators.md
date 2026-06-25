@@ -70,7 +70,7 @@ Creates:
 
 For namespaced models, `terrazzo:dashboard Blog::Post` writes
 `app/dashboards/blog/post_dashboard.rb` and `app/controllers/admin/blog/posts_controller.rb`
-with an explicit `Admin::Blog::PostsController` module nesting.
+with explicit `Blog::PostDashboard` and `Admin::Blog::PostsController` module nesting.
 
 The generator inspects your model's columns and associations:
 - Primary key columns → `Field::String`

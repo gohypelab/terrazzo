@@ -1,43 +1,51 @@
 require "terrazzo/base_dashboard"
 
-class <%= class_name %>Dashboard < Terrazzo::BaseDashboard
-  ATTRIBUTE_TYPES = {
+<% dashboard_modules.each_with_index do |module_name, index| -%>
+<%= "  " * index %>module <%= module_name %>
+<% end -%>
+<% class_indent = "  " * dashboard_modules.size -%>
+<% body_indent = "  " * (dashboard_modules.size + 1) -%>
+<%= class_indent %>class <%= dashboard_class_name %> < Terrazzo::BaseDashboard
+<%= body_indent %>ATTRIBUTE_TYPES = {
 <% attribute_types.each do |attr, type| -%>
 <% if has_enum?(attr.to_s) -%>
-    <%= attr %>: <%= type %>.with_options(collection: <%= enum_collection(attr.to_s).inspect %>),
+<%= body_indent %>  <%= attr %>: <%= type %>.with_options(collection: <%= enum_collection(attr.to_s).inspect %>),
 <% else -%>
-    <%= attr %>: <%= type %>,
+<%= body_indent %>  <%= attr %>: <%= type %>,
 <% end -%>
 <% end -%>
-  }.freeze
+<%= body_indent %>}.freeze
 
-  COLLECTION_ATTRIBUTES = %i[
+<%= body_indent %>COLLECTION_ATTRIBUTES = %i[
 <% collection_attributes.each do |attr| -%>
-    <%= attr %>
+<%= body_indent %>  <%= attr %>
 <% end -%>
-  ].freeze
+<%= body_indent %>].freeze
 
-  SHOW_PAGE_ATTRIBUTES = %i[
+<%= body_indent %>SHOW_PAGE_ATTRIBUTES = %i[
 <% show_page_attributes.each do |attr| -%>
-    <%= attr %>
+<%= body_indent %>  <%= attr %>
 <% end -%>
-  ].freeze
+<%= body_indent %>].freeze
 
-  FORM_ATTRIBUTES = %i[
+<%= body_indent %>FORM_ATTRIBUTES = %i[
 <% form_attributes.each do |attr| -%>
-    <%= attr %>
+<%= body_indent %>  <%= attr %>
 <% end -%>
-  ].freeze
+<%= body_indent %>].freeze
 
-  # COLLECTION_FILTERS = {
-  #   active: ->(resources) { resources.where(active: true) },
-  #   recent: ->(resources) { resources.where("created_at > ?", 30.days.ago) },
-  # }.freeze
+<%= body_indent %># COLLECTION_FILTERS = {
+<%= body_indent %>#   active: ->(resources) { resources.where(active: true) },
+<%= body_indent %>#   recent: ->(resources) { resources.where("created_at > ?", 30.days.ago) },
+<%= body_indent %># }.freeze
 
-  # Overwrite this method to customize how <%= file_name.pluralize.humanize.downcase %> are displayed
-  # across all pages of the admin dashboard.
-  #
-  # def display_resource(resource)
-  #   "<%= class_name %> ##{resource.id}"
-  # end
-end
+<%= body_indent %># Overwrite this method to customize how <%= file_name.pluralize.humanize.downcase %> are displayed
+<%= body_indent %># across all pages of the admin dashboard.
+<%= body_indent %>#
+<%= body_indent %># def display_resource(resource)
+<%= body_indent %>#   "<%= class_name %> ##{resource.id}"
+<%= body_indent %># end
+<%= class_indent %>end
+<% dashboard_modules.reverse.each_with_index do |_module_name, index| -%>
+<%= "  " * (dashboard_modules.size - index - 1) %>end
+<% end -%>

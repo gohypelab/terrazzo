@@ -114,6 +114,14 @@ module Terrazzo
         "#{file_name.pluralize.camelize}Controller"
       end
 
+      def dashboard_modules
+        class_path.map(&:camelize)
+      end
+
+      def dashboard_class_name
+        "#{file_name.camelize}Dashboard"
+      end
+
       def association_foreign_key?(column_name, associations)
         associations.any? do |assoc|
           assoc.macro == :belongs_to &&

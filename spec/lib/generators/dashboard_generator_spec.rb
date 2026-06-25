@@ -34,10 +34,15 @@ RSpec.describe Terrazzo::Generators::DashboardGenerator do
   it "generates conventional nested controllers for namespaced models" do
     run_generator(["Blog::Post"])
 
+    dashboard = read("app/dashboards/blog/post_dashboard.rb")
+    expect(dashboard).to include("module Blog\n  class PostDashboard < Terrazzo::BaseDashboard")
+    expect(dashboard).not_to include("class Blog::PostDashboard")
+
     controller = read("app/controllers/admin/blog/posts_controller.rb")
     expect(controller).to include("module Admin\n  module Blog\n    class PostsController < ApplicationController")
     expect(controller).not_to include("class Blog::PostsController")
 
+    expect_ruby_syntax_to_be_valid("app/dashboards/blog/post_dashboard.rb")
     expect_ruby_syntax_to_be_valid("app/controllers/admin/blog/posts_controller.rb")
   end
 
