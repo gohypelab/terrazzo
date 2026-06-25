@@ -171,6 +171,36 @@ RSpec.describe Terrazzo::Generators::EjectGenerator do
     expect(read("app/views/admin/application/_collection.jsx")).to include("custom collection")
   end
 
+  it "keeps resource-specific view generators from overwriting app-owned partials" do
+    create_file "app/views/admin/orders/_collection.jsx", <<~JS
+      export function AdminCollection() {
+        return "custom order collection";
+      }
+    JS
+    create_file "app/views/admin/customers/_form.jsx", <<~JS
+      export function AdminForm() {
+        return "custom customer form";
+      }
+    JS
+    create_file "app/views/admin/payments/_form.jsx", <<~JS
+      export function AdminForm() {
+        return "custom payment form";
+      }
+    JS
+
+    output = [
+      run_generator(Terrazzo::Generators::Views::IndexGenerator, ["Order"]),
+      run_generator(Terrazzo::Generators::Views::NewGenerator, ["Customer", "--no-with-counterpart"]),
+      run_generator(Terrazzo::Generators::Views::EditGenerator, ["Payment", "--no-with-counterpart"]),
+    ].join
+
+    expect(output).not_to include("conflict")
+    expect(output).not_to include("Overwrite")
+    expect(read("app/views/admin/orders/_collection.jsx")).to include("custom order collection")
+    expect(read("app/views/admin/customers/_form.jsx")).to include("custom customer form")
+    expect(read("app/views/admin/payments/_form.jsx")).to include("custom payment form")
+  end
+
   it "fails loudly for unsupported ejection targets" do
     {
       "widgets/button" => /Unknown ejection target 'widgets\/button'/,

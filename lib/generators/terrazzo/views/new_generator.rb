@@ -25,7 +25,7 @@ module Terrazzo
           if resource.present?
             eject_json_props
             copy_file "pages/new.jsx", "app/views/#{namespace_name}/#{resource_path}/new.jsx"
-            copy_file "pages/_form.jsx", "app/views/#{namespace_name}/#{resource_path}/_form.jsx"
+            copy_file_unless_exists "pages/_form.jsx", "app/views/#{namespace_name}/#{resource_path}/_form.jsx"
             register_page_mapping("new")
             eject_edit_view if should_eject_edit?
           else
