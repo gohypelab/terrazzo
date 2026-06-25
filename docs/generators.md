@@ -201,7 +201,7 @@ Ejected files import through app-level barrels:
 
 If one of those barrels is missing, `terrazzo:eject` creates the base package re-export before writing the ejected file. This keeps standalone ejection commands buildable, while installed apps continue using the barrels created by `terrazzo:views`.
 
-Page ejection copies required partials with the page. For example, `pages/index` also copies `_collection.jsx`, and `pages/edit` or `pages/new` also copies `_form.jsx`. If the matching form page is still a generated package stub, ejecting `pages/edit` or `pages/new` also replaces that counterpart so both pages use the shared app-owned `_form.jsx`.
+Page ejection copies required partials with the page when they are missing. For example, `pages/index` also copies `_collection.jsx`, and `pages/edit` or `pages/new` also copies `_form.jsx`. If you have already customized one of those shared partials, later page ejections preserve it. If the matching form page is still a generated package stub, ejecting `pages/edit` or `pages/new` also replaces that counterpart so both pages use the shared app-owned `_form.jsx`.
 
 UI ejection copies required local primitive dependencies with the requested file. For example, `ui/pagination` also copies `ui/button`, and `ui/sidebar` also copies the primitives it imports locally. Ejected UI primitives are consumed by app-owned pages, fields, and components that import from `../components/ui`; packaged default pages continue using the package defaults until you eject or override the relevant page, field, or component.
 

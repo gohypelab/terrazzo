@@ -117,7 +117,8 @@ module Terrazzo
         copy_file_over_generated source, "app/views/#{namespace_name}/application/#{name}.jsx",
           generated_content: generated_page_stub(name)
         page_dependencies(name).each do |dependency|
-          copy_file "pages/#{dependency}.jsx", "app/views/#{namespace_name}/application/#{dependency}.jsx"
+          copy_file_unless_exists "pages/#{dependency}.jsx",
+            "app/views/#{namespace_name}/application/#{dependency}.jsx"
         end
         eject_generated_form_counterpart(name)
       end

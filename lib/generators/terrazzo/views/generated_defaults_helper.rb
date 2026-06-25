@@ -17,6 +17,15 @@ module Terrazzo
           copy_file source, destination, **options
         end
 
+        def copy_file_unless_exists(source, destination)
+          if File.exist?(File.join(destination_root, destination))
+            say_status :skip, destination, :yellow
+            return
+          end
+
+          copy_file source, destination
+        end
+
         def generated_file?(destination, generated_content)
           path = File.join(destination_root, destination)
           File.exist?(path) && File.read(path) == generated_content

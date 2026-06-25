@@ -85,6 +85,30 @@ RSpec.describe Terrazzo::Generators::EjectGenerator do
     expect(read("app/views/admin/application/_form.jsx")).to include("export function AdminForm")
   end
 
+  it "preserves existing app-owned shared page partials" do
+    run_generator(Terrazzo::Generators::ViewsGenerator, [])
+    create_file "app/views/admin/application/_form.jsx", <<~JS
+      export function AdminForm() {
+        return "custom form";
+      }
+    JS
+    create_file "app/views/admin/application/_collection.jsx", <<~JS
+      export function AdminCollection() {
+        return "custom collection";
+      }
+    JS
+
+    output = [
+      run_generator(described_class, ["pages/edit"]),
+      run_generator(described_class, ["pages/index"]),
+    ].join
+
+    expect(output).not_to include("conflict")
+    expect(output).not_to include("Overwrite")
+    expect(read("app/views/admin/application/_form.jsx")).to include("custom form")
+    expect(read("app/views/admin/application/_collection.jsx")).to include("custom collection")
+  end
+
   it "replaces the installed navigation partial without a conflict prompt" do
     run_generator(Terrazzo::Generators::ViewsGenerator, [])
 
@@ -121,6 +145,30 @@ RSpec.describe Terrazzo::Generators::EjectGenerator do
     expect(read("app/views/admin/application/edit.jsx")).to include("export default function AdminEdit")
     expect(read("app/views/admin/application/new.jsx")).to include("export default function AdminNew")
     expect(read("app/views/admin/application/_form.jsx")).to include("export function AdminForm")
+  end
+
+  it "keeps legacy shared page generators from overwriting app-owned partials" do
+    run_generator(Terrazzo::Generators::ViewsGenerator, [])
+    create_file "app/views/admin/application/_form.jsx", <<~JS
+      export function AdminForm() {
+        return "custom form";
+      }
+    JS
+    create_file "app/views/admin/application/_collection.jsx", <<~JS
+      export function AdminCollection() {
+        return "custom collection";
+      }
+    JS
+
+    output = [
+      run_generator(Terrazzo::Generators::Views::EditGenerator, []),
+      run_generator(Terrazzo::Generators::Views::IndexGenerator, []),
+    ].join
+
+    expect(output).not_to include("conflict")
+    expect(output).not_to include("Overwrite")
+    expect(read("app/views/admin/application/_form.jsx")).to include("custom form")
+    expect(read("app/views/admin/application/_collection.jsx")).to include("custom collection")
   end
 
   it "fails loudly for unsupported ejection targets" do

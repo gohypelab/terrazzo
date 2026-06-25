@@ -28,7 +28,7 @@ module Terrazzo
           else
             copy_file_over_generated "pages/index.jsx", "app/views/#{namespace_name}/application/index.jsx",
               generated_content: generated_page_stub("index")
-            copy_file "pages/_collection.jsx", "app/views/#{namespace_name}/application/_collection.jsx"
+            copy_file_unless_exists "pages/_collection.jsx", "app/views/#{namespace_name}/application/_collection.jsx"
           end
         end
 

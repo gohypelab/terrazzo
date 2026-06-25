@@ -31,7 +31,7 @@ module Terrazzo
           else
             copy_file_over_generated "pages/edit.jsx", "app/views/#{namespace_name}/application/edit.jsx",
               generated_content: generated_page_stub("edit")
-            copy_file "pages/_form.jsx", "app/views/#{namespace_name}/application/_form.jsx"
+            copy_file_unless_exists "pages/_form.jsx", "app/views/#{namespace_name}/application/_form.jsx"
             eject_new_view if should_eject_new?
           end
         end
