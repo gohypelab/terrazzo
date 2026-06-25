@@ -185,13 +185,20 @@ RSpec.describe "Admin Customizations", type: :system do
       visit new_admin_page_path
       expect(page).to have_css('[data-testid="custom-layout"]')
     end
+
+    it "renders the custom layout on edit pages" do
+      page_record = create(:page)
+
+      visit edit_admin_page_path(page_record)
+      expect(page).to have_css('[data-testid="custom-layout"]')
+    end
   end
 
   describe "local override registration" do
     let!(:customer) { create(:customer, name: "Registry Customer", territory: country) }
     let!(:order) { create(:order, customer: customer, address_line_one: "987 Registry Lane") }
 
-    it "uses app-owned component and field overrides in packaged pages" do
+    it "uses app-owned component and field overrides at runtime" do
       visit admin_orders_path
 
       expect(page).to have_css('[data-testid="custom-search-bar"]')
