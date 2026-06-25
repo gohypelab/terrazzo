@@ -155,7 +155,11 @@ rails g terrazzo:views:index Order
 rails g terrazzo:views:edit Product
 rails g terrazzo:views:new BlogPost
 rails g terrazzo:views:index Catalog::Product
+rails g terrazzo:views:index catalog/product
 ```
+
+Resource arguments accept either Ruby constant style (`Catalog::Product`) or Rails path
+style (`catalog/product`).
 
 When ejecting for a resource, the generator creates a complete set of files:
 

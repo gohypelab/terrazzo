@@ -40,10 +40,6 @@ module Terrazzo
           RUBY
         end
 
-        def resource_path
-          resource.underscore.pluralize
-        end
-
         def namespace_name
           options[:namespace]
         end

@@ -294,6 +294,32 @@ RSpec.describe Terrazzo::Generators::EjectGenerator do
     expect(manifest).to include("'admin/catalog/products/edit': Catalog__ProductEdit,")
   end
 
+  it "builds JavaScript after slash-style namespaced resource-specific view generation" do
+    run_generator(Terrazzo::Generators::ViewsGenerator, [])
+
+    run_generator(Terrazzo::Generators::Views::IndexGenerator, ["catalog/product"])
+
+    create_node_package_link
+    create_file "slash_style_resource_entry.jsx", <<~JS
+      import "./app/views/admin/fields/index.js";
+      import "./app/views/admin/components/index.js";
+      import "./app/views/admin/components/ui/index.js";
+      import { generatedPageMapping } from "./app/javascript/admin/generated_page_mapping.js";
+      import CatalogProductIndex from "./app/views/admin/catalog/products/index.jsx";
+
+      console.log(generatedPageMapping, CatalogProductIndex);
+    JS
+
+    expect_bundle_to_succeed("slash_style_resource_entry.jsx")
+    expect(File).to exist(File.join(destination_root, "app/views/admin/catalog/products/index.jsx"))
+    expect(File).to exist(File.join(destination_root, "app/views/admin/catalog/products/index.json.props"))
+    expect(File).to exist(File.join(destination_root, "app/views/admin/catalog/products/_collection.jsx"))
+
+    manifest = read("app/javascript/admin/generated_page_mapping.js")
+    expect(manifest).to include('import Catalog__ProductIndex from "../../views/admin/catalog/products/index";')
+    expect(manifest).to include("'admin/catalog/products/index': Catalog__ProductIndex,")
+  end
+
   it "builds JavaScript when generated page mapping identifiers would otherwise collide" do
     run_generator(Terrazzo::Generators::ViewsGenerator, [])
 

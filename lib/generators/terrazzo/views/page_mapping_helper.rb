@@ -93,8 +93,16 @@ module Terrazzo
           executable_content.match?(/\bgeneratedPageMapping\b/)
         end
 
+        def resource_class_name
+          resource.to_s.camelize
+        end
+
+        def resource_path
+          resource_class_name.underscore.pluralize
+        end
+
         def generated_page_component_name(action)
-          resource.split("::").map(&:camelize).join("__") + action.camelize
+          resource_class_name.split("::").map(&:camelize).join("__") + action.camelize
         end
 
         def insert_generated_import(mapping_path, content, import_line, component_name)
