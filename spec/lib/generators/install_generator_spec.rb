@@ -17,6 +17,7 @@ RSpec.describe Terrazzo::Generators::InstallGenerator do
   end
 
   it "builds the generated admin JavaScript entrypoint with installed page stubs" do
+    create_default_vite_config
     create_file "package.json", JSON.pretty_generate({
       dependencies: described_class::FRONTEND_DEPENDENCIES.to_h { |package_name| [package_name, "*"] },
     })
@@ -70,6 +71,8 @@ RSpec.describe Terrazzo::Generators::InstallGenerator do
 
     expect(read("app/javascript/entrypoints/admin/application.jsx"))
       .to eq(%(import "../../admin/application.jsx"\n))
+    expect(JSON.parse(read("config/vite.json")).dig("all", "watchAdditionalPaths"))
+      .to eq(["app/views/admin/**/*"])
     expect_bundle_to_succeed("app/javascript/entrypoints/admin/application.jsx")
   end
 
@@ -93,6 +96,22 @@ RSpec.describe Terrazzo::Generators::InstallGenerator do
     expect_bundle_to_succeed("app/javascript/admin/application.jsx")
   end
 
+  it "adds generated admin files to Vite watch paths when they are outside sourceCodeDir" do
+    create_file "config/vite.json", JSON.pretty_generate({
+      "all" => {
+        "watchAdditionalPaths" => ["app/components/**/*"],
+      },
+    })
+
+    run_install_entrypoint_generators
+
+    expect(JSON.parse(read("config/vite.json")).dig("all", "watchAdditionalPaths")).to eq([
+      "app/components/**/*",
+      "app/javascript/admin/**/*",
+      "app/views/admin/**/*",
+    ])
+  end
+
   it "rejects unsupported JavaScript bundlers" do
     generator = described_class.new([], { bundler: "sprockets" }, destination_root: destination_root)
 
@@ -103,11 +122,29 @@ RSpec.describe Terrazzo::Generators::InstallGenerator do
     generator = described_class.new([], {}, destination_root: destination_root)
 
     expect { generator.verify_vite_bundler }
-      .to raise_error(Thor::Error, /vite_rails was not detected/)
+      .to raise_error(Thor::Error, /vite_rails is not installed and configured/)
+  end
+
+  it "fails vite installs when vite_rails has not been configured" do
+    create_file "Gemfile", %(gem "vite_rails"\n)
+    generator = described_class.new([], {}, destination_root: destination_root)
+
+    expect { generator.verify_vite_bundler }
+      .to raise_error(Thor::Error, /bundle exec vite install/)
+  end
+
+  it "fails vite installs when vite_rails config cannot be parsed" do
+    create_file "Gemfile", %(gem "vite_rails"\n)
+    create_file "config/vite.json", "{"
+    generator = described_class.new([], {}, destination_root: destination_root)
+
+    expect { generator.verify_vite_bundler }
+      .to raise_error(Thor::Error, /bundle exec vite install/)
   end
 
   it "continues vite installs when vite_rails is installed" do
     create_file "Gemfile", %(gem "vite_rails"\n)
+    create_default_vite_config
     generator = described_class.new([], {}, destination_root: destination_root)
 
     expect { generator.verify_vite_bundler }.not_to raise_error
@@ -180,6 +217,7 @@ RSpec.describe Terrazzo::Generators::InstallGenerator do
   end
 
   it "builds the installed admin JavaScript entrypoint after release-gate ejections" do
+    create_default_vite_config
     create_file "package.json", JSON.pretty_generate({
       dependencies: described_class::FRONTEND_DEPENDENCIES.to_h { |package_name| [package_name, "*"] },
     })
@@ -422,6 +460,7 @@ RSpec.describe Terrazzo::Generators::InstallGenerator do
       validate_namespace
       create_js_entry_point
       create_vite_entry_point
+      configure_vite_watch_paths
       create_esbuild_entry_point
       create_store
       create_page_to_page_mapping
@@ -511,6 +550,24 @@ RSpec.describe Terrazzo::Generators::InstallGenerator do
     path = File.join(destination_root, relative_path)
     FileUtils.mkdir_p(File.dirname(path))
     File.write(path, content)
+  end
+
+  def create_default_vite_config
+    create_file "config/vite.json", JSON.pretty_generate({
+      "all" => {
+        "watchAdditionalPaths" => [],
+      },
+      "development" => {
+        "autoBuild" => true,
+        "publicOutputDir" => "vite-dev",
+        "port" => 3036,
+      },
+      "test" => {
+        "autoBuild" => true,
+        "publicOutputDir" => "vite-test",
+        "port" => 3037,
+      },
+    })
   end
 
   def read(relative_path)

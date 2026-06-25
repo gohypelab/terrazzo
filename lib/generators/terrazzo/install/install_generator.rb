@@ -62,10 +62,10 @@ module Terrazzo
 
       def verify_vite_bundler
         return unless vite?
-        return if vite_rails_installed?
+        return if vite_rails_installed? && parsed_vite_config
 
         raise Thor::Error, <<~MESSAGE
-          Terrazzo is configured for Vite, but vite_rails was not detected.
+          Terrazzo is configured for Vite, but vite_rails is not installed and configured.
 
           Add `gem "vite_rails"` and run `bundle exec vite install` first, or re-run Terrazzo with `--bundler=esbuild`.
         MESSAGE
@@ -111,6 +111,24 @@ module Terrazzo
 
         create_file vite_entry_point_path,
           %(import "#{relative_import_path(vite_entry_point_directory, js_entry_point_path)}"\n)
+      end
+
+      def configure_vite_watch_paths
+        return unless vite?
+
+        config = parsed_vite_config
+        return unless config
+
+        watch_paths = vite_watch_paths
+        return if watch_paths.empty?
+
+        config["all"] = {} unless config["all"].is_a?(Hash)
+        existing_paths = Array(config["all"]["watchAdditionalPaths"])
+        updated_paths = existing_paths | watch_paths
+        return if updated_paths == existing_paths
+
+        config["all"]["watchAdditionalPaths"] = updated_paths
+        create_file "config/vite.json", "#{JSON.pretty_generate(config)}\n", force: true
       end
 
       def create_esbuild_entry_point
@@ -247,7 +265,7 @@ module Terrazzo
 
       def vite_config
         @vite_config ||= begin
-          raw_config = parsed_vite_config
+          raw_config = parsed_vite_config || {}
           raw_config
             .merge(raw_config.fetch("all", {}))
             .merge(raw_config.fetch(vite_environment, {}))
@@ -259,12 +277,11 @@ module Terrazzo
       end
 
       def parsed_vite_config
-        path = File.join(destination_root, "config/vite.json")
-        return {} unless File.exist?(path)
+        return nil unless vite_config_installed?
 
-        JSON.parse(File.read(path))
+        JSON.parse(File.read(vite_config_path))
       rescue JSON::ParserError
-        {}
+        nil
       end
 
       def relative_import_path(from_directory, to_path)
@@ -278,6 +295,29 @@ module Terrazzo
 
       def clean_relative_path(path)
         Pathname.new(path).cleanpath.to_s
+      end
+
+      def vite_watch_paths
+        [
+          "app/javascript/#{namespace_name}/**/*",
+          "app/views/#{namespace_name}/**/*",
+        ].select { |path| outside_vite_source_code_dir?(path) }
+      end
+
+      def outside_vite_source_code_dir?(path)
+        source_dir = clean_relative_path(vite_source_code_dir)
+        return false if source_dir == "."
+
+        watched_root = clean_relative_path(path.delete_suffix("/**/*"))
+        watched_root != source_dir && !watched_root.start_with?("#{source_dir}/")
+      end
+
+      def vite_config_installed?
+        File.exist?(vite_config_path)
+      end
+
+      def vite_config_path
+        File.join(destination_root, "config/vite.json")
       end
 
       def vite_rails_installed?

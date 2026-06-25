@@ -91,9 +91,9 @@ add a model first and run the installer afterwards.
 rails g terrazzo:install
 ```
 
-By default the generator assumes **Vite** and requires `vite_rails`, because the
-generated admin layout uses Vite Rails asset helpers. If your app uses Rails
-esbuild instead:
+By default the generator assumes **Vite** and requires the `vite_rails` installer
+output, including `config/vite.json`, because the generated admin layout uses
+Vite Rails asset helpers. If your app uses Rails esbuild instead:
 
 ```bash
 rails g terrazzo:install --bundler=esbuild
@@ -106,6 +106,7 @@ This creates an isolated admin namespace alongside your existing app — it won'
 **Admin Superglue infrastructure** (namespaced under `admin/`):
 - `app/javascript/admin/application.jsx` — separate Superglue entry point for the admin
 - `app/frontend/entrypoints/admin/application.jsx` — default Vite entrypoint shim generated only with `--bundler=vite`; custom Vite `sourceCodeDir` / `entrypointsDir` settings are respected
+- `config/vite.json` — updated with admin JS/view `watchAdditionalPaths` when those generated files live outside Vite's `sourceCodeDir`
 - `app/javascript/admin/page_to_page_mapping.js` — maps admin pages to React components with shared-page fallbacks
 - `app/javascript/admin/generated_page_mapping.js` — resource-specific page manifest maintained by Terrazzo generators
 - `app/javascript/admin/custom_page_mapping.js` — manual custom page manifest you own
