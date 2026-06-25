@@ -44,5 +44,58 @@ RSpec.describe Terrazzo::Search do
       expect(results.count).to eq(1)
       expect(results.first.name).to eq("Bob Jones")
     end
+
+    it "searches explicit searchable_fields on associations" do
+      dashboard = association_search_dashboard(
+        territory: Terrazzo::Field::BelongsTo.with_options(
+          searchable: true,
+          searchable_fields: ["code"]
+        )
+      )
+      country = create_country(code: "NLD", name: "Netherlands")
+      customer = create_customer(name: "Country Code Customer", email: "country-code@example.com", country: country)
+      scoped = Customer.where(id: @customers.map(&:id) + [customer.id])
+
+      results = described_class.new(scoped, dashboard, "NLD").run
+
+      expect(results).to contain_exactly(customer)
+    end
+
+    it "uses conventional display columns for searchable associations by default" do
+      dashboard = association_search_dashboard(
+        territory: Terrazzo::Field::BelongsTo.with_options(searchable: true)
+      )
+      country = create_country(code: "DE", name: "Germany")
+      customer = create_customer(name: "Fallback Customer", email: "fallback@example.com", country: country)
+      scoped = Customer.where(id: @customers.map(&:id) + [customer.id])
+
+      results = described_class.new(scoped, dashboard, "Germany").run
+
+      expect(results).to contain_exactly(customer)
+    end
+
+    it "ignores association searchable_fields that are not real columns" do
+      dashboard = association_search_dashboard(
+        territory: Terrazzo::Field::BelongsTo.with_options(
+          searchable: true,
+          searchable_fields: ["missing_column"]
+        )
+      )
+
+      results = described_class.new(scope, dashboard, "anything").run
+
+      expect(results).to contain_exactly(*@customers)
+    end
+  end
+
+  def association_search_dashboard(attribute_overrides)
+    base_types = CustomerDashboard::ATTRIBUTE_TYPES.merge(
+      name: Terrazzo::Field::String,
+      email: Terrazzo::Field::Email
+    )
+
+    Class.new(CustomerDashboard) do
+      const_set(:ATTRIBUTE_TYPES, base_types.merge(attribute_overrides).freeze)
+    end.new
   end
 end

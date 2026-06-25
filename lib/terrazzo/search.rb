@@ -26,27 +26,42 @@ module Terrazzo
         type = dashboard.attribute_type_for(attr)
 
         if type.respond_to?(:associative?) && type.associative?
-          build_association_search(attr)
+          build_association_search(attr, type)
         else
           table = scoped_resource.model.arel_table
           table[attr].matches("%#{sanitize(term)}%")
         end
       end.compact
 
+      return scoped_resource if conditions.empty?
+
       combined = conditions.reduce(:or)
       scoped_resource.where(combined)
     end
 
-    def build_association_search(attr)
+    def build_association_search(attr, type)
       reflection = scoped_resource.model.reflect_on_association(attr)
       return nil unless reflection
 
       assoc_table = reflection.klass.arel_table
-      name_column = [:name, :title, :email].find { |col| reflection.klass.column_names.include?(col.to_s) }
-      return nil unless name_column
+      columns = association_search_columns(type, reflection.klass)
+      return nil if columns.empty?
 
       @scoped_resource = scoped_resource.left_joins(attr)
-      assoc_table[name_column].matches("%#{sanitize(term)}%")
+      columns
+        .map { |column| assoc_table[column].matches("%#{sanitize(term)}%") }
+        .reduce(:or)
+    end
+
+    def association_search_columns(type, associated_class)
+      configured = type.respond_to?(:options) ? Array(type.options[:searchable_fields]) : []
+      candidates = configured.presence || [:name, :title, :email]
+      column_names = associated_class.column_names
+
+      candidates
+        .map(&:to_s)
+        .select { |column| column_names.include?(column) }
+        .map(&:to_sym)
     end
 
     def sanitize(term)
