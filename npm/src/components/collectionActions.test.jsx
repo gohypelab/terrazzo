@@ -53,6 +53,20 @@ describe("collection action components", () => {
     confirmSpy.mockRestore();
   });
 
+  it("applies toolbar action variants to links and forms", () => {
+    const { container } = render(
+      <CollectionToolbarActions
+        actions={[
+          { label: "Primary Link", url: "/primary-link", variant: "default" },
+          { label: "Danger Form", url: "/danger-form", method: "POST", variant: "destructive" },
+        ]}
+      />
+    );
+
+    expect(container.querySelector('a[href="/primary-link"]')).toHaveClass("bg-primary");
+    expect(container.querySelector('form[action="/danger-form"] button')).toHaveClass("bg-destructive");
+  });
+
   it("normalizes row action methods before rendering dropdown forms", async () => {
     render(
       <CollectionItemActions

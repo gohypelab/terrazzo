@@ -199,6 +199,7 @@ The `view` parameter provides access to route helpers. Each action hash supports
 | `method` | No | HTTP method (e.g. `"delete"` or `:delete`; normalized case-insensitively) — renders as a form instead of a link |
 | `confirm` | No | Confirmation message shown before submitting non-GET form actions |
 | `sg_visit` | No | Set to `false` to bypass SPA navigation and perform a standard browser request (useful for actions that redirect outside the admin) |
+| `variant` | No | Button variant for toolbar and page header actions (for example `"default"`, `"outline"`, or `"destructive"`). Row dropdown actions ignore this key; `delete` row actions are styled as destructive automatically. |
 
 Custom actions also appear in has_many tables on show pages — for example, if a Customer has_many Orders, the orders table on the customer show page will use the OrderDashboard's custom actions.
 
@@ -235,7 +236,7 @@ class OrderDashboard < Terrazzo::BaseDashboard
 end
 ```
 
-Toolbar actions use the same action hash shape as row actions.
+Toolbar actions use the same action hash shape as row actions and also render the optional `variant` key as a button variant. Non-GET toolbar actions default to `"outline"`, except `delete` actions default to `"destructive"`.
 
 ## Page Header Actions
 
@@ -260,7 +261,7 @@ class OrderDashboard < Terrazzo::BaseDashboard
 end
 ```
 
-Layout actions use the same action hash shape as row and toolbar actions. Use this for page-level actions before ejecting the full layout or page.
+Layout actions use the same action hash shape as row and toolbar actions and render the optional `variant` key as a button variant. Use this for page-level actions before ejecting the full layout or page.
 
 ## CSV Exports
 
