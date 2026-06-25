@@ -490,6 +490,25 @@ RSpec.describe Terrazzo::Generators::EjectGenerator do
     expect(manifest).to include("'admin/users/index': UserIndex,")
   end
 
+  it "merges the generated page manifest when the main mapping only imports it" do
+    create_file "app/javascript/admin/page_to_page_mapping.js", <<~JS
+      import { generatedPageMapping } from "./generated_page_mapping";
+      import { customPageMapping } from "./custom_page_mapping";
+      const pages = { ...customPageMapping };
+      export const pageToPageMapping = pages;
+    JS
+
+    run_generator(Terrazzo::Generators::Views::IndexGenerator, ["User"])
+
+    mapping = read("app/javascript/admin/page_to_page_mapping.js")
+    expect(mapping.scan('import { generatedPageMapping } from "./generated_page_mapping";').size).to eq(1)
+    expect(mapping).to include("...generatedPageMapping")
+
+    manifest = read("app/javascript/admin/generated_page_mapping.js")
+    expect(manifest).to include('import UserIndex from "../../views/admin/users/index";')
+    expect(manifest).to include("'admin/users/index': UserIndex,")
+  end
+
   it "repairs the main page mapping when the generated manifest already has the page" do
     create_file "app/javascript/admin/page_to_page_mapping.js", <<~JS
       import { customPageMapping } from "./custom_page_mapping";

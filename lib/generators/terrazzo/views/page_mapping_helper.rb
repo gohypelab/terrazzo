@@ -53,9 +53,8 @@ module Terrazzo
           return unless File.exist?(main_mapping_file)
 
           content = File.read(main_mapping_file)
-          already_references_generated_mapping = content.include?("generatedPageMapping")
 
-          unless already_references_generated_mapping
+          unless imports_generated_mapping?(content)
             import_line = %(import { generatedPageMapping } from "./generated_page_mapping";\n)
             if content.include?(%(import { customPageMapping } from "./custom_page_mapping";))
               inject_into_file main_mapping_path, import_line,
@@ -66,8 +65,7 @@ module Terrazzo
             content = File.read(main_mapping_file)
           end
 
-          return if content.include?("...generatedPageMapping")
-          return if already_references_generated_mapping
+          return if generated_mapping_used_in_code?(content)
 
           generated_spread = "  ...generatedPageMapping,\n"
           if content.include?("  ...customPageMapping,")
@@ -80,6 +78,19 @@ module Terrazzo
             raise Thor::Error,
               "#{main_mapping_path} imports generated_page_mapping.js but Terrazzo could not find the pages object to merge it automatically."
           end
+        end
+
+        def imports_generated_mapping?(content)
+          content.match?(/^import\s+\{\s*generatedPageMapping\s*\}\s+from\s+["']\.\/generated_page_mapping["'];?\s*$/)
+        end
+
+        def generated_mapping_used_in_code?(content)
+          executable_content = content
+            .gsub(/^import\s+.*\n/, "")
+            .gsub(%r{//.*$}, "")
+            .gsub(%r{/\*.*?\*/}m, "")
+
+          executable_content.match?(/\bgeneratedPageMapping\b/)
         end
 
         def insert_generated_import(mapping_path, content, import_line, component_name)
