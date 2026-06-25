@@ -206,6 +206,33 @@ RSpec.describe Terrazzo::BaseDashboard do
     end
   end
 
+  describe "#collection_item_actions" do
+    it "includes the default row actions when a view context is available" do
+      customer = create_customer(name: "Alice")
+      view = double("view")
+      allow(view).to receive(:collection_action_path).with(customer, :show).and_return("/admin/customers/1")
+      allow(view).to receive(:collection_action_path).with(customer, :edit).and_return("/admin/customers/1/edit")
+      allow(view).to receive(:collection_action_path).with(customer, :destroy).and_return("/admin/customers/1")
+
+      expect(dashboard.collection_item_actions(customer, view)).to eq([
+        { label: "Show", url: "/admin/customers/1" },
+        { label: "Edit", url: "/admin/customers/1/edit" },
+        {
+          label: "Destroy",
+          url: "/admin/customers/1",
+          method: "delete",
+          confirm: "Are you sure?"
+        },
+      ])
+    end
+
+    it "returns no row actions without a view context" do
+      customer = Customer.new(name: "Alice")
+
+      expect(dashboard.collection_item_actions(customer)).to eq([])
+    end
+  end
+
   describe "#layout_actions" do
     it "returns no page header actions by default" do
       customer = create_customer(name: "Alice")

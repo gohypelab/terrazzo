@@ -2,11 +2,9 @@ module Terrazzo
   module CollectionActionsHelper
     def collection_item_actions(resource)
       resource_dashboard = "#{resource.class.name}Dashboard".safe_constantize&.new
-      if resource_dashboard&.respond_to?(:collection_item_actions)
-        resource_dashboard.collection_item_actions(resource, self)
-      else
-        default_collection_item_actions(resource)
-      end
+      dashboard = resource_dashboard if resource_dashboard&.respond_to?(:collection_item_actions)
+      dashboard ||= Terrazzo::BaseDashboard.new
+      dashboard.collection_item_actions(resource, self)
     end
 
     def collection_action_path(resource, action = :show)
@@ -33,25 +31,6 @@ module Terrazzo
     end
 
     private
-
-    def default_collection_item_actions(resource)
-      actions = []
-      if (path = collection_action_path(resource, :show))
-        actions << { label: "Show", url: path }
-      end
-      if (path = collection_action_path(resource, :edit))
-        actions << { label: "Edit", url: path }
-      end
-      if (path = collection_action_path(resource, :destroy))
-        actions << {
-          label: "Destroy",
-          url: path,
-          method: "delete",
-          confirm: "Are you sure?"
-        }
-      end
-      actions
-    end
 
     def collection_action_route?(resource, action)
       path = terrazzo_resource_member_path(resource, action: action)

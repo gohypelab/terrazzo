@@ -57,5 +57,26 @@ RSpec.describe Terrazzo::CollectionActionsHelper do
 
       expect(actions.map { |action| action[:label] }).to eq(["Show"])
     end
+
+    it "lets dashboard row action overrides extend the defaults with super" do
+      stub_const("CountryDashboard", Class.new(Terrazzo::BaseDashboard) do
+        def collection_item_actions(resource, view)
+          super + [
+            {
+              label: "Audit",
+              url: "#{view.collection_action_path(resource, :show)}/audit",
+            },
+          ]
+        end
+      end)
+
+      country = Country.new(id: 123, code: "US", name: "United States")
+      allow(country).to receive(:persisted?).and_return(true)
+
+      actions = collection_item_actions(country)
+
+      expect(actions.map { |action| action[:label] }).to eq(["Show", "Destroy", "Audit"])
+      expect(actions.last).to include(url: "/admin/countries/123/audit")
+    end
   end
 end

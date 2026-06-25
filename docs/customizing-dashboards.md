@@ -190,6 +190,16 @@ class OrderDashboard < Terrazzo::BaseDashboard
 end
 ```
 
+Use `super` when you want to keep the default Show/Edit/Destroy actions and add one more action:
+
+```ruby
+def collection_item_actions(resource, view)
+  super + [
+    { label: "Invoice", url: view.invoice_admin_order_path(resource), sg_visit: false },
+  ]
+end
+```
+
 The `view` parameter provides access to route helpers. Each action hash supports:
 
 | Key | Required | Description |

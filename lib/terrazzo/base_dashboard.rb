@@ -126,6 +126,27 @@ module Terrazzo
       filter_name.to_s.humanize
     end
 
+    def collection_item_actions(resource, view = nil)
+      return [] unless view
+
+      actions = []
+      if (path = view.collection_action_path(resource, :show))
+        actions << { label: "Show", url: path }
+      end
+      if (path = view.collection_action_path(resource, :edit))
+        actions << { label: "Edit", url: path }
+      end
+      if (path = view.collection_action_path(resource, :destroy))
+        actions << {
+          label: "Destroy",
+          url: path,
+          method: "delete",
+          confirm: "Are you sure?"
+        }
+      end
+      actions
+    end
+
     def collection_toolbar_actions(view = nil)
       return [] unless view && csv_export_enabled?
 
