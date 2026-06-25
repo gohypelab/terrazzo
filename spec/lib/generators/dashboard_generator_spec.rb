@@ -29,6 +29,8 @@ RSpec.describe Terrazzo::Generators::DashboardGenerator do
     expect(customer_dashboard).to include('kind: Field::Select.with_options(collection: ["standard", "vip"]),')
     expect(customer_dashboard).to include("territory: Field::BelongsTo,")
     expect(customer_dashboard).not_to include("country_code:")
+    expect(customer_dashboard).to include("# Override this method to customize how customers are displayed")
+    expect(customer_dashboard).not_to include("# Overwrite this method")
   end
 
   it "generates conventional nested controllers for namespaced models" do

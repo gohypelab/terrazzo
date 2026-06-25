@@ -39,7 +39,7 @@ require "terrazzo/base_dashboard"
 <%= body_indent %>#   recent: ->(resources) { resources.where("created_at > ?", 30.days.ago) },
 <%= body_indent %># }.freeze
 
-<%= body_indent %># Overwrite this method to customize how <%= file_name.pluralize.humanize.downcase %> are displayed
+<%= body_indent %># Override this method to customize how <%= file_name.pluralize.humanize.downcase %> are displayed
 <%= body_indent %># across all pages of the admin dashboard.
 <%= body_indent %>#
 <%= body_indent %># def display_resource(resource)
