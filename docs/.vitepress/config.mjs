@@ -42,6 +42,7 @@ export default defineConfig({
           { text: "Authentication", link: "/authentication" },
           { text: "Authorization", link: "/authorization" },
           { text: "Generators", link: "/generators" },
+          { text: "v0.7 Readiness", link: "/v0-7-readiness" },
         ],
       },
     ],
