@@ -1,11 +1,16 @@
 import React from "react";
 
-import { AppSidebar } from "./app-sidebar";
-import { SiteHeader } from "./site-header";
-import { FlashMessages } from "./FlashMessages";
+import { getComponent } from "terrazzo";
+import { AppSidebar as DefaultAppSidebar } from "./app-sidebar";
+import { SiteHeader as DefaultSiteHeader } from "./site-header";
+import { FlashMessages as DefaultFlashMessages } from "./FlashMessages";
 import { SidebarProvider, SidebarInset } from "./ui";
 
 export function Layout({ navigation, title, actions, children }) {
+  const AppSidebar = getComponent("AppSidebar") || DefaultAppSidebar;
+  const SiteHeader = getComponent("SiteHeader") || DefaultSiteHeader;
+  const FlashMessages = getComponent("FlashMessages") || DefaultFlashMessages;
+
   return (
     <SidebarProvider>
       <div data-testid="custom-layout" className="contents">
