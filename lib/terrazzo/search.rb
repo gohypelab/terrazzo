@@ -19,6 +19,7 @@ module Terrazzo
     private
 
     def search_results
+      @association_search_joined = false
       searchable_attributes = dashboard.search_attributes
       return scoped_resource if searchable_attributes.empty?
 
@@ -36,7 +37,8 @@ module Terrazzo
       return scoped_resource if conditions.empty?
 
       combined = conditions.reduce(:or)
-      scoped_resource.where(combined)
+      results = scoped_resource.where(combined)
+      @association_search_joined ? results.distinct : results
     end
 
     def build_association_search(attr, type)
@@ -48,6 +50,7 @@ module Terrazzo
       return nil if columns.empty?
 
       @scoped_resource = scoped_resource.left_joins(attr)
+      @association_search_joined = true
       columns
         .map { |column| assoc_table[column].matches("%#{sanitize(term)}%") }
         .reduce(:or)

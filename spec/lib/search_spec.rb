@@ -74,6 +74,23 @@ RSpec.describe Terrazzo::Search do
       expect(results).to contain_exactly(customer)
     end
 
+    it "deduplicates parent records when has_many association search matches multiple children" do
+      dashboard = association_search_dashboard(
+        orders: Terrazzo::Field::HasMany.with_options(
+          searchable: true,
+          searchable_fields: ["address_city"]
+        )
+      )
+      customer = create_customer(name: "Has Many Search", email: "has-many-search@example.com")
+      2.times { create_order(customer: customer, address_city: "Needle City") }
+      scoped = Customer.where(id: @customers.map(&:id) + [customer.id])
+
+      results = described_class.new(scoped, dashboard, "Needle").run
+
+      expect(results.to_a).to contain_exactly(customer)
+      expect(results.count).to eq(1)
+    end
+
     it "ignores association searchable_fields that are not real columns" do
       dashboard = association_search_dashboard(
         territory: Terrazzo::Field::BelongsTo.with_options(
