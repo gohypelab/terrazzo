@@ -1,10 +1,12 @@
 require "rails/generators"
+require_relative "generated_defaults_helper"
 require_relative "page_mapping_helper"
 
 module Terrazzo
   module Generators
     module Views
       class IndexGenerator < Rails::Generators::Base
+        include GeneratedDefaultsHelper
         include PageMappingHelper
 
         source_root File.expand_path("templates", __dir__)
@@ -24,7 +26,8 @@ module Terrazzo
             copy_file "pages/_collection.jsx", "app/views/#{namespace_name}/#{resource_path}/_collection.jsx"
             register_page_mapping("index")
           else
-            copy_file "pages/index.jsx", "app/views/#{namespace_name}/application/index.jsx"
+            copy_file_over_generated "pages/index.jsx", "app/views/#{namespace_name}/application/index.jsx",
+              generated_content: generated_page_stub("index")
             copy_file "pages/_collection.jsx", "app/views/#{namespace_name}/application/_collection.jsx"
           end
         end

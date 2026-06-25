@@ -1,10 +1,12 @@
 require "rails/generators"
+require_relative "generated_defaults_helper"
 require_relative "page_mapping_helper"
 
 module Terrazzo
   module Generators
     module Views
       class NewGenerator < Rails::Generators::Base
+        include GeneratedDefaultsHelper
         include PageMappingHelper
 
         source_root File.expand_path("templates", __dir__)
@@ -27,7 +29,8 @@ module Terrazzo
             register_page_mapping("new")
             eject_edit_view if should_eject_edit?
           else
-            copy_file "pages/new.jsx", "app/views/#{namespace_name}/application/new.jsx"
+            copy_file_over_generated "pages/new.jsx", "app/views/#{namespace_name}/application/new.jsx",
+              generated_content: generated_page_stub("new")
             copy_file "pages/_form.jsx", "app/views/#{namespace_name}/application/_form.jsx"
             eject_edit_view if should_eject_edit?
           end
@@ -61,7 +64,8 @@ module Terrazzo
             copy_file "pages/edit.jsx", "app/views/#{namespace_name}/#{resource_path}/edit.jsx"
             register_page_mapping("edit")
           else
-            copy_file "pages/edit.jsx", "app/views/#{namespace_name}/application/edit.jsx"
+            copy_file_over_generated "pages/edit.jsx", "app/views/#{namespace_name}/application/edit.jsx",
+              generated_content: generated_page_stub("edit")
           end
         end
 

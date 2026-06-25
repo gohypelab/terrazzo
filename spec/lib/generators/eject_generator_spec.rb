@@ -85,6 +85,24 @@ RSpec.describe Terrazzo::Generators::EjectGenerator do
     expect(read("app/views/admin/application/_navigation.json.props")).to include("nav_resource.navigation_label")
   end
 
+  it "keeps legacy shared page generators prompt-free over installed stubs" do
+    run_generator(Terrazzo::Generators::ViewsGenerator, [])
+
+    output = [
+      run_generator(Terrazzo::Generators::Views::IndexGenerator, []),
+      run_generator(Terrazzo::Generators::Views::ShowGenerator, []),
+      run_generator(Terrazzo::Generators::Views::NewGenerator, []),
+      run_generator(Terrazzo::Generators::Views::EditGenerator, []),
+    ].join
+
+    expect(output).not_to include("conflict")
+    expect(output).not_to include("Overwrite")
+    expect(read("app/views/admin/application/index.jsx")).to include("export default function AdminIndex")
+    expect(read("app/views/admin/application/show.jsx")).to include("export default function AdminShow")
+    expect(read("app/views/admin/application/new.jsx")).to include("export default function AdminNew")
+    expect(read("app/views/admin/application/edit.jsx")).to include("export default function AdminEdit")
+  end
+
   it "fails loudly for unsupported ejection targets" do
     {
       "widgets/button" => /Unknown ejection target 'widgets\/button'/,

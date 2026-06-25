@@ -1,8 +1,11 @@
 require "rails/generators"
+require_relative "../views/generated_defaults_helper"
 
 module Terrazzo
   module Generators
     class EjectGenerator < Rails::Generators::Base
+      include Views::GeneratedDefaultsHelper
+
       source_root File.expand_path("../views/templates", __dir__)
 
       argument :target, type: :string,
@@ -111,7 +114,7 @@ module Terrazzo
         end
 
         ensure_page_barrels
-        copy_ejection_file source, "app/views/#{namespace_name}/application/#{name}.jsx",
+        copy_file_over_generated source, "app/views/#{namespace_name}/application/#{name}.jsx",
           generated_content: generated_page_stub(name)
         page_dependencies(name).each do |dependency|
           copy_file "pages/#{dependency}.jsx", "app/views/#{namespace_name}/application/#{dependency}.jsx"
@@ -120,7 +123,7 @@ module Terrazzo
 
       def eject_navigation
         dest = "app/views/#{namespace_name}/application/_navigation.json.props"
-        copy_ejection_file "pages/_navigation.json.props", dest,
+        copy_file_over_generated "pages/_navigation.json.props", dest,
           generated_content: generated_navigation_partial
         say "\nNavigation partial ejected to #{dest}.", :green
         say "Edit it to customize your admin navigation."
@@ -202,51 +205,6 @@ module Terrazzo
 
       def copy_ui_template(name)
         copy_file "components/ui/#{name}.jsx", "app/views/#{namespace_name}/components/ui/#{name}.jsx"
-      end
-
-      def copy_ejection_file(source, destination, generated_content: nil)
-        options = {}
-        if generated_content && generated_file?(destination, generated_content)
-          options[:force] = true
-        end
-
-        copy_file source, destination, **options
-      end
-
-      def generated_file?(destination, generated_content)
-        path = File.join(destination_root, destination)
-        File.exist?(path) && File.read(path) == generated_content
-      end
-
-      def generated_page_stub(name)
-        component = {
-          "index" => "AdminIndex",
-          "show" => "AdminShow",
-          "new" => "AdminNew",
-          "edit" => "AdminEdit",
-        }.fetch(name)
-
-        %(export { #{component} as default } from "terrazzo/pages";\n)
-      end
-
-      def generated_navigation_partial
-        <<~RUBY
-          resources = Terrazzo::Namespace.new(namespace).navigation_resources
-          navigation_groups = resources.group_by(&:navigation_group).map do |label, items|
-            { label: label, items: items }
-          end
-
-          json.array! navigation_groups do |group|
-            json.label group[:label]
-            json.items do
-              json.array! group[:items] do |r|
-                json.label r.navigation_label
-                json.path url_for(controller: "/\#{r.controller_path}", action: :index, only_path: true)
-                json.active r.controller_path == controller_path
-              end
-            end
-          end
-        RUBY
       end
 
       def field_shared_dependencies(field_type)

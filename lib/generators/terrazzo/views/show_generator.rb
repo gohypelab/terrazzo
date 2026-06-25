@@ -1,10 +1,12 @@
 require "rails/generators"
+require_relative "generated_defaults_helper"
 require_relative "page_mapping_helper"
 
 module Terrazzo
   module Generators
     module Views
       class ShowGenerator < Rails::Generators::Base
+        include GeneratedDefaultsHelper
         include PageMappingHelper
 
         source_root File.expand_path("templates", __dir__)
@@ -23,7 +25,8 @@ module Terrazzo
             copy_file "pages/show.jsx", "app/views/#{namespace_name}/#{resource_path}/show.jsx"
             register_page_mapping("show")
           else
-            copy_file "pages/show.jsx", "app/views/#{namespace_name}/application/show.jsx"
+            copy_file_over_generated "pages/show.jsx", "app/views/#{namespace_name}/application/show.jsx",
+              generated_content: generated_page_stub("show")
           end
         end
 
