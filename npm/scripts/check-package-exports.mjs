@@ -1,4 +1,4 @@
-import { readFileSync } from "node:fs";
+import { readdirSync, readFileSync } from "node:fs";
 import { createRequire } from "node:module";
 import React from "react";
 import { renderToStaticMarkup } from "react-dom/server";
@@ -21,6 +21,8 @@ for (const [specifier, names] of Object.entries(expectedExports)) {
   const cjsModule = require(specifier);
   assertExports(specifier, "require", cjsModule, names);
 }
+
+assertTemplatePackageImports(expectedExports);
 
 const components = await import("terrazzo/components");
 const fields = await import("terrazzo/fields");
@@ -417,6 +419,72 @@ function sourceBarrelExports(relativePath) {
   }
 
   return [...new Set(names)].sort();
+}
+
+function assertTemplatePackageImports(exportsBySpecifier) {
+  const templateRoot = new URL("../../lib/generators/terrazzo/views/templates/", import.meta.url);
+  const templateFiles = walk(templateRoot)
+    .filter((file) => file.pathname.endsWith(".jsx") || file.pathname.endsWith(".js"));
+  const missingImports = [];
+
+  for (const file of templateFiles) {
+    const source = readFileSync(file, "utf8");
+    for (const { specifier, names } of namedPackageImports(source)) {
+      const exportedNames = exportsBySpecifier[specifier];
+      if (!exportedNames) {
+        missingImports.push(`${templateRelativePath(templateRoot, file)} imports unsupported package specifier ${specifier}`);
+        continue;
+      }
+
+      const missingNames = names.filter((name) => !exportedNames.includes(name));
+      if (missingNames.length > 0) {
+        missingImports.push(
+          `${templateRelativePath(templateRoot, file)} imports missing ${specifier} exports: ${missingNames.join(", ")}`
+        );
+      }
+    }
+  }
+
+  if (missingImports.length > 0) {
+    throw new Error(`Ejected template package imports are not exported:\n${missingImports.join("\n")}`);
+  }
+}
+
+function namedPackageImports(source) {
+  const imports = [];
+  const pattern = /import\s*\{(?<names>[^}]*)\}\s*from\s*["'](?<specifier>terrazzo(?:\/[A-Za-z0-9_-]+)?)["'];?/gm;
+
+  for (const match of source.matchAll(pattern)) {
+    imports.push({
+      specifier: match.groups.specifier,
+      names: match.groups.names
+        .split(",")
+        .map((name) => name.trim())
+        .filter(Boolean)
+        .map((name) => name.split(/\s+as\s+/).shift().trim()),
+    });
+  }
+
+  return imports;
+}
+
+function walk(directoryUrl) {
+  const files = [];
+
+  for (const entry of readdirSync(directoryUrl, { withFileTypes: true })) {
+    const entryUrl = new URL(entry.name, directoryUrl);
+    if (entry.isDirectory()) {
+      files.push(...walk(new URL(`${entry.name}/`, directoryUrl)));
+    } else if (entry.isFile()) {
+      files.push(entryUrl);
+    }
+  }
+
+  return files;
+}
+
+function templateRelativePath(templateRoot, file) {
+  return decodeURIComponent(file.href.replace(templateRoot.href, ""));
 }
 
 function createSuperglueStore(pageKey, data) {
