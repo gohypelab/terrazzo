@@ -46,6 +46,13 @@ RSpec.describe Terrazzo::Generators::DashboardGenerator do
     expect_ruby_syntax_to_be_valid("app/controllers/admin/blog/posts_controller.rb")
   end
 
+  it "fails clearly when the model does not exist" do
+    generator = described_class.new(["MissingModel"], {}, destination_root: destination_root)
+
+    expect { generator.create_dashboard }
+      .to raise_error(Thor::Error, /could not find model 'MissingModel'/)
+  end
+
   private
 
   def run_generator(args)

@@ -57,6 +57,9 @@ rails g terrazzo:dashboard Product
 rails g terrazzo:dashboard Blog::Post
 ```
 
+The model must already exist; the generator inspects the model class to infer fields,
+associations, enums, rich text, and attachments.
+
 ### Options
 
 | Option | Default | Description |

@@ -35,6 +35,12 @@ module Terrazzo
 
       def model_class
         class_name.constantize
+      rescue NameError
+        raise Thor::Error, <<~MESSAGE
+          Terrazzo could not find model '#{class_name}'.
+
+          Generate the model first, then run `bin/rails generate terrazzo:dashboard #{class_name}` again.
+        MESSAGE
       end
 
       def attribute_types
