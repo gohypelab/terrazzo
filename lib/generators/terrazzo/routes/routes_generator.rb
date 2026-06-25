@@ -13,33 +13,21 @@ module Terrazzo
         models = application_models
         raise_no_models_error if models.empty?
 
-        # Group models by their module namespace
-        namespaced = {}
-        top_level = []
+        route_tree = empty_route_tree
 
         models.each do |model|
           parts = model.name.split("::")
           if parts.size > 1
-            ns = parts[0..-2].join("::").underscore
+            namespaces = parts[0..-2].map(&:underscore)
             resource = parts.last.underscore.pluralize
-            namespaced[ns] ||= []
-            namespaced[ns] << resource
+            add_route_resource(route_tree, namespaces, resource)
           else
-            top_level << model.model_name.plural
+            add_route_resource(route_tree, [], model.model_name.plural)
           end
         end
 
-        lines = []
-        top_level.sort.each { |r| lines << "  resources :#{r}" }
-
-        namespaced.sort.each do |ns, resources|
-          lines << "" if lines.any?
-          lines << "  namespace :#{ns} do"
-          resources.sort.each { |r| lines << "    resources :#{r}" }
-          lines << "  end"
-        end
-
-        first_resource = namespace_root_target(top_level, namespaced)
+        lines = route_lines(route_tree, indent_level: 1)
+        first_resource = first_route_target(route_tree)
 
         route_block = <<~RUBY
           namespace :#{namespace_name} do
@@ -80,11 +68,42 @@ module Terrazzo
          .sort_by { |klass| klass.name }
       end
 
-      def namespace_root_target(top_level, namespaced)
-        return top_level.sort.first if top_level.any?
+      def empty_route_tree
+        { resources: [], namespaces: {} }
+      end
 
-        first_namespace, resources = namespaced.sort.first
-        return "#{first_namespace}/#{resources.sort.first}" if first_namespace
+      def add_route_resource(tree, namespaces, resource)
+        if namespaces.empty?
+          tree[:resources] << resource
+          return
+        end
+
+        namespace = namespaces.first
+        child_tree = tree[:namespaces][namespace] ||= empty_route_tree
+        add_route_resource(child_tree, namespaces.drop(1), resource)
+      end
+
+      def route_lines(tree, indent_level:)
+        indent = "  " * indent_level
+        lines = tree[:resources].uniq.sort.map { |resource| "#{indent}resources :#{resource}" }
+
+        tree[:namespaces].sort.each do |namespace, child_tree|
+          lines << "" if lines.any?
+          lines << "#{indent}namespace :#{namespace} do"
+          lines.concat(route_lines(child_tree, indent_level: indent_level + 1))
+          lines << "#{indent}end"
+        end
+
+        lines
+      end
+
+      def first_route_target(tree)
+        resource = tree[:resources].uniq.sort.first
+        return resource if resource
+
+        namespace, child_tree = tree[:namespaces].sort.first
+        child_target = first_route_target(child_tree) if child_tree
+        return "#{namespace}/#{child_target}" if namespace && child_target
       end
 
       def raise_no_models_error

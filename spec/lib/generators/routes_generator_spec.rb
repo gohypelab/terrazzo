@@ -41,6 +41,37 @@ RSpec.describe Terrazzo::Generators::RoutesGenerator do
     expect(routes).not_to include('root to: "posts#index"')
   end
 
+  it "generates nested route namespaces for deeply namespaced models" do
+    create_file "config/routes.rb", <<~RUBY
+      Rails.application.routes.draw do
+      end
+    RUBY
+
+    with_destination_rails_root do
+      generator = routes_generator
+      deep_model = double("Store::Catalog::Product", name: "Store::Catalog::Product")
+      allow(generator).to receive(:application_models).and_return([deep_model])
+
+      capture_stdout { generator.insert_routes }
+    end
+
+    routes = read("config/routes.rb")
+    expect(routes).to eq(<<~RUBY)
+      Rails.application.routes.draw do
+        namespace :admin do
+          namespace :store do
+            namespace :catalog do
+              resources :products
+            end
+          end
+
+          root to: "store/catalog/products#index"
+        end
+      end
+    RUBY
+    expect(routes).not_to include("namespace :store/catalog")
+  end
+
   it "inserts a cleanly indented admin namespace for top-level models" do
     create_file "config/routes.rb", <<~RUBY
       Rails.application.routes.draw do
