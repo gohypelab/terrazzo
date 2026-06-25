@@ -115,6 +115,16 @@ Creates:
 
 The generator creates or updates the app-level field and UI barrels, then registers the custom field components in `app/views/admin/fields/index.js` so package pages and ejected pages can render `Field::Rating`.
 
+For custom namespaces, pass the same namespace you used at install time:
+
+```bash
+rails g terrazzo:field Rating --namespace=backstage
+```
+
+| Option | Default | Description |
+|--------|---------|-------------|
+| `--namespace` | `admin` | Admin namespace whose field barrel should register the custom field components |
+
 ## `terrazzo:views`
 
 Regenerates the shared page stubs, app-level barrels, and navigation props.

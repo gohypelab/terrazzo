@@ -32,6 +32,18 @@ RSpec.describe Terrazzo::Generators::FieldGenerator do
     expect(ui_barrel).to include('export * from "terrazzo/ui";')
   end
 
+  it "creates app-level barrels in a custom namespace" do
+    run_generator(["Rating", "--namespace=backstage"])
+    create_node_package_link
+    write_field_entry(namespace: "backstage")
+
+    expect_bundle_to_succeed("field_entry.jsx")
+
+    expect(File).to exist(File.join(destination_root, "app/views/backstage/fields/rating/FormField.jsx"))
+    expect(read("app/views/backstage/fields/index.js")).to include('registerRatingFieldType("rating"')
+    expect(read("app/views/backstage/components/ui/index.js")).to include('export * from "terrazzo/ui";')
+  end
+
   it "does not duplicate the field registration when rerun" do
     run_generator(["Rating"])
     run_generator(["Rating"])
@@ -67,11 +79,11 @@ RSpec.describe Terrazzo::Generators::FieldGenerator do
     raise "#{stdout}\n#{stderr}" unless status.success?
   end
 
-  def write_field_entry
+  def write_field_entry(namespace: "admin")
     create_file "field_entry.jsx", <<~JS
-      import "./app/views/admin/fields/index.js";
-      import { FormField as RatingFormField } from "./app/views/admin/fields/rating/FormField.jsx";
-      import { Input, Label } from "./app/views/admin/components/ui/index.js";
+      import "./app/views/#{namespace}/fields/index.js";
+      import { FormField as RatingFormField } from "./app/views/#{namespace}/fields/rating/FormField.jsx";
+      import { Input, Label } from "./app/views/#{namespace}/components/ui/index.js";
 
       console.log(RatingFormField, Input, Label);
     JS
