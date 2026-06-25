@@ -31,8 +31,8 @@ jobs:
           ruby-version: "3.4"
           bundler-cache: true
 
-      - name: Run unit specs
-        run: bundle exec rspec
+      - name: Run Ruby package checks
+        run: bundle exec rake check
 
   npm:
     name: npm package checks

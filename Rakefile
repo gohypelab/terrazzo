@@ -5,6 +5,7 @@ begin
   RSpec::Core::RakeTask.new(:spec) do |t|
     t.pattern = "spec/lib/**/*_spec.rb"
   end
+  task check: [:spec, :build]
   task default: :spec
 rescue LoadError
   # rspec not available
