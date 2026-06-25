@@ -15,11 +15,13 @@ import {
   TableCell,
 } from "terrazzo/ui";
 
-export function ResourceTable({ headers, rows, emptyState, showActions = true }) {
+export function ResourceTable({ headers = [], rows = [], emptyState, showActions = true }) {
   const { visit } = useContext(NavigationContext);
   const SortableHeader = getComponent("SortableHeader") || DefaultSortableHeader;
   const CollectionItemActions = getComponent("CollectionItemActions") || DefaultCollectionItemActions;
-  const columnCount = headers.length + (showActions ? 1 : 0);
+  const safeHeaders = Array.isArray(headers) ? headers : [];
+  const safeRows = Array.isArray(rows) ? rows : [];
+  const columnCount = safeHeaders.length + (showActions ? 1 : 0);
 
   const handleRowClick = (e, showPath) => {
     if (!showPath) return;
@@ -33,7 +35,7 @@ export function ResourceTable({ headers, rows, emptyState, showActions = true })
       <Table>
         <TableHeader>
           <TableRow>
-            {headers.map((header) => (
+            {safeHeaders.map((header) => (
               <SortableHeader key={header.attribute} {...header} />
             ))}
             {showActions && (
@@ -44,7 +46,7 @@ export function ResourceTable({ headers, rows, emptyState, showActions = true })
           </TableRow>
         </TableHeader>
         <TableBody>
-          {rows.length === 0 ? (
+          {safeRows.length === 0 ? (
             <TableRow>
               <TableCell colSpan={columnCount} className="h-32 text-center">
                 <div className="mx-auto flex max-w-sm flex-col items-center gap-1">
@@ -55,7 +57,7 @@ export function ResourceTable({ headers, rows, emptyState, showActions = true })
                 </div>
               </TableCell>
             </TableRow>
-          ) : rows.map((row) => (
+          ) : safeRows.map((row) => (
             <TableRow
               key={row.id}
               className={cn(
@@ -64,7 +66,7 @@ export function ResourceTable({ headers, rows, emptyState, showActions = true })
               )}
               onClick={(e) => handleRowClick(e, row.showPath)}
             >
-              {row.cells.map((cell) => {
+              {(Array.isArray(row.cells) ? row.cells : []).map((cell) => {
                 const cellClassName = cell.cellOptions?.className || cell.cellOptions?.class_name;
                 return (
                   <TableCell key={cell.attribute} className={cellClassName}>

@@ -3,12 +3,13 @@ import React from "react";
 import { getComponent } from "../componentRegistry";
 import { ResourceTable as DefaultResourceTable } from "../components/ResourceTable";
 
-export function AdminCollection({ table, emptyState }) {
+export function AdminCollection({ table = {}, emptyState }) {
   const ResourceTable = getComponent("ResourceTable") || DefaultResourceTable;
+  const { headers = [], rows = [] } = table || {};
 
   return (
     <div className="overflow-x-auto">
-      <ResourceTable headers={table.headers} rows={table.rows} emptyState={emptyState} />
+      <ResourceTable headers={headers} rows={rows} emptyState={emptyState} />
     </div>
   );
 }

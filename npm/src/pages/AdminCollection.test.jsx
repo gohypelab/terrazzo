@@ -39,4 +39,22 @@ describe("AdminCollection component registry overrides", () => {
       "1 headers, 1 rows, Nothing here"
     );
   });
+
+  it("passes empty collection data when table props are missing", () => {
+    function CustomResourceTable({ headers, rows, emptyState }) {
+      return (
+        <div data-testid="custom-resource-table">
+          {headers.length} headers, {rows.length} rows, {emptyState.title}
+        </div>
+      );
+    }
+
+    registerComponent("ResourceTable", CustomResourceTable);
+
+    render(<AdminCollection emptyState={{ title: "No rows" }} />);
+
+    expect(screen.getByTestId("custom-resource-table")).toHaveTextContent(
+      "0 headers, 0 rows, No rows"
+    );
+  });
 });

@@ -153,4 +153,18 @@ describe("ResourceTable", () => {
     expect(screen.getByTestId("custom-sortable-header")).toHaveTextContent("Customer");
     expect(screen.getByTestId("custom-item-actions")).toHaveTextContent("Archive");
   });
+
+  it("renders the empty state when collection arrays are missing", () => {
+    render(
+      <ResourceTable
+        emptyState={{
+          title: "No invoices",
+          description: "Try a different filter.",
+        }}
+      />
+    );
+
+    expect(screen.getByText("No invoices")).toBeInTheDocument();
+    expect(screen.getByText("Try a different filter.")).toBeInTheDocument();
+  });
 });
