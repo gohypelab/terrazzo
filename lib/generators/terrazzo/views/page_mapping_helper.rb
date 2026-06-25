@@ -94,7 +94,7 @@ module Terrazzo
         end
 
         def generated_page_component_name(action)
-          resource.split("::").map(&:camelize).join("Namespace") + action.camelize
+          resource.split("::").map(&:camelize).join("__") + action.camelize
         end
 
         def insert_generated_import(mapping_path, content, import_line, component_name)

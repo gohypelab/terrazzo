@@ -284,14 +284,14 @@ RSpec.describe Terrazzo::Generators::EjectGenerator do
     expect(read("app/views/admin/catalog/products/_form.jsx")).to include('from "../../components/ui"')
 
     manifest = read("app/javascript/admin/generated_page_mapping.js")
-    expect(manifest).to include('import CatalogNamespaceProductIndex from "../../views/admin/catalog/products/index";')
-    expect(manifest).to include('import CatalogNamespaceProductShow from "../../views/admin/catalog/products/show";')
-    expect(manifest).to include('import CatalogNamespaceProductNew from "../../views/admin/catalog/products/new";')
-    expect(manifest).to include('import CatalogNamespaceProductEdit from "../../views/admin/catalog/products/edit";')
-    expect(manifest).to include("'admin/catalog/products/index': CatalogNamespaceProductIndex,")
-    expect(manifest).to include("'admin/catalog/products/show': CatalogNamespaceProductShow,")
-    expect(manifest).to include("'admin/catalog/products/new': CatalogNamespaceProductNew,")
-    expect(manifest).to include("'admin/catalog/products/edit': CatalogNamespaceProductEdit,")
+    expect(manifest).to include('import Catalog__ProductIndex from "../../views/admin/catalog/products/index";')
+    expect(manifest).to include('import Catalog__ProductShow from "../../views/admin/catalog/products/show";')
+    expect(manifest).to include('import Catalog__ProductNew from "../../views/admin/catalog/products/new";')
+    expect(manifest).to include('import Catalog__ProductEdit from "../../views/admin/catalog/products/edit";')
+    expect(manifest).to include("'admin/catalog/products/index': Catalog__ProductIndex,")
+    expect(manifest).to include("'admin/catalog/products/show': Catalog__ProductShow,")
+    expect(manifest).to include("'admin/catalog/products/new': Catalog__ProductNew,")
+    expect(manifest).to include("'admin/catalog/products/edit': Catalog__ProductEdit,")
   end
 
   it "builds JavaScript when generated page mapping identifiers would otherwise collide" do
@@ -314,9 +314,9 @@ RSpec.describe Terrazzo::Generators::EjectGenerator do
 
     manifest = read("app/javascript/admin/generated_page_mapping.js")
     expect(manifest).to include('import CatalogProductIndex from "../../views/admin/catalog_products/index";')
-    expect(manifest).to include('import CatalogNamespaceProductIndex from "../../views/admin/catalog/products/index";')
+    expect(manifest).to include('import Catalog__ProductIndex from "../../views/admin/catalog/products/index";')
     expect(manifest).to include("'admin/catalog_products/index': CatalogProductIndex,")
-    expect(manifest).to include("'admin/catalog/products/index': CatalogNamespaceProductIndex,")
+    expect(manifest).to include("'admin/catalog/products/index': Catalog__ProductIndex,")
     expect(manifest.scan(/^import CatalogProductIndex /).size).to eq(1)
   end
 
