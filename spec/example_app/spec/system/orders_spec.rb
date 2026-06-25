@@ -17,6 +17,19 @@ RSpec.describe "Admin Orders", type: :system do
 
       expect(page).not_to have_button("Delete")
     end
+
+    it "submits selected rows to a bulk action" do
+      second_order = create(:order, customer: customer, shipped_at: nil)
+
+      visit admin_orders_path
+
+      find("input[aria-label='Select row #{order.id}']").check
+      click_button "Mark shipped"
+
+      expect(page).to have_content("Marked 1 order shipped")
+      expect(order.reload.shipped_at).to be_present
+      expect(second_order.reload.shipped_at).to be_nil
+    end
   end
 
   describe "pagination" do

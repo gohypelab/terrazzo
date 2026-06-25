@@ -1,5 +1,5 @@
 import React from "react";
-import { render, screen } from "@testing-library/react";
+import { fireEvent, render, screen } from "@testing-library/react";
 
 import { registerComponent } from "../componentRegistry";
 import { registerFieldType } from "terrazzo/fields";
@@ -152,6 +152,60 @@ describe("ResourceTable", () => {
 
     expect(screen.getByTestId("custom-sortable-header")).toHaveTextContent("Customer");
     expect(screen.getByTestId("custom-item-actions")).toHaveTextContent("Archive");
+  });
+
+  it("renders bulk actions with selected row ids", () => {
+    const { container } = render(
+      <ResourceTable
+        headers={[
+          {
+            attribute: "name",
+            label: "Customer",
+            sortable: false,
+          },
+        ]}
+        rows={[
+          {
+            id: "customer-1",
+            cells: [
+              {
+                attribute: "name",
+                fieldType: "string",
+                value: "Alice",
+              },
+            ],
+            collectionItemActions: [],
+          },
+          {
+            id: "customer-2",
+            cells: [
+              {
+                attribute: "name",
+                fieldType: "string",
+                value: "Bob",
+              },
+            ],
+            collectionItemActions: [],
+          },
+        ]}
+        bulkActions={[
+          { label: "Archive", url: "/admin/customers/archive", method: "post" },
+        ]}
+        showActions={false}
+      />
+    );
+
+    expect(screen.getByText("0 rows selected")).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Archive" })).toBeDisabled();
+
+    fireEvent.click(screen.getByLabelText("Select row customer-1"));
+
+    expect(screen.getByText("1 row selected")).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Archive" })).not.toBeDisabled();
+
+    const form = container.querySelector('form[action="/admin/customers/archive"]');
+    expect(form.querySelectorAll('input[name="ids[]"]')).toHaveLength(1);
+    expect(form.querySelector('input[name="ids[]"]')).toHaveValue("customer-1");
   });
 
   it("renders the empty state when collection arrays are missing", () => {

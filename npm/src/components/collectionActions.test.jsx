@@ -67,6 +67,28 @@ describe("collection action components", () => {
     expect(container.querySelector('form[action="/danger-form"] button')).toHaveClass("bg-destructive");
   });
 
+  it("renders selected ids for bulk toolbar form actions", () => {
+    const { container } = render(
+      <CollectionToolbarActions
+        actions={[
+          { label: "Archive", url: "/archive", method: "POST" },
+          { label: "Export", url: "/export", method: "GET", param_name: "selected_ids[]" },
+        ]}
+        selectedIds={["order-1", "order-2"]}
+      />
+    );
+
+    const archiveForm = container.querySelector('form[action="/archive"]');
+    expect(archiveForm).toHaveAttribute("method", "post");
+    expect(archiveForm.querySelectorAll('input[name="ids[]"]')).toHaveLength(2);
+    expect(archiveForm.querySelector('input[name="authenticity_token"]')).toHaveValue("csrf-token-value");
+
+    const exportForm = container.querySelector('form[action="/export"]');
+    expect(exportForm).toHaveAttribute("method", "get");
+    expect(exportForm.querySelectorAll('input[name="selected_ids[]"]')).toHaveLength(2);
+    expect(exportForm.querySelector('input[name="authenticity_token"]')).not.toBeInTheDocument();
+  });
+
   it("normalizes row action methods before rendering dropdown forms", async () => {
     render(
       <CollectionItemActions

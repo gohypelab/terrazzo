@@ -51,6 +51,8 @@ end
 
 When this returns `false`, Terrazzo raises `Terrazzo::NotAuthorizedError` for that controller action. The same hook is used when building page props, so unauthorized default actions such as New, Edit, Delete, and row Show links are hidden automatically.
 
+Custom member, collection, toolbar, and bulk action routes are app-defined controller actions. Authorize those actions in the controller method itself, or route them through your existing authorization layer before mutating records.
+
 ## Using Pundit
 
 If you use [Pundit](https://github.com/varvet/pundit), integrate it through the authorization hooks:

@@ -115,6 +115,36 @@ RSpec.describe "dashboard field metadata", type: :request do
     ])
   end
 
+  it "serializes bulk collection actions from the dashboard" do
+    create_customer(name: "Bulk Action Customer")
+    allow_any_instance_of(CustomerDashboard).to receive(:collection_bulk_actions)
+      .with(anything)
+      .and_return([
+        {
+          label: "Archive selected",
+          url: "/admin/customers/archive",
+          method: "post",
+          confirm: "Archive selected customers?",
+          variant: "destructive",
+        },
+      ])
+
+    get "/admin/customers", headers: json_headers
+
+    expect(response).to have_http_status(:ok)
+    data = JSON.parse(response.body).fetch("data")
+
+    expect(data.fetch("bulkActions")).to eq([
+      {
+        "label" => "Archive selected",
+        "url" => "/admin/customers/archive",
+        "method" => "post",
+        "confirm" => "Archive selected customers?",
+        "variant" => "destructive",
+      },
+    ])
+  end
+
   def json_headers
     { "ACCEPT" => "application/json" }
   end

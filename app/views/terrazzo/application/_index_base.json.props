@@ -54,6 +54,7 @@ end
 
 json.layoutActions Array(dashboard.layout_actions(:index, self))
 json.toolbarActions Array(dashboard.collection_toolbar_actions(self))
+json.bulkActions Array(dashboard.collection_bulk_actions(self))
 
 json.emptyState do
   json.title "No #{resource_name.pluralize.downcase} found"

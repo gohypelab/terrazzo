@@ -15,6 +15,7 @@ export default function AdminIndex() {
     pagination,
     layoutActions,
     toolbarActions,
+    bulkActions,
     emptyState,
     navigation,
     newResourcePath,
@@ -43,7 +44,7 @@ export default function AdminIndex() {
         <CollectionFilters {...filters} />
       </div>
 
-      <AdminCollection table={table} emptyState={emptyState} />
+      <AdminCollection table={table} emptyState={emptyState} bulkActions={bulkActions} />
 
       <Pagination {...pagination} />
     </Layout>);

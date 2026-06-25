@@ -206,6 +206,12 @@ RSpec.describe Terrazzo::BaseDashboard do
     end
   end
 
+  describe "#collection_bulk_actions" do
+    it "returns no bulk actions by default" do
+      expect(dashboard.collection_bulk_actions(double("view"))).to eq([])
+    end
+  end
+
   describe "#collection_item_actions" do
     it "includes the default row actions when a view context is available" do
       customer = create_customer(name: "Alice")

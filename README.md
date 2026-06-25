@@ -80,6 +80,22 @@ Return a new array instead when you want to fully replace the default actions.
 
 The `view` argument gives access to route helpers. Each action hash supports `label` (String), `url` (String), `method` (optional, e.g. `"delete"`), `confirm` (optional confirmation message for non-GET form actions), and `sg_visit` (set to `false` to bypass SPA navigation).
 
+## Bulk Collection Actions
+
+Override `collection_bulk_actions` to add actions for selected rows on an index page:
+
+```ruby
+class OrderDashboard < Terrazzo::BaseDashboard
+  def collection_bulk_actions(view)
+    [
+      { label: "Mark shipped", url: view.bulk_ship_admin_orders_path, method: "post" },
+    ]
+  end
+end
+```
+
+Bulk action forms submit selected row IDs as `params[:ids]`. Define the matching collection route and controller action in your app.
+
 ## License
 
 MIT

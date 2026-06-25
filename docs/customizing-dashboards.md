@@ -251,6 +251,44 @@ end
 
 Toolbar actions use the same action hash shape as row actions and also render the optional `variant` key as a button variant. Non-GET toolbar actions default to `"outline"`, except `delete` actions default to `"destructive"`.
 
+## Bulk Collection Actions
+
+Use `collection_bulk_actions` to add actions for selected rows on an index page. When at least one bulk action is present, the default table renders selection checkboxes and submits the selected row IDs as `params[:ids]`.
+
+```ruby
+class OrderDashboard < Terrazzo::BaseDashboard
+  # ...
+
+  def collection_bulk_actions(view)
+    [
+      {
+        label: "Mark shipped",
+        url: view.bulk_ship_admin_orders_path,
+        method: "post",
+        confirm: "Mark selected orders as shipped?",
+      },
+    ]
+  end
+end
+```
+
+Define the matching collection route and controller action in your Rails app:
+
+```ruby
+# config/routes.rb
+resources :orders do
+  collection { post :bulk_ship }
+end
+
+# app/controllers/admin/orders_controller.rb
+def bulk_ship
+  scoped_resource.where(id: params[:ids]).update_all(shipped_at: Time.current)
+  redirect_to admin_orders_path, notice: "Marked selected orders shipped"
+end
+```
+
+Bulk actions use the same action hash shape as row and toolbar actions. They default to the `ids[]` parameter name; pass `param_name: "order_ids[]"` when a custom controller action expects a different parameter.
+
 ## Page Header Actions
 
 Use `layout_actions` to add buttons to the page header slot on index, show, new, and edit pages:

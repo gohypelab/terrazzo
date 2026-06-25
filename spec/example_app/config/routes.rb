@@ -8,6 +8,7 @@ Rails.application.routes.draw do
     resources :line_items
     resources :log_entries
     resources :orders, except: [:destroy] do
+      collection { post :bulk_ship }
       member { get :invoice }
     end
     resources :pages

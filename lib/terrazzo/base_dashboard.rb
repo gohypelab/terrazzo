@@ -159,6 +159,10 @@ module Terrazzo
       ]
     end
 
+    def collection_bulk_actions(_view = nil)
+      []
+    end
+
     def layout_actions(_page, _view = nil, resource: nil)
       []
     end

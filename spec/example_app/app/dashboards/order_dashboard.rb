@@ -72,4 +72,14 @@ class OrderDashboard < Terrazzo::BaseDashboard
       { label: "Invoice", url: view.invoice_admin_order_path(resource), sg_visit: false },
     ]
   end
+
+  def collection_bulk_actions(view)
+    [
+      {
+        label: "Mark shipped",
+        url: view.bulk_ship_admin_orders_path,
+        method: "post",
+      },
+    ]
+  end
 end
