@@ -40,6 +40,62 @@ RSpec.describe Terrazzo::Generators::InstallGenerator do
     expect_bundle_to_succeed("app/javascript/admin/application.jsx")
   end
 
+  it "resolves generated and custom resource pages before shared fallback" do
+    run_install_entrypoint_generators([], bundler: "esbuild")
+
+    create_file "app/views/admin/application/index.jsx", "export default 'shared-index';\n"
+    create_file "app/views/admin/application/show.jsx", "export default 'shared-show';\n"
+    create_file "app/views/admin/application/new.jsx", "export default 'shared-new';\n"
+    create_file "app/views/admin/application/edit.jsx", "export default 'shared-edit';\n"
+    create_file "app/views/admin/orders/index.jsx", "export default 'generated-order-index';\n"
+    create_file "app/views/admin/users/index.jsx", "export default 'generated-user-index';\n"
+    create_file "app/views/admin/custom_users/index.jsx", "export default 'custom-user-index';\n"
+
+    create_file "app/javascript/admin/generated_page_mapping.js", <<~JS
+      import OrderIndex from "../../views/admin/orders/index";
+      import GeneratedUserIndex from "../../views/admin/users/index";
+
+      export const generatedPageMapping = {
+        'admin/orders/index': OrderIndex,
+        'admin/users/index': GeneratedUserIndex,
+      }
+    JS
+    create_file "app/javascript/admin/custom_page_mapping.js", <<~JS
+      import CustomUserIndex from "../../views/admin/custom_users/index";
+
+      export const customPageMapping = {
+        'admin/users/index': CustomUserIndex,
+      }
+    JS
+    create_file "mapping_runtime_check.js", <<~JS
+      import { pageToPageMapping } from "./app/javascript/admin/page_to_page_mapping.js";
+
+      const expected = {
+        generated: "generated-order-index",
+        customOverride: "custom-user-index",
+        indexFallback: "shared-index",
+        showFallback: "shared-show",
+        missing: undefined,
+      };
+
+      const actual = {
+        generated: pageToPageMapping["admin/orders/index"],
+        customOverride: pageToPageMapping["admin/users/index"],
+        indexFallback: pageToPageMapping["admin/invoices/index"],
+        showFallback: pageToPageMapping["admin/orders/show"],
+        missing: pageToPageMapping["admin/orders/export"],
+      };
+
+      for (const [key, value] of Object.entries(expected)) {
+        if (actual[key] !== value) {
+          throw new Error(`${key} resolved to ${actual[key]}, expected ${value}`);
+        }
+      }
+    JS
+
+    expect_node_bundle_to_succeed("mapping_runtime_check.js")
+  end
+
   it "builds a Rails esbuild-compatible root entrypoint" do
     create_file "package.json", JSON.pretty_generate({
       dependencies: described_class::FRONTEND_DEPENDENCIES.to_h { |package_name| [package_name, "*"] },
@@ -969,6 +1025,25 @@ RSpec.describe Terrazzo::Generators::InstallGenerator do
       chdir: destination_root
     )
 
+    expect(status).to be_success, "#{stdout}\n#{stderr}"
+  end
+
+  def expect_node_bundle_to_succeed(entry)
+    stdout, stderr, status = Open3.capture3(
+      esbuild_bin,
+      entry,
+      "--bundle",
+      "--format=esm",
+      "--platform=node",
+      "--outfile=runtime-check.mjs",
+      "--loader:.js=jsx",
+      "--loader:.jsx=jsx",
+      chdir: destination_root
+    )
+
+    expect(status).to be_success, "#{stdout}\n#{stderr}"
+
+    stdout, stderr, status = Open3.capture3("node", "runtime-check.mjs", chdir: destination_root)
     expect(status).to be_success, "#{stdout}\n#{stderr}"
   end
 
