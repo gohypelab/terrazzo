@@ -399,6 +399,43 @@ RSpec.describe Terrazzo::Generators::EjectGenerator do
     end
   end
 
+  it "preserves app-owned dependency files copied by ejection" do
+    create_file "app/views/admin/components/app-sidebar.jsx", <<~JS
+      export function AppSidebar() {
+        return "custom sidebar";
+      }
+    JS
+    create_file "app/views/admin/components/ui/button.jsx", <<~JS
+      export function Button() {
+        return "custom button";
+      }
+
+      export function buttonVariants() {
+        return "custom variants";
+      }
+    JS
+    create_file "app/views/admin/fields/shared/TextInputFormField.jsx", <<~JS
+      export function TextInputFormField() {
+        return "custom text input";
+      }
+    JS
+
+    output = [
+      run_generator(described_class, ["components/Layout"]),
+      run_generator(described_class, ["ui/sidebar"]),
+      run_generator(described_class, ["fields/string"]),
+    ].join
+
+    expect(output).not_to include("conflict")
+    expect(output).not_to include("Overwrite")
+    expect(read("app/views/admin/components/app-sidebar.jsx")).to include("custom sidebar")
+    expect(read("app/views/admin/components/ui/button.jsx")).to include("custom button")
+    expect(read("app/views/admin/fields/shared/TextInputFormField.jsx")).to include("custom text input")
+    expect(File).to exist(File.join(destination_root, "app/views/admin/components/Layout.jsx"))
+    expect(File).to exist(File.join(destination_root, "app/views/admin/components/ui/sidebar.jsx"))
+    expect(File).to exist(File.join(destination_root, "app/views/admin/fields/string/FormField.jsx"))
+  end
+
   it "keeps ejected implementation files on app-owned UI and component imports" do
     run_generator(Terrazzo::Generators::ViewsGenerator, [])
 

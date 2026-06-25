@@ -96,6 +96,7 @@ rails g terrazzo:views
 
 This will overwrite those generated files. Use `rails g terrazzo:eject ...` for individual pages, components, fields, or UI primitives that you want to own locally.
 Ejection replaces Terrazzo's generated package stubs directly; customized app-owned files still use Rails' normal overwrite prompt.
+Files copied only as dependencies of the requested ejection are skipped when they already exist, so later ejections do not clobber app-owned dependency files. Eject that dependency directly when you want to replace it.
 
 ## Custom Pages
 
@@ -193,7 +194,7 @@ All page components — both the gem's built-in pages and ejected pages — will
 
 Ejected pages use `getLayout()` (also exported from `terrazzo`) to resolve the active Layout at render time, so they respect `setLayout` without any extra wiring.
 
-Running `rails g terrazzo:eject components/Layout` copies the default layout and its local dependencies, then updates `app/views/admin/components/index.js` to call `setLayout(Layout)` for you. The generated admin entrypoint imports that barrel before rendering.
+Running `rails g terrazzo:eject components/Layout` copies the default layout and any missing local dependencies, then updates `app/views/admin/components/index.js` to call `setLayout(Layout)` for you. The generated admin entrypoint imports that barrel before rendering.
 
 The default Layout is also available as `DefaultLayout` from `terrazzo/components`, so you can extend it:
 

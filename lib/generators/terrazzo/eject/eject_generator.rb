@@ -67,7 +67,7 @@ module Terrazzo
         end
 
         field_shared_dependencies(field_type).each do |dependency|
-          copy_file "fields/shared/#{dependency}.jsx",
+          copy_file_unless_exists "fields/shared/#{dependency}.jsx",
             "app/views/#{namespace_name}/fields/shared/#{dependency}.jsx"
         end
 
@@ -83,8 +83,9 @@ module Terrazzo
           raise Thor::Error, "Unknown component '#{name}'"
         end
 
-        ([name] + component_dependencies(name)).uniq.each do |component|
-          copy_component_template(component)
+        copy_component_template(name)
+        component_dependencies(name).each do |component|
+          copy_component_template_unless_exists(component)
         end
 
         ensure_ui_barrel
@@ -99,8 +100,11 @@ module Terrazzo
           raise Thor::Error, "Unknown UI component '#{name}'"
         end
 
-        ([name] + ui_dependencies(name)).uniq.each do |component|
-          copy_ui_template(component)
+        copy_ui_template(name)
+        update_ui_barrel(name)
+
+        ui_dependencies(name).each do |component|
+          copy_ui_template_unless_exists(component)
           update_ui_barrel(component)
         end
       end
@@ -205,8 +209,16 @@ module Terrazzo
         copy_file "components/#{name}.jsx", "app/views/#{namespace_name}/components/#{name}.jsx"
       end
 
+      def copy_component_template_unless_exists(name)
+        copy_file_unless_exists "components/#{name}.jsx", "app/views/#{namespace_name}/components/#{name}.jsx"
+      end
+
       def copy_ui_template(name)
         copy_file "components/ui/#{name}.jsx", "app/views/#{namespace_name}/components/ui/#{name}.jsx"
+      end
+
+      def copy_ui_template_unless_exists(name)
+        copy_file_unless_exists "components/ui/#{name}.jsx", "app/views/#{namespace_name}/components/ui/#{name}.jsx"
       end
 
       def eject_generated_form_counterpart(name)

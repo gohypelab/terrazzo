@@ -192,6 +192,7 @@ rails g terrazzo:eject navigation
 
 Unsupported targets fail the generator instead of silently doing nothing, so typos are safe to catch in scripts and CI.
 When a target path still contains Terrazzo's generated package stub, ejection replaces it without a conflict prompt. If the file has already become app-owned/customized, Rails' normal overwrite prompt still applies.
+Dependency files copied only to satisfy the requested target's imports are non-destructive: Terrazzo skips them when they already exist. Run `terrazzo:eject` for that dependency directly when you want Rails' overwrite prompt for it.
 
 Ejected files import through app-level barrels:
 
@@ -203,7 +204,7 @@ If one of those barrels is missing, `terrazzo:eject` creates the base package re
 
 Page ejection copies required partials with the page when they are missing. For example, `pages/index` also copies `_collection.jsx`, and `pages/edit` or `pages/new` also copies `_form.jsx`. If you have already customized one of those shared partials, later page ejections preserve it. If the matching form page is still a generated package stub, ejecting `pages/edit` or `pages/new` also replaces that counterpart so both pages use the shared app-owned `_form.jsx`.
 
-UI ejection copies required local primitive dependencies with the requested file. For example, `ui/pagination` also copies `ui/button`, and `ui/sidebar` also copies the primitives it imports locally. Ejected UI primitives are consumed by app-owned pages, fields, and components that import from `../components/ui`; packaged default pages continue using the package defaults until you eject or override the relevant page, field, or component.
+UI ejection copies required local primitive dependencies with the requested file when those dependencies are missing. For example, `ui/pagination` also copies `ui/button`, and `ui/sidebar` also copies the primitives it imports locally. Ejected UI primitives are consumed by app-owned pages, fields, and components that import from `../components/ui`; packaged default pages continue using the package defaults until you eject or override the relevant page, field, or component.
 
 The default index already supports search, filter facets, sortable rows, row actions, toolbar actions, page header actions, CSV exports, empty states, header/row/cell metadata, and a pagination footer with page and total-count context. Prefer dashboard hooks such as `attribute_label`, `attribute_hint`, `collection_header_options`, `collection_row_options`, `collection_cell_options`, `collection_item_actions`, `collection_toolbar_actions`, `layout_actions`, `csv_attributes`, `empty_collection_message`, and the `NAVIGATION_*` constants before ejecting full pages or navigation.
 
