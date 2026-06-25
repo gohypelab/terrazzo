@@ -13,6 +13,12 @@ RSpec.describe Terrazzo::Field::HasMany do
     end
   end
 
+  describe ".eager_load?" do
+    it "returns true" do
+      expect(described_class.eager_load?).to be true
+    end
+  end
+
   describe "#serialize_value" do
     let(:customer) { create_customer(name: "Alice") }
 

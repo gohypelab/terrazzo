@@ -17,6 +17,10 @@ module Terrazzo
           false
         end
 
+        def sortable?
+          false
+        end
+
         def eager_load?
           true
         end

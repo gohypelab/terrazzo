@@ -1,6 +1,18 @@
 require "spec_helper"
 
 RSpec.describe Terrazzo::Field::Polymorphic do
+  describe ".sortable?" do
+    it "returns false" do
+      expect(described_class.sortable?).to be false
+    end
+  end
+
+  describe ".eager_load?" do
+    it "returns true" do
+      expect(described_class.eager_load?).to be true
+    end
+  end
+
   describe "#serialize_value" do
     let(:customer) { create_customer(name: "Alice") }
     let(:log_entry) { LogEntry.create!(action: "login", loggable: customer) }

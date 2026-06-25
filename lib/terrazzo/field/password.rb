@@ -11,6 +11,12 @@ module Terrazzo
           data.present? ? MASKED : nil
         end
       end
+
+      class << self
+        def sortable?
+          false
+        end
+      end
     end
   end
 end

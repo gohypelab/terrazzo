@@ -238,11 +238,11 @@ ATTRIBUTE_TYPES = {
 | URL | `Field::Url` | No | Yes | No |
 | Password | `Field::Password` | No | No | No |
 | Select | `Field::Select` | No | Yes | No |
-| Rich Text | `Field::RichText` | No | No | No |
+| Rich Text | `Field::RichText` | No | No | Yes |
 | BelongsTo | `Field::BelongsTo` | No | Yes | Yes |
-| HasMany | `Field::HasMany` | No | Yes | No |
+| HasMany | `Field::HasMany` | No | No | Yes |
 | HasOne | `Field::HasOne` | No | No | Yes |
-| Polymorphic | `Field::Polymorphic` | No | No | No |
+| Polymorphic | `Field::Polymorphic` | No | No | Yes |
 | Hstore | `Field::Hstore` | No | No | No |
 | Asset | `Field::Asset` | No | No | Yes |
 
