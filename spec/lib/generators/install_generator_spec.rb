@@ -327,6 +327,35 @@ RSpec.describe Terrazzo::Generators::InstallGenerator do
     expect_bundle_to_succeed("app/javascript/admin/application.jsx")
   end
 
+  it "builds a custom namespace JavaScript entrypoint after release-gate ejections" do
+    create_file "package.json", JSON.pretty_generate({
+      dependencies: described_class::FRONTEND_DEPENDENCIES.to_h { |package_name| [package_name, "*"] },
+    })
+
+    run_install_entrypoint_generators([], namespace: "backstage", bundler: "esbuild")
+    run_views_generator(namespace: "backstage")
+
+    %w[
+      pages/index
+      pages/edit
+      fields/string
+      components/Layout
+      navigation
+    ].each do |target|
+      run_eject_generator(target, namespace: "backstage")
+    end
+
+    create_node_package_link
+
+    expect(File).to exist(File.join(destination_root, "app/views/backstage/application/_collection.jsx"))
+    expect(File).to exist(File.join(destination_root, "app/views/backstage/application/_form.jsx"))
+    expect(read("app/views/backstage/fields/index.js")).to include('registerStringFieldType("string"')
+    expect(read("app/views/backstage/components/index.js")).to include("setLayout(Layout);")
+    expect(read("app/views/backstage/application/_navigation.json.props")).to include("navigation_groups")
+
+    expect_bundle_to_succeed("app/javascript/backstage.js")
+  end
+
   it "sources package and app-owned admin files in the generated stylesheet" do
     run_install_stylesheet_generator
 
@@ -786,10 +815,10 @@ RSpec.describe Terrazzo::Generators::InstallGenerator do
     $stdout = original_stdout
   end
 
-  def run_eject_generator(target)
+  def run_eject_generator(target, namespace: "admin")
     original_stdout = $stdout
     $stdout = StringIO.new
-    Terrazzo::Generators::EjectGenerator.start([target], destination_root: destination_root)
+    Terrazzo::Generators::EjectGenerator.start([target, "--namespace=#{namespace}"], destination_root: destination_root)
   ensure
     $stdout = original_stdout
   end
