@@ -79,6 +79,9 @@ Creates:
 For namespaced models, `terrazzo:dashboard Blog::Post` writes
 `app/dashboards/blog/post_dashboard.rb` and `app/controllers/admin/blog/posts_controller.rb`
 with explicit `Blog::PostDashboard` and `Admin::Blog::PostsController` module nesting.
+Deeper namespaces follow the same convention, so `Store::Catalog::Product` writes
+`app/dashboards/store/catalog/product_dashboard.rb` and
+`app/controllers/admin/store/catalog/products_controller.rb`.
 
 The generator inspects your model's columns and associations:
 - Primary key columns → `Field::String`

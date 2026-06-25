@@ -48,6 +48,37 @@ RSpec.describe Terrazzo::Generators::DashboardGenerator do
     expect_ruby_syntax_to_be_valid("app/controllers/admin/blog/posts_controller.rb")
   end
 
+  it "generates conventional modules for deeply namespaced models" do
+    column = Struct.new(:name, :type)
+    fake_model = Class.new do
+      define_singleton_method(:columns) do
+        [
+          column.new("id", :integer),
+          column.new("name", :string),
+        ]
+      end
+      define_singleton_method(:reflect_on_all_associations) { [] }
+      define_singleton_method(:defined_enums) { {} }
+    end
+
+    stub_const("Store", Module.new)
+    stub_const("Store::Catalog", Module.new)
+    stub_const("Store::Catalog::Product", fake_model)
+
+    run_generator(["Store::Catalog::Product"])
+
+    dashboard = read("app/dashboards/store/catalog/product_dashboard.rb")
+    expect(dashboard).to include("module Store\n  module Catalog\n    class ProductDashboard < Terrazzo::BaseDashboard")
+    expect(dashboard).not_to include("class Store::Catalog::ProductDashboard")
+
+    controller = read("app/controllers/admin/store/catalog/products_controller.rb")
+    expect(controller).to include("module Admin\n  module Store\n    module Catalog\n      class ProductsController < ApplicationController")
+    expect(controller).not_to include("class Store::Catalog::ProductsController")
+
+    expect_ruby_syntax_to_be_valid("app/dashboards/store/catalog/product_dashboard.rb")
+    expect_ruby_syntax_to_be_valid("app/controllers/admin/store/catalog/products_controller.rb")
+  end
+
   it "fails clearly when the model does not exist" do
     generator = described_class.new(["MissingModel"], {}, destination_root: destination_root)
 
