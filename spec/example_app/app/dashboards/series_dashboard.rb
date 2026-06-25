@@ -64,7 +64,7 @@ class SeriesDashboard < Terrazzo::BaseDashboard
     }
   end
 
-  # Overwrite this method to customize how series are displayed
+  # Override this method to customize how series are displayed
   # across all pages of the admin dashboard.
   #
   # def display_resource(resource)

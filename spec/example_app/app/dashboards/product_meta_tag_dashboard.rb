@@ -37,7 +37,7 @@ class ProductMetaTagDashboard < Terrazzo::BaseDashboard
   #   recent: ->(resources) { resources.where("created_at > ?", 30.days.ago) },
   # }.freeze
 
-  # Overwrite this method to customize how product meta tags are displayed
+  # Override this method to customize how product meta tags are displayed
   # across all pages of the admin dashboard.
   #
   # def display_resource(resource)
