@@ -48,7 +48,7 @@ yarn add -D @tailwindcss/cli
 }
 ```
 
-The install generator warns when it cannot detect a Tailwind build script, `@tailwindcss/cli`, `@tailwindcss/vite`, or `tailwindcss-rails`, and it prints the matching CLI install command for your package manager.
+The install generator warns when it cannot detect a Tailwind build script for `app/assets/stylesheets/admin.css`, the `@tailwindcss/vite` plugin, or `tailwindcss-rails`. For package.json script setups, it prints the matching CLI install command for your package manager.
 
 ## 4. Install Superglue (if you haven't already)
 

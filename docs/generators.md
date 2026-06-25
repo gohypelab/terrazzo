@@ -40,7 +40,7 @@ Creates:
 - Dashboards for all existing `ApplicationRecord` models
 - App-level component, field, and UI barrels that fall back to the `terrazzo` package
 
-The generator checks `package.json` for the required Terrazzo frontend packages and prints the package-manager command to install anything missing. It also warns when `app/assets/stylesheets/admin.css` has no detectable Tailwind build pipeline; package.json script users should install `@tailwindcss/cli` for the `tailwindcss` command.
+The generator checks `package.json` for the required Terrazzo frontend packages and prints the package-manager command to install anything missing. It also warns when `app/assets/stylesheets/admin.css` has no detectable Tailwind build pipeline; package.json script users should install `@tailwindcss/cli` and add a script that compiles the generated admin stylesheet.
 When `components.json` does not exist, the install generator creates one that points shadcn CLI output at `app/views/admin/components` and `app/views/admin/components/ui` (or the matching custom namespace). Existing `components.json` files are left untouched.
 When neither `jsconfig.json` nor `tsconfig.json` exists, the installer also creates a small `jsconfig.json` so editor tooling and shadcn-style generators can resolve root `@/*` imports. Existing JS/TS configs are left untouched.
 The installer also verifies that application model tables exist before generating dashboards. Run `bin/rails db:prepare` first if the generator reports missing tables.

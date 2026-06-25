@@ -258,20 +258,24 @@ module Terrazzo
 
       def tailwind_build_pipeline?
         tailwind_package_script? ||
-          tailwind_package_tooling? ||
+          tailwind_vite_plugin? ||
           tailwind_rails_gem?
       end
 
       def tailwind_package_script?
         package_json_scripts.any? do |_name, command|
-          command.to_s.include?("tailwindcss")
+          command = command.to_s
+          command.include?("tailwindcss") && command.include?(admin_stylesheet_path)
         end
       end
 
-      def tailwind_package_tooling?
+      def tailwind_vite_plugin?
         dependencies = package_json_dependencies
-        dependencies.key?("@tailwindcss/cli") ||
-          dependencies.key?("@tailwindcss/vite")
+        dependencies.key?("@tailwindcss/vite")
+      end
+
+      def admin_stylesheet_path
+        "app/assets/stylesheets/#{namespace_name}.css"
       end
 
       def tailwind_rails_gem?

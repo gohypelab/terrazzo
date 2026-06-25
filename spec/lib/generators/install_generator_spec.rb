@@ -273,11 +273,39 @@ RSpec.describe Terrazzo::Generators::InstallGenerator do
     expect(run_tailwind_pipeline_verifier).to eq("")
   end
 
-  it "does not warn when Tailwind CLI package tooling is installed" do
+  it "warns when Tailwind scripts do not compile the generated admin stylesheet" do
+    create_file "package.json", JSON.pretty_generate({
+      dependencies: described_class::FRONTEND_DEPENDENCIES.to_h { |package_name| [package_name, "*"] },
+      scripts: {
+        "build:css" => "tailwindcss -i app/assets/stylesheets/application.css -o app/assets/builds/application.css --minify",
+      },
+    })
+
+    output = run_tailwind_pipeline_verifier
+
+    expect(output).to include("no Tailwind build pipeline was detected")
+    expect(output).to include("app/assets/stylesheets/admin.css")
+  end
+
+  it "warns when Tailwind CLI package tooling is installed without an admin build script" do
     create_file "package.json", JSON.pretty_generate({
       dependencies: described_class::FRONTEND_DEPENDENCIES.to_h { |package_name| [package_name, "*"] },
       devDependencies: {
         "@tailwindcss/cli" => "^4.0.0",
+      },
+    })
+
+    output = run_tailwind_pipeline_verifier
+
+    expect(output).to include("no Tailwind build pipeline was detected")
+    expect(output).to include("app/assets/stylesheets/admin.css")
+  end
+
+  it "does not warn when the Tailwind Vite plugin is installed" do
+    create_file "package.json", JSON.pretty_generate({
+      dependencies: described_class::FRONTEND_DEPENDENCIES.to_h { |package_name| [package_name, "*"] },
+      devDependencies: {
+        "@tailwindcss/vite" => "^4.0.0",
       },
     })
 
