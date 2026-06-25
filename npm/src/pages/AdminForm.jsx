@@ -3,8 +3,10 @@ import React from "react";
 import { FieldRenderer } from "terrazzo/fields";
 import { Button } from "terrazzo/ui";
 
-export function AdminForm({ form, errors }) {
-  const { props: formProps, extras, fieldGroups, fields } = form;
+export function AdminForm({ form = {}, errors = [] }) {
+  const { props: formProps = {}, extras = {}, fieldGroups = [], fields = [] } = form;
+  const groups = Array.isArray(fieldGroups) ? fieldGroups : [];
+  const hasFieldGroups = groups.length > 0;
 
   const renderField = (field) => {
     const hintId = field.hint && field.input?.id ? `${field.input.id}_hint` : null;
@@ -53,15 +55,15 @@ export function AdminForm({ form, errors }) {
         <input key={hiddenProps.name} {...hiddenProps} />
         )}
 
-        {fieldGroups ? (
+        {hasFieldGroups ? (
           <div className="space-y-8">
-            {fieldGroups.map((group, groupIndex) =>
+            {groups.map((group, groupIndex) =>
               <fieldset key={groupIndex} className="space-y-6">
                 {group.name && (
                   <legend className="text-lg font-semibold">{group.name}</legend>
                 )}
                 <div className="space-y-6">
-                  {group.fields.map((field) => renderField(field))}
+                  {(group.fields || []).map((field) => renderField(field))}
                 </div>
               </fieldset>
             )}
