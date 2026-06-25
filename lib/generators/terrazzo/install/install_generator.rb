@@ -323,13 +323,6 @@ module Terrazzo
           return
         end
 
-        if tailwind_vite_plugin_package? && !tailwind_vite_plugin_supported?
-          say_status :warning, "Installed #{TAILWIND_VITE_PACKAGE_NAME} is below Terrazzo's supported version.", :yellow
-          say "Terrazzo generated app/assets/stylesheets/#{namespace_name}.css with Tailwind #{TAILWIND_MINIMUM_VERSION}+ syntax."
-          say "Run: #{package_manager_add_dev_command} #{TAILWIND_VITE_PACKAGE_NAME}@latest"
-          return
-        end
-
         if tailwind_rails_gem? && !tailwind_rails_gem_supported?
           say_status :warning, "Installed #{TAILWIND_RAILS_GEM_NAME} is below Terrazzo's supported version.", :yellow
           say "Terrazzo generated app/assets/stylesheets/#{namespace_name}.css with Tailwind #{TAILWIND_MINIMUM_VERSION}+ syntax."
@@ -341,7 +334,7 @@ module Terrazzo
 
         say_status :warning, "Terrazzo generated app/assets/stylesheets/#{namespace_name}.css but no Tailwind build pipeline was detected.", :yellow
         say "Make sure your app compiles that file with Tailwind before serving the admin UI."
-        if tailwind_vite_plugin_supported?
+        if tailwind_vite_plugin_package?
           say "#{TAILWIND_VITE_PACKAGE_NAME} is installed, but Terrazzo links #{admin_stylesheet_path} as a Rails stylesheet asset."
         end
         say "For package.json scripts, install the Tailwind CLI and add a build script:"

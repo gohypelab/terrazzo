@@ -513,7 +513,7 @@ RSpec.describe Terrazzo::Generators::InstallGenerator do
     output = run_tailwind_pipeline_verifier
     expect(output).to include("Installed @tailwindcss/cli is below Terrazzo's supported version")
     expect(output).to include("Tailwind 4.0.0+ syntax")
-    expect(output).to include("Run: npm install --save-dev @tailwindcss/cli@latest")
+    expect(output).to include("npm install --save-dev @tailwindcss/cli@latest")
   end
 
   it "adds a Vite build script that includes generated admin CSS" do
@@ -570,7 +570,7 @@ RSpec.describe Terrazzo::Generators::InstallGenerator do
       .to eq("vite build && tailwindcss -i app/assets/stylesheets/admin.css -o app/assets/builds/admin.css --minify")
   end
 
-  it "does not treat an old Tailwind Vite plugin as a supported build pipeline" do
+  it "warns about the missing admin CSS build when only an old Tailwind Vite plugin is installed" do
     create_file "package.json", JSON.pretty_generate({
       dependencies: described_class::FRONTEND_DEPENDENCIES.to_h { |package_name| [package_name, "*"] },
       devDependencies: {
@@ -585,9 +585,10 @@ RSpec.describe Terrazzo::Generators::InstallGenerator do
     expect(scripts.fetch("build")).to eq("vite build")
 
     output = run_tailwind_pipeline_verifier
-    expect(output).to include("Installed @tailwindcss/vite is below Terrazzo's supported version")
-    expect(output).to include("Tailwind 4.0.0+ syntax")
-    expect(output).to include("Run: npm install --save-dev @tailwindcss/vite@latest")
+    expect(output).to include("no Tailwind build pipeline was detected")
+    expect(output).to include("@tailwindcss/vite is installed")
+    expect(output).to include("app/assets/stylesheets/admin.css")
+    expect(output).to include("npm install --save-dev @tailwindcss/cli@latest")
   end
 
   it "does not overwrite an existing Tailwind build script name" do
