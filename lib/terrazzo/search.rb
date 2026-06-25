@@ -18,6 +18,8 @@ module Terrazzo
 
     private
 
+    LIKE_ESCAPE = "\\"
+
     def search_results
       @association_search_joined = false
       searchable_attributes = dashboard.search_attributes
@@ -30,7 +32,7 @@ module Terrazzo
           build_association_search(attr, type)
         else
           table = scoped_resource.model.arel_table
-          table[attr].matches("%#{sanitize(term)}%")
+          table[attr].matches(search_pattern, LIKE_ESCAPE)
         end
       end.compact
 
@@ -52,7 +54,7 @@ module Terrazzo
       @scoped_resource = scoped_resource.left_joins(attr)
       @association_search_joined = true
       columns
-        .map { |column| assoc_table[column].matches("%#{sanitize(term)}%") }
+        .map { |column| assoc_table[column].matches(search_pattern, LIKE_ESCAPE) }
         .reduce(:or)
     end
 
@@ -67,8 +69,8 @@ module Terrazzo
         .map(&:to_sym)
     end
 
-    def sanitize(term)
-      term.gsub(/[%_\\]/) { |m| "\\#{m}" }
+    def search_pattern
+      "%#{ActiveRecord::Base.sanitize_sql_like(term.to_s, LIKE_ESCAPE)}%"
     end
   end
 end

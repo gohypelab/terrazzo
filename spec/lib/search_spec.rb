@@ -45,6 +45,15 @@ RSpec.describe Terrazzo::Search do
       expect(results.first.name).to eq("Bob Jones")
     end
 
+    it "treats SQL wildcard characters as literal search text" do
+      percent_customer = create_customer(name: "Literal 100%", email: "literal-percent@example.com")
+      underscore_customer = create_customer(name: "Literal_under", email: "literal-underscore@example.com")
+      scoped = Customer.where(id: @customers.map(&:id) + [percent_customer.id, underscore_customer.id])
+
+      expect(described_class.new(scoped, dashboard, "100%").run).to contain_exactly(percent_customer)
+      expect(described_class.new(scoped, dashboard, "_under").run).to contain_exactly(underscore_customer)
+    end
+
     it "searches explicit searchable_fields on associations" do
       dashboard = association_search_dashboard(
         territory: Terrazzo::Field::BelongsTo.with_options(
@@ -57,6 +66,22 @@ RSpec.describe Terrazzo::Search do
       scoped = Customer.where(id: @customers.map(&:id) + [customer.id])
 
       results = described_class.new(scoped, dashboard, "NLD").run
+
+      expect(results).to contain_exactly(customer)
+    end
+
+    it "treats SQL wildcard characters as literal text in association search" do
+      dashboard = association_search_dashboard(
+        territory: Terrazzo::Field::BelongsTo.with_options(
+          searchable: true,
+          searchable_fields: ["code"]
+        )
+      )
+      country = create_country(code: "A_B", name: "Underscore Country")
+      customer = create_customer(name: "Association Wildcard Customer", email: "assoc-wildcard@example.com", country: country)
+      scoped = Customer.where(id: @customers.map(&:id) + [customer.id])
+
+      results = described_class.new(scoped, dashboard, "A_B").run
 
       expect(results).to contain_exactly(customer)
     end

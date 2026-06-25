@@ -222,6 +222,7 @@ ATTRIBUTE_TYPES = {
 
 For association fields, `searchable_fields` lists columns on the associated table. If you omit it, Terrazzo searches the first conventional display column it finds: `name`, `title`, or `email`.
 Association searches return unique parent records even when multiple associated rows match.
+Search treats `%`, `_`, and backslashes as literal characters, not SQL wildcards.
 
 > **Note:** Unlike Administrate, Terrazzo does not auto-enable search on String/Text/Email fields. This avoids accidentally exposing sensitive data in search queries. Always opt in explicitly.
 
