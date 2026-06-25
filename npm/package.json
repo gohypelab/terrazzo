@@ -52,10 +52,12 @@
     "prepare": "tsup",
     "build": "tsup",
     "dev": "tsup --watch",
+    "check": "npm run lint && npm test && npm run test:exports",
     "test": "vitest run",
     "test:exports": "npm run build && node scripts/check-package-exports.mjs && node scripts/check-package-contents.mjs",
     "test:watch": "vitest",
-    "lint": "eslint src/"
+    "lint": "eslint src/",
+    "prepack": "npm run check"
   },
   "peerDependencies": {
     "@radix-ui/react-avatar": ">=1.0.0",
