@@ -144,6 +144,12 @@ json.partial! partial: "terrazzo/application/show_base"
 # json.customProp @resource.some_method
 ```
 
+Resource-specific view generators register the page in `app/javascript/admin/generated_page_mapping.js`
+and make sure `page_to_page_mapping.js` merges that manifest. If the main mapping file has been
+customized so heavily that Terrazzo cannot find a pages object to merge into, the generator fails
+instead of creating an unreachable page. Either restore the generated mapping shape or wire
+`generatedPageMapping` into your custom mapping file yourself.
+
 ### Options
 
 | Option | Default | Description |

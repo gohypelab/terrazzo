@@ -336,6 +336,33 @@ RSpec.describe Terrazzo::Generators::EjectGenerator do
     expect(manifest.scan("'admin/users/index': UserIndex,").size).to eq(1)
   end
 
+  it "fails when a generated page mapping cannot be merged into the main mapping" do
+    create_file "app/javascript/admin/page_to_page_mapping.js", <<~JS
+      export const pageToPageMapping = {};
+    JS
+
+    expect { generate_resource_index_directly("User") }.to raise_error(
+      Thor::Error,
+      /could not find the pages object to merge it automatically/
+    )
+  end
+
+  it "allows app-owned main mappings that already reference generated page mappings" do
+    create_file "app/javascript/admin/page_to_page_mapping.js", <<~JS
+      import { generatedPageMapping } from "./generated_page_mapping";
+      export const pageToPageMapping = generatedPageMapping;
+    JS
+
+    run_generator(Terrazzo::Generators::Views::IndexGenerator, ["User"])
+
+    mapping = read("app/javascript/admin/page_to_page_mapping.js")
+    expect(mapping.scan("generatedPageMapping").size).to eq(2)
+
+    manifest = read("app/javascript/admin/generated_page_mapping.js")
+    expect(manifest).to include('import UserIndex from "../../views/admin/users/index";')
+    expect(manifest).to include("'admin/users/index': UserIndex,")
+  end
+
   it "preserves manual custom page mappings when registering resource-specific pages" do
     create_file "app/javascript/admin/page_to_page_mapping.js", <<~JS
       import { customPageMapping } from "./custom_page_mapping";
@@ -629,6 +656,16 @@ RSpec.describe Terrazzo::Generators::EjectGenerator do
 
   def eject_directly(target)
     described_class.new([target], {}, destination_root: destination_root).eject
+  end
+
+  def generate_resource_index_directly(resource)
+    original_stdout = $stdout
+    $stdout = StringIO.new
+    Terrazzo::Generators::Views::IndexGenerator
+      .new([resource], {}, destination_root: destination_root)
+      .copy_index_template
+  ensure
+    $stdout = original_stdout
   end
 
   def read_repo(relative_path)

@@ -53,8 +53,9 @@ module Terrazzo
           return unless File.exist?(main_mapping_file)
 
           content = File.read(main_mapping_file)
+          already_references_generated_mapping = content.include?("generatedPageMapping")
 
-          unless content.include?("generatedPageMapping")
+          unless already_references_generated_mapping
             import_line = %(import { generatedPageMapping } from "./generated_page_mapping";\n)
             if content.include?(%(import { customPageMapping } from "./custom_page_mapping";))
               inject_into_file main_mapping_path, import_line,
@@ -66,6 +67,7 @@ module Terrazzo
           end
 
           return if content.include?("...generatedPageMapping")
+          return if already_references_generated_mapping
 
           generated_spread = "  ...generatedPageMapping,\n"
           if content.include?("  ...customPageMapping,")
@@ -75,9 +77,8 @@ module Terrazzo
           elsif content.include?("const pages = {\n")
             inject_into_file main_mapping_path, generated_spread, after: "const pages = {\n"
           else
-            say_status :warning,
-              "#{main_mapping_path} imports generated_page_mapping.js but Terrazzo could not find the pages object to merge it automatically.",
-              :yellow
+            raise Thor::Error,
+              "#{main_mapping_path} imports generated_page_mapping.js but Terrazzo could not find the pages object to merge it automatically."
           end
         end
 
