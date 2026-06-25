@@ -60,6 +60,31 @@ RSpec.describe Terrazzo::Generators::EjectGenerator do
     expect(read("app/views/admin/application/_navigation.json.props")).to include("json.items")
   end
 
+  it "replaces installed page stubs without conflict prompts" do
+    run_generator(Terrazzo::Generators::ViewsGenerator, [])
+
+    output = %w[pages/index pages/show pages/new pages/edit].map do |target|
+      run_generator(described_class, [target])
+    end.join
+
+    expect(output).not_to include("conflict")
+    expect(output).not_to include("Overwrite")
+    expect(read("app/views/admin/application/index.jsx")).to include("export default function AdminIndex")
+    expect(read("app/views/admin/application/show.jsx")).to include("export default function AdminShow")
+    expect(read("app/views/admin/application/new.jsx")).to include("export default function AdminNew")
+    expect(read("app/views/admin/application/edit.jsx")).to include("export default function AdminEdit")
+  end
+
+  it "replaces the installed navigation partial without a conflict prompt" do
+    run_generator(Terrazzo::Generators::ViewsGenerator, [])
+
+    output = run_generator(described_class, ["navigation"])
+
+    expect(output).not_to include("conflict")
+    expect(output).not_to include("Overwrite")
+    expect(read("app/views/admin/application/_navigation.json.props")).to include("nav_resource.navigation_label")
+  end
+
   it "fails loudly for unsupported ejection targets" do
     {
       "widgets/button" => /Unknown ejection target 'widgets\/button'/,
@@ -480,8 +505,10 @@ RSpec.describe Terrazzo::Generators::EjectGenerator do
 
   def run_generator(generator, args)
     original_stdout = $stdout
-    $stdout = StringIO.new
+    output = StringIO.new
+    $stdout = output
     generator.start(args, destination_root: destination_root)
+    output.string
   ensure
     $stdout = original_stdout
   end

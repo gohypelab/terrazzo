@@ -95,6 +95,7 @@ rails g terrazzo:views
 ```
 
 This will overwrite those generated files. Use `rails g terrazzo:eject ...` for individual pages, components, fields, or UI primitives that you want to own locally.
+Ejection replaces Terrazzo's generated package stubs directly; customized app-owned files still use Rails' normal overwrite prompt.
 
 ## Custom Pages
 
