@@ -1,5 +1,8 @@
+per_page = @resources.limit_value
+
 filter_url_for = ->(filter_name = nil) do
   query = request.query_parameters.except("_page", "filter", "filter_value")
+  query["per_page"] = per_page
   query["filter"] = filter_name if filter_name.present?
   url_for(query.merge(only_path: true))
 end
@@ -46,6 +49,7 @@ end
 json.searchBar do
   json.searchTerm @search_term
   json.searchPath request.path
+  json.perPage per_page
 end
 
 json.layoutActions Array(dashboard.layout_actions(:index, self))
@@ -88,6 +92,7 @@ json.table do
           search: @search_term,
           filter: @active_filter,
           filter_value: @filter_value,
+          per_page: per_page,
           _page: 1,
           only_path: true
         )
@@ -123,7 +128,6 @@ json.table do
 end
 
 json.pagination do
-  per_page = @resources.limit_value
   json.currentPage @resources.current_page
   json.totalPages @resources.total_pages
   json.totalCount @resources.total_count

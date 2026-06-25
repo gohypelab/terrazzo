@@ -8,6 +8,7 @@ RSpec.describe "admin index pagination", type: :request do
 
     pagination = response_data.fetch("pagination")
     expect(pagination.fetch("perPage")).to eq(2)
+    expect(response_data.dig("searchBar", "perPage")).to eq(2)
     expect(response_data.dig("table", "rows").length).to eq(2)
     expect(pagination.fetch("nextPagePath")).to include("per_page=2")
   end
@@ -32,6 +33,29 @@ RSpec.describe "admin index pagination", type: :request do
     expect(pagination.fetch("perPage")).to eq(100)
     expect(response_data.dig("table", "rows").length).to eq(100)
     expect(pagination.fetch("nextPagePath")).to include("per_page=100")
+  end
+
+  it "uses the normalized per-page value in index control urls" do
+    allow_any_instance_of(CustomerDashboard).to receive(:collection_filters)
+      .and_return(recent: ->(resources) { resources })
+    allow_any_instance_of(CustomerDashboard).to receive(:collection_filter_options)
+      .and_return([{ label: "Recent", value: "recent" }])
+    create_customers(101)
+
+    get "/admin/customers",
+      params: { per_page: 10_000, search: "Pagination" },
+      headers: json_headers
+
+    data = response_data
+    sort_url = data.dig("table", "headers")
+      .find { |header| header.fetch("attribute") == "name" }
+      .fetch("sortUrl")
+    filter_url = data.dig("filters", "options", 0, "url")
+
+    expect(data.dig("searchBar", "perPage")).to eq(100)
+    expect(sort_url).to include("per_page=100")
+    expect(filter_url).to include("per_page=100")
+    expect(filter_url).not_to include("10000")
   end
 
   it "lets admin controllers override the default and maximum per-page limits" do

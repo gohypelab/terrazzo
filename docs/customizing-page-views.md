@@ -86,6 +86,8 @@ export default function ProductsIndex() {
 }
 ```
 
+Index props carry normalized pagination state. The default `searchBar.perPage`, table sort URLs, filter URLs, and pagination links all use the controller-clamped page size so custom index pages can preserve row-count selection without reading raw query params.
+
 ## Re-generating Views
 
 To reset the shared page stubs, app barrels, and navigation props to their defaults:

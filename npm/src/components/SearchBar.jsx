@@ -4,7 +4,7 @@ import { NavigationContext } from "@thoughtbot/superglue";
 import { Input } from "terrazzo/ui";
 import { Search } from "lucide-react";
 
-export function SearchBar({ searchTerm, searchPath }) {
+export function SearchBar({ searchTerm, searchPath, perPage }) {
   const { visit } = useContext(NavigationContext);
   const inputRef = useRef(null);
 
@@ -14,6 +14,7 @@ export function SearchBar({ searchTerm, searchPath }) {
     const url = new URL(window.location.href);
     url.pathname = searchPath;
     url.searchParams.delete("_page");
+    if (perPage != null) url.searchParams.set("per_page", String(perPage));
 
     if (search.trim()) {
       url.searchParams.set("search", search);
