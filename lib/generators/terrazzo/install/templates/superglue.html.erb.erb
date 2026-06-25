@@ -7,7 +7,7 @@
   <%%= csp_meta_tag %>
   <%%= yield :head %>
 <% if vite? -%>
-  <%%= vite_react_refresh_tag %>
+  <%%= vite_client_tag %>
   <%%= vite_javascript_tag "<%= namespace_name %>/application" %>
 <% else -%>
   <%%= javascript_include_tag "<%= namespace_name %>", type: "module" %>

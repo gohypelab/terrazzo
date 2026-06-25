@@ -186,10 +186,24 @@ RSpec.describe Terrazzo::Generators::InstallGenerator do
     expect(File).to exist(File.join(destination_root, "app/views/layouts/admin/application.json.props"))
     expect(File).not_to exist(File.join(destination_root, "app/views/layouts/admin/superglue.html.erb"))
 
+    html_layout = read("app/views/layouts/admin/application.html.erb")
+    expect(html_layout).to include("vite_client_tag")
+    expect(html_layout).to include('vite_javascript_tag "admin/application"')
+    expect(html_layout).not_to include("vite_react_refresh_tag")
+
     json_layout = read("app/views/layouts/admin/application.json.props")
     expect(json_layout).to include('json.navigation(partial: ["admin/application/navigation"])')
     expect(json_layout).to include("json.componentIdentifier terrazzo_page_identifier")
     expect(json_layout).to include("json.slices")
+  end
+
+  it "generates an esbuild admin HTML layout" do
+    run_install_layout_generators(options: { bundler: "esbuild" })
+
+    html_layout = read("app/views/layouts/admin/application.html.erb")
+    expect(html_layout).to include('javascript_include_tag "admin", type: "module"')
+    expect(html_layout).not_to include("vite_client_tag")
+    expect(html_layout).not_to include("vite_javascript_tag")
   end
 
   it "fails before generation when no application models exist" do
@@ -518,8 +532,8 @@ RSpec.describe Terrazzo::Generators::InstallGenerator do
     $stdout = original_stdout
   end
 
-  def run_install_layout_generators
-    generator = described_class.new([], {}, destination_root: destination_root)
+  def run_install_layout_generators(options: {})
+    generator = described_class.new([], options, destination_root: destination_root)
     original_stdout = $stdout
     $stdout = StringIO.new
     generator.create_layout

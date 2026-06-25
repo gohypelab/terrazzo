@@ -13,7 +13,7 @@ rails g terrazzo:install
 | Option | Default | Description |
 |--------|---------|-------------|
 | `--namespace` | `admin` | Admin namespace (controller prefix, route scope, JS directory) |
-| `--bundler` | `vite` | JavaScript bundler. `vite` emits Vite asset tags; `esbuild` emits `javascript_include_tag` and a root `app/javascript/admin.js` entrypoint for Rails' default esbuild glob. Page mappings are explicit and can be extended through `custom_page_mapping.js`. |
+| `--bundler` | `vite` | JavaScript bundler. `vite` emits `vite_client_tag` and `vite_javascript_tag` for the admin entrypoint; `esbuild` emits `javascript_include_tag` and a root `app/javascript/admin.js` entrypoint for Rails' default esbuild glob. Page mappings are explicit and can be extended through `custom_page_mapping.js`. |
 
 ```bash
 # Vite (default)
