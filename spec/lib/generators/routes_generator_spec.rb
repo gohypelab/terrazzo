@@ -52,6 +52,21 @@ RSpec.describe Terrazzo::Generators::RoutesGenerator do
     expect(output).not_to include('root to: "posts#index"')
   end
 
+  it "fails instead of routing admin root to a missing dashboard when no models exist" do
+    create_file "config/routes.rb", <<~RUBY
+      Rails.application.routes.draw do
+      end
+    RUBY
+
+    with_destination_rails_root do
+      generator = routes_generator
+      allow(generator).to receive(:application_models).and_return([])
+
+      expect { capture_stdout { generator.insert_routes } }
+        .to raise_error(Thor::Error, /could not find any ApplicationRecord models/)
+    end
+  end
+
   private
 
   def routes_generator

@@ -90,6 +90,14 @@ RSpec.describe Terrazzo::Generators::InstallGenerator do
     expect(json_layout).to include("json.slices")
   end
 
+  it "fails before generation when no application models exist" do
+    generator = described_class.new([], {}, destination_root: destination_root)
+    allow(generator).to receive(:application_models).and_return([])
+
+    expect { generator.verify_database_schema }
+      .to raise_error(Thor::Error, /could not find any ApplicationRecord models/)
+  end
+
   it "fails before generation when application model tables are missing" do
     generator = described_class.new([], {}, destination_root: destination_root)
     model = double("Blog::Post", name: "Blog::Post", table_exists?: false)

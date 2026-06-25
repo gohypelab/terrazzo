@@ -75,6 +75,10 @@ Make sure your database schema is loaded before installing, because Terrazzo ins
 bin/rails db:prepare
 ```
 
+Run the installer after your app has at least one concrete `ApplicationRecord` model.
+Terrazzo generates dashboards and admin routes from those models; if none exist yet,
+add a model first and run the installer afterwards.
+
 ```bash
 rails g terrazzo:install
 ```

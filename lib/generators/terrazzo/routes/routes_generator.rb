@@ -11,6 +11,7 @@ module Terrazzo
       def insert_routes
         namespace_name = options[:namespace]
         models = application_models
+        raise_no_models_error if models.empty?
 
         # Group models by their module namespace
         namespaced = {}
@@ -84,8 +85,14 @@ module Terrazzo
 
         first_namespace, resources = namespaced.sort.first
         return "#{first_namespace}/#{resources.sort.first}" if first_namespace
+      end
 
-        "dashboard"
+      def raise_no_models_error
+        raise Thor::Error, <<~MESSAGE
+          Terrazzo could not find any ApplicationRecord models to route.
+
+          Add at least one model first, then run `bin/rails generate terrazzo:routes` again.
+        MESSAGE
       end
     end
   end

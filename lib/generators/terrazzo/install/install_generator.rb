@@ -60,7 +60,10 @@ module Terrazzo
       end
 
       def verify_database_schema
-        missing_tables = application_models.reject { |model| table_exists_for?(model) }
+        models = application_models
+        raise_no_models_error if models.empty?
+
+        missing_tables = models.reject { |model| table_exists_for?(model) }
         return if missing_tables.empty?
 
         model_names = missing_tables.map(&:name).join(", ")
@@ -304,6 +307,14 @@ module Terrazzo
         ActiveRecord::NoDatabaseError,
         ActiveRecord::StatementInvalid
         false
+      end
+
+      def raise_no_models_error
+        raise Thor::Error, <<~MESSAGE
+          Terrazzo could not find any ApplicationRecord models to generate dashboards.
+
+          Add at least one model first, then run `bin/rails generate terrazzo:install` again.
+        MESSAGE
       end
     end
   end
