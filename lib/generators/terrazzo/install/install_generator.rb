@@ -142,6 +142,20 @@ module Terrazzo
         template "components.json.erb", "components.json"
       end
 
+      def create_jsconfig
+        if File.exist?(File.join(destination_root, "jsconfig.json"))
+          say_status :skip, "jsconfig.json already exists", :yellow
+          return
+        end
+
+        if File.exist?(File.join(destination_root, "tsconfig.json"))
+          say_status :skip, "tsconfig.json already exists", :yellow
+          return
+        end
+
+        copy_file "jsconfig.json", "jsconfig.json"
+      end
+
       def run_views_generator
         generate "terrazzo:views", "--namespace=#{namespace_name}"
       end

@@ -34,6 +34,7 @@ Creates:
 - `app/javascript/admin/custom_page_mapping.js` for manual page mappings you own
 - `app/assets/stylesheets/admin.css` with Tailwind sources for package defaults and local admin files
 - `components.json` with shadcn aliases for the admin component and UI primitive paths, unless the app already has one
+- `jsconfig.json` with a root `@/*` path alias for shadcn-style tooling, unless the app already has `jsconfig.json` or `tsconfig.json`
 - Admin application controller
 - Admin routes namespace
 - Dashboards for all existing `ApplicationRecord` models
@@ -41,6 +42,7 @@ Creates:
 
 The generator checks `package.json` for the required Terrazzo frontend packages and prints the package-manager command to install anything missing. It also warns when `app/assets/stylesheets/admin.css` has no detectable Tailwind build pipeline; package.json script users should install `@tailwindcss/cli` for the `tailwindcss` command.
 When `components.json` does not exist, the install generator creates one that points shadcn CLI output at `app/views/admin/components` and `app/views/admin/components/ui` (or the matching custom namespace). Existing `components.json` files are left untouched.
+When neither `jsconfig.json` nor `tsconfig.json` exists, the installer also creates a small `jsconfig.json` so editor tooling and shadcn-style generators can resolve root `@/*` imports. Existing JS/TS configs are left untouched.
 The installer also verifies that application model tables exist before generating dashboards. Run `bin/rails db:prepare` first if the generator reports missing tables.
 Resource-specific view generators update `generated_page_mapping.js`; add hand-written custom pages to `custom_page_mapping.js`.
 

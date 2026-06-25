@@ -172,6 +172,45 @@ RSpec.describe Terrazzo::Generators::InstallGenerator do
     expect(output).to include("components.json already exists")
   end
 
+  it "generates a JavaScript path config for shadcn-style aliases" do
+    run_install_jsconfig_generator
+
+    config = JSON.parse(read("jsconfig.json"))
+    expect(config.fetch("compilerOptions")).to include({
+      "baseUrl" => ".",
+      "paths" => {
+        "@/*" => ["./*"],
+      },
+    })
+  end
+
+  it "does not overwrite an existing JavaScript path config" do
+    create_file "jsconfig.json", JSON.pretty_generate({
+      "compilerOptions" => {
+        "baseUrl" => "app/javascript",
+      },
+    })
+
+    output = run_install_jsconfig_generator
+
+    config = JSON.parse(read("jsconfig.json"))
+    expect(config.fetch("compilerOptions").fetch("baseUrl")).to eq("app/javascript")
+    expect(output).to include("jsconfig.json already exists")
+  end
+
+  it "does not add jsconfig when a TypeScript config already exists" do
+    create_file "tsconfig.json", JSON.pretty_generate({
+      "compilerOptions" => {
+        "baseUrl" => ".",
+      },
+    })
+
+    output = run_install_jsconfig_generator
+
+    expect(File).not_to exist(File.join(destination_root, "jsconfig.json"))
+    expect(output).to include("tsconfig.json already exists")
+  end
+
   it "prints the package-manager command for missing frontend dependencies" do
     create_file "package.json", JSON.pretty_generate({
       dependencies: {
@@ -322,6 +361,16 @@ RSpec.describe Terrazzo::Generators::InstallGenerator do
     original_stdout = $stdout
     $stdout = StringIO.new
     generator.create_components_json
+    $stdout.string
+  ensure
+    $stdout = original_stdout
+  end
+
+  def run_install_jsconfig_generator
+    generator = described_class.new([], {}, destination_root: destination_root)
+    original_stdout = $stdout
+    $stdout = StringIO.new
+    generator.create_jsconfig
     $stdout.string
   ensure
     $stdout = original_stdout

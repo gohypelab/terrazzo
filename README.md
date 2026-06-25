@@ -23,7 +23,7 @@ npm install --save-dev @tailwindcss/cli # if your app does not already compile T
 rails g superglue:install
 
 # Install Terrazzo — generates admin namespace, app barrels,
-# shadcn metadata, and dashboards.
+# shadcn metadata/path aliases, and dashboards.
 # Uses Vite by default; for Rails esbuild pass --bundler=esbuild.
 rails g terrazzo:install
 
