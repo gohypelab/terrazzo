@@ -32,7 +32,7 @@ module Terrazzo
             JS
           end
 
-          component_name = "#{resource.gsub('::', '')}#{action.capitalize}"
+          component_name = generated_page_component_name(action)
           import_path = "../../views/#{namespace_name}/#{resource_path}/#{action}"
           key = "'#{namespace_name}/#{resource_path}/#{action}'"
 
@@ -91,6 +91,10 @@ module Terrazzo
             .gsub(%r{/\*.*?\*/}m, "")
 
           executable_content.match?(/\bgeneratedPageMapping\b/)
+        end
+
+        def generated_page_component_name(action)
+          resource.split("::").map(&:camelize).join("Namespace") + action.camelize
         end
 
         def insert_generated_import(mapping_path, content, import_line, component_name)

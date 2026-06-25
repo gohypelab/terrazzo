@@ -284,14 +284,40 @@ RSpec.describe Terrazzo::Generators::EjectGenerator do
     expect(read("app/views/admin/catalog/products/_form.jsx")).to include('from "../../components/ui"')
 
     manifest = read("app/javascript/admin/generated_page_mapping.js")
-    expect(manifest).to include('import CatalogProductIndex from "../../views/admin/catalog/products/index";')
-    expect(manifest).to include('import CatalogProductShow from "../../views/admin/catalog/products/show";')
-    expect(manifest).to include('import CatalogProductNew from "../../views/admin/catalog/products/new";')
-    expect(manifest).to include('import CatalogProductEdit from "../../views/admin/catalog/products/edit";')
-    expect(manifest).to include("'admin/catalog/products/index': CatalogProductIndex,")
-    expect(manifest).to include("'admin/catalog/products/show': CatalogProductShow,")
-    expect(manifest).to include("'admin/catalog/products/new': CatalogProductNew,")
-    expect(manifest).to include("'admin/catalog/products/edit': CatalogProductEdit,")
+    expect(manifest).to include('import CatalogNamespaceProductIndex from "../../views/admin/catalog/products/index";')
+    expect(manifest).to include('import CatalogNamespaceProductShow from "../../views/admin/catalog/products/show";')
+    expect(manifest).to include('import CatalogNamespaceProductNew from "../../views/admin/catalog/products/new";')
+    expect(manifest).to include('import CatalogNamespaceProductEdit from "../../views/admin/catalog/products/edit";')
+    expect(manifest).to include("'admin/catalog/products/index': CatalogNamespaceProductIndex,")
+    expect(manifest).to include("'admin/catalog/products/show': CatalogNamespaceProductShow,")
+    expect(manifest).to include("'admin/catalog/products/new': CatalogNamespaceProductNew,")
+    expect(manifest).to include("'admin/catalog/products/edit': CatalogNamespaceProductEdit,")
+  end
+
+  it "builds JavaScript when generated page mapping identifiers would otherwise collide" do
+    run_generator(Terrazzo::Generators::ViewsGenerator, [])
+
+    run_generator(Terrazzo::Generators::Views::IndexGenerator, ["CatalogProduct"])
+    run_generator(Terrazzo::Generators::Views::IndexGenerator, ["Catalog::Product"])
+
+    create_node_package_link
+    create_file "collision_resource_entry.jsx", <<~JS
+      import "./app/views/admin/fields/index.js";
+      import "./app/views/admin/components/index.js";
+      import "./app/views/admin/components/ui/index.js";
+      import { generatedPageMapping } from "./app/javascript/admin/generated_page_mapping.js";
+
+      console.log(generatedPageMapping);
+    JS
+
+    expect_bundle_to_succeed("collision_resource_entry.jsx")
+
+    manifest = read("app/javascript/admin/generated_page_mapping.js")
+    expect(manifest).to include('import CatalogProductIndex from "../../views/admin/catalog_products/index";')
+    expect(manifest).to include('import CatalogNamespaceProductIndex from "../../views/admin/catalog/products/index";')
+    expect(manifest).to include("'admin/catalog_products/index': CatalogProductIndex,")
+    expect(manifest).to include("'admin/catalog/products/index': CatalogNamespaceProductIndex,")
+    expect(manifest.scan(/^import CatalogProductIndex /).size).to eq(1)
   end
 
   it "builds JavaScript after standalone resource-specific view generation" do
