@@ -112,6 +112,43 @@ RSpec.describe Terrazzo::Generators::InstallGenerator do
     ])
   end
 
+  it "configures bin/dev to run Rails and Vite together" do
+    create_file "bin/dev", <<~RUBY
+      #!/usr/bin/env ruby
+      exec "./bin/rails", "server", *ARGV
+    RUBY
+
+    run_install_vite_dev_server_generator
+
+    expect(read("Procfile.dev")).to eq(<<~PROCFILE)
+      web: bin/rails s
+      vite: bin/vite dev
+    PROCFILE
+    expect(read("bin/dev")).to include("foreman start -f Procfile.dev")
+    expect(File.executable?(File.join(destination_root, "bin/dev"))).to eq(true)
+  end
+
+  it "preserves custom bin/dev scripts while adding the Vite process" do
+    create_file "Procfile.dev", <<~PROCFILE
+      web: bin/rails s
+      worker: bin/jobs
+    PROCFILE
+    create_file "bin/dev", <<~SH
+      #!/usr/bin/env sh
+      echo custom dev server
+    SH
+
+    output = run_install_vite_dev_server_generator
+
+    expect(read("Procfile.dev")).to eq(<<~PROCFILE)
+      web: bin/rails s
+      worker: bin/jobs
+      vite: bin/vite dev
+    PROCFILE
+    expect(read("bin/dev")).to include("echo custom dev server")
+    expect(output).to include("bin/dev does not run Procfile.dev")
+  end
+
   it "rejects unsupported JavaScript bundlers" do
     generator = described_class.new([], { bundler: "sprockets" }, destination_root: destination_root)
 
@@ -560,6 +597,7 @@ RSpec.describe Terrazzo::Generators::InstallGenerator do
       create_js_entry_point
       create_vite_entry_point
       configure_vite_watch_paths
+      configure_vite_dev_server
       create_esbuild_entry_point
       create_store
       create_page_to_page_mapping
@@ -568,6 +606,16 @@ RSpec.describe Terrazzo::Generators::InstallGenerator do
       create_application_visit
       create_flash_slice
     ].each { |method_name| generator.public_send(method_name) }
+  ensure
+    $stdout = original_stdout
+  end
+
+  def run_install_vite_dev_server_generator
+    generator = described_class.new([], {}, destination_root: destination_root)
+    original_stdout = $stdout
+    $stdout = StringIO.new
+    generator.configure_vite_dev_server
+    $stdout.string
   ensure
     $stdout = original_stdout
   end

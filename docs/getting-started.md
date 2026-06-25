@@ -129,6 +129,7 @@ This creates an isolated admin namespace alongside your existing app — it won'
 - `app/javascript/admin/application.jsx` — separate Superglue entry point for the admin
 - `app/frontend/entrypoints/admin/application.jsx` — default Vite entrypoint shim generated only with `--bundler=vite`; custom Vite `sourceCodeDir` / `entrypointsDir` settings are respected
 - `config/vite.json` — updated with admin JS/view `watchAdditionalPaths` when those generated files live outside Vite's `sourceCodeDir`
+- `Procfile.dev` and `bin/dev` — for Vite installs, ensures local development starts Rails and `bin/vite dev` together; custom `bin/dev` scripts are left untouched with a warning
 - `app/javascript/admin/page_to_page_mapping.js` — maps admin pages to React components with shared-page fallbacks
 - `app/javascript/admin/generated_page_mapping.js` — resource-specific page manifest maintained by Terrazzo generators
 - `app/javascript/admin/custom_page_mapping.js` — manual custom page manifest you own
@@ -175,5 +176,10 @@ The shared page mapping fallback handles the standard CRUD pages. Generate a res
 ```bash
 bin/dev
 ```
+
+For Vite installs, Terrazzo adds `vite: bin/vite dev` to `Procfile.dev` and
+replaces the stock Rails-only `bin/dev` with a Foreman runner. If your app
+already had a custom `bin/dev`, the generator leaves it in place and warns you
+to start Vite alongside Rails.
 
 Visit `http://localhost:3000/admin` to see your admin panel.

@@ -145,6 +145,13 @@ module Terrazzo
         create_file "config/vite.json", "#{JSON.pretty_generate(config)}\n", force: true
       end
 
+      def configure_vite_dev_server
+        return unless vite?
+
+        ensure_vite_procfile
+        ensure_vite_bin_dev
+      end
+
       def create_esbuild_entry_point
         return unless esbuild?
 
@@ -352,6 +359,70 @@ module Terrazzo
 
       def vite_config_path
         File.join(destination_root, "config/vite.json")
+      end
+
+      def ensure_vite_procfile
+        if File.exist?(procfile_dev_path)
+          return if procfile_runs_vite?(File.read(procfile_dev_path))
+
+          existing_content = File.read(procfile_dev_path)
+          append_to_file "Procfile.dev",
+            "#{existing_content.end_with?("\n") ? "" : "\n"}vite: bin/vite dev\n"
+        else
+          create_file "Procfile.dev", <<~PROCFILE
+            web: bin/rails s
+            vite: bin/vite dev
+          PROCFILE
+        end
+      end
+
+      def ensure_vite_bin_dev
+        if File.exist?(bin_dev_path)
+          content = File.read(bin_dev_path)
+          return if bin_dev_runs_procfile?(content)
+
+          unless default_rails_server_bin_dev?(content)
+            say_status :warning, "bin/dev does not run Procfile.dev; start Vite with `bin/vite dev` or update bin/dev.", :yellow
+            return
+          end
+        end
+
+        create_file "bin/dev", vite_bin_dev_script, force: true
+        File.chmod(0o755, bin_dev_path)
+      end
+
+      def procfile_dev_path
+        File.join(destination_root, "Procfile.dev")
+      end
+
+      def bin_dev_path
+        File.join(destination_root, "bin/dev")
+      end
+
+      def procfile_runs_vite?(content)
+        content.match?(/^\s*[^#\n]+:\s*.*(?:bin\/)?vite\s+dev\b/)
+      end
+
+      def bin_dev_runs_procfile?(content)
+        content.include?("Procfile.dev")
+      end
+
+      def default_rails_server_bin_dev?(content)
+        content.include?('exec "./bin/rails", "server", *ARGV') ||
+          content.match?(/exec\s+\.?\/?bin\/rails\s+(server|s)\b/)
+      end
+
+      def vite_bin_dev_script
+        <<~SH
+          #!/usr/bin/env sh
+
+          if ! gem list foreman -i --silent; then
+            echo "Installing foreman..."
+            gem install foreman
+          fi
+
+          exec foreman start -f Procfile.dev "$@"
+        SH
       end
 
       def vite_rails_installed?

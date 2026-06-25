@@ -39,7 +39,7 @@ rails g terrazzo:install
 # The installer adds build:admin:css when @tailwindcss/cli is installed,
 # or warns with the setup command if no Tailwind build pipeline is detected.
 
-# Start the server
+# Start Rails and Vite
 bin/dev
 ```
 
