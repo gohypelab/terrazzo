@@ -82,11 +82,13 @@ yarn add -D @tailwindcss/cli
 ```
 
 When `@tailwindcss/cli` is installed and no Tailwind pipeline is detected, the
-Terrazzo installer adds this package script for you:
+Terrazzo installer adds this package script for you and includes it in a new
+`build` script when the app does not already define one:
 
 ```json
 {
   "scripts": {
+    "build": "vite build && tailwindcss -i app/assets/stylesheets/admin.css -o app/assets/builds/admin.css --minify",
     "build:admin:css": "tailwindcss -i app/assets/stylesheets/admin.css -o app/assets/builds/admin.css --minify"
   }
 }

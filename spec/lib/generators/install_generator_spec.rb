@@ -463,6 +463,57 @@ RSpec.describe Terrazzo::Generators::InstallGenerator do
     expect(run_tailwind_pipeline_verifier).to eq("")
   end
 
+  it "adds a Vite build script that includes generated admin CSS" do
+    create_file "package.json", JSON.pretty_generate({
+      dependencies: described_class::FRONTEND_DEPENDENCIES.to_h { |package_name| [package_name, "*"] },
+      devDependencies: {
+        "@tailwindcss/cli" => "^4.0.0",
+      },
+    })
+
+    run_install_build_script_generators
+
+    scripts = JSON.parse(read("package.json")).fetch("scripts")
+    expect(scripts.fetch("build:admin:css"))
+      .to eq("tailwindcss -i app/assets/stylesheets/admin.css -o app/assets/builds/admin.css --minify")
+    expect(scripts.fetch("build"))
+      .to eq("vite build && tailwindcss -i app/assets/stylesheets/admin.css -o app/assets/builds/admin.css --minify")
+  end
+
+  it "does not overwrite an existing package build script" do
+    create_file "package.json", JSON.pretty_generate({
+      scripts: {
+        "build" => "bin/custom-build",
+      },
+      dependencies: described_class::FRONTEND_DEPENDENCIES.to_h { |package_name| [package_name, "*"] },
+      devDependencies: {
+        "@tailwindcss/cli" => "^4.0.0",
+      },
+    })
+
+    run_install_build_script_generators
+
+    scripts = JSON.parse(read("package.json")).fetch("scripts")
+    expect(scripts.fetch("build")).to eq("bin/custom-build")
+    expect(scripts.fetch("build:admin:css"))
+      .to eq("tailwindcss -i app/assets/stylesheets/admin.css -o app/assets/builds/admin.css --minify")
+  end
+
+  it "adds a JS-only Vite build script when Tailwind is handled elsewhere" do
+    create_file "package.json", JSON.pretty_generate({
+      dependencies: described_class::FRONTEND_DEPENDENCIES.to_h { |package_name| [package_name, "*"] },
+      devDependencies: {
+        "@tailwindcss/vite" => "^4.0.0",
+      },
+    })
+
+    run_install_build_script_generators
+
+    scripts = JSON.parse(read("package.json")).fetch("scripts")
+    expect(scripts).not_to have_key("build:admin:css")
+    expect(scripts.fetch("build")).to eq("vite build")
+  end
+
   it "does not overwrite an existing Tailwind build script name" do
     create_file "package.json", JSON.pretty_generate({
       scripts: {
@@ -697,6 +748,16 @@ RSpec.describe Terrazzo::Generators::InstallGenerator do
     original_stdout = $stdout
     $stdout = StringIO.new
     described_class.new([], {}, destination_root: destination_root).create_tailwind_build_script
+  ensure
+    $stdout = original_stdout
+  end
+
+  def run_install_build_script_generators
+    original_stdout = $stdout
+    $stdout = StringIO.new
+    generator = described_class.new([], {}, destination_root: destination_root)
+    generator.create_tailwind_build_script
+    generator.create_vite_build_script
   ensure
     $stdout = original_stdout
   end

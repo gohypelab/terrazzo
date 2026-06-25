@@ -37,7 +37,8 @@ rails g terrazzo:install
 
 # Make sure app/assets/stylesheets/admin.css is compiled by Tailwind.
 # The installer adds build:admin:css when @tailwindcss/cli is installed,
-# or warns with the setup command if no Tailwind build pipeline is detected.
+# adds a package build script when one is missing, or warns with the setup
+# command if no Tailwind build pipeline is detected.
 
 # Start Rails and Vite
 bin/dev

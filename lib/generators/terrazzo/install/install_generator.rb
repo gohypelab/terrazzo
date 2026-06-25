@@ -210,6 +210,26 @@ module Terrazzo
         create_file "package.json", "#{JSON.pretty_generate(package_json)}\n", force: true
       end
 
+      def create_vite_build_script
+        return unless vite?
+        return unless package_json_file?
+
+        package_json = parsed_package_json
+        return if package_json.empty?
+
+        scripts = package_json["scripts"]
+        scripts = package_json["scripts"] = {} unless scripts.is_a?(Hash)
+        return if scripts.key?("build")
+
+        build_commands = ["vite build"]
+        if scripts[tailwind_build_script_name] == tailwind_build_command
+          build_commands << tailwind_build_command
+        end
+
+        scripts["build"] = build_commands.join(" && ")
+        create_file "package.json", "#{JSON.pretty_generate(package_json)}\n", force: true
+      end
+
       def create_components_json
         if File.exist?(File.join(destination_root, "components.json"))
           say_status :skip, "components.json already exists", :yellow
