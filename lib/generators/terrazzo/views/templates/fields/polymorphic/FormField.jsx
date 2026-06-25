@@ -13,7 +13,8 @@ export function FormField({ value, label, input, options, required }) {
 
   const filteredItems = selectedType ? groupedOptions[selectedType] ?? [] : [];
 
-  const { typeName: _typeName, ...idInputProps } = inputProps ?? {};
+  const idInputProps = { ...(inputProps ?? {}) };
+  delete idInputProps.typeName;
 
   return (
     <div className="space-y-2">

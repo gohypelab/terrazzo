@@ -17,8 +17,7 @@ export default function AdminEdit() {
     layoutActions,
     indexPath,
     showPath,
-    navigation,
-    resourceName
+    navigation
   } = useContent();
 
   return (

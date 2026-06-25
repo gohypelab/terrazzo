@@ -97,6 +97,8 @@
     "@testing-library/react": "^14.2.0",
     "@thoughtbot/superglue": "^1.0.3",
     "class-variance-authority": "^0.7.0",
+    "eslint": "^9.39.4",
+    "eslint-plugin-react": "^7.37.5",
     "jsdom": "^24.0.0",
     "lucide-react": "^0.300.0",
     "react": "^18.2.0",

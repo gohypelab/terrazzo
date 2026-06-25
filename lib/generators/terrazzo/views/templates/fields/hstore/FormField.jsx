@@ -1,10 +1,10 @@
-import React, { useState, useRef, useEffect } from "react";
+import React, { useState, useRef } from "react";
 
 import { Input } from "../../components/ui";
 import { Button } from "../../components/ui";
 import { Label } from "../../components/ui";
 
-export function FormField({ value, label, input, options, required }) {
+export function FormField({ value, label, input, required }) {
   const initialPairs = () => {
     if (value && typeof value === "object" && Object.keys(value).length > 0) {
       return Object.entries(value).map(([k, v], i) => ({ id: i, key: k, value: v ?? "" }));

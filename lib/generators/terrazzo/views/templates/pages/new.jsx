@@ -14,8 +14,7 @@ export default function AdminNew() {
     errors,
     layoutActions,
     indexPath,
-    navigation,
-    resourceName
+    navigation
   } = useContent();
 
   return (

@@ -18,7 +18,6 @@ export default function AdminShow() {
     editPath,
     deletePath,
     indexPath,
-    resourceName,
     pluralResourceName,
     navigation
   } = useContent();
