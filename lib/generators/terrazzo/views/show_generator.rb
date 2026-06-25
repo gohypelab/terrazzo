@@ -22,7 +22,7 @@ module Terrazzo
 
           if resource.present?
             eject_json_props
-            copy_file "pages/show.jsx", "app/views/#{namespace_name}/#{resource_path}/show.jsx"
+            copy_resource_page_file "pages/show.jsx", "app/views/#{namespace_name}/#{resource_path}/show.jsx"
             register_page_mapping("show")
           else
             copy_file_over_generated "pages/show.jsx", "app/views/#{namespace_name}/application/show.jsx",

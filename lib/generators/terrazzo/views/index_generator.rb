@@ -22,8 +22,8 @@ module Terrazzo
 
           if resource.present?
             eject_json_props
-            copy_file "pages/index.jsx", "app/views/#{namespace_name}/#{resource_path}/index.jsx"
-            copy_file_unless_exists "pages/_collection.jsx", "app/views/#{namespace_name}/#{resource_path}/_collection.jsx"
+            copy_resource_page_file "pages/index.jsx", "app/views/#{namespace_name}/#{resource_path}/index.jsx"
+            copy_resource_page_file_unless_exists "pages/_collection.jsx", "app/views/#{namespace_name}/#{resource_path}/_collection.jsx"
             register_page_mapping("index")
           else
             copy_file_over_generated "pages/index.jsx", "app/views/#{namespace_name}/application/index.jsx",

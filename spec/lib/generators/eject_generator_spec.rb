@@ -243,6 +243,35 @@ RSpec.describe Terrazzo::Generators::EjectGenerator do
     expect(manifest).to include("'admin/payments/edit': PaymentEdit,")
   end
 
+  it "builds JavaScript after namespaced resource-specific view generation" do
+    run_generator(Terrazzo::Generators::ViewsGenerator, [])
+
+    run_generator(Terrazzo::Generators::Views::IndexGenerator, ["Catalog::Product"])
+
+    create_node_package_link
+    create_file "namespaced_resource_entry.jsx", <<~JS
+      import "./app/views/admin/fields/index.js";
+      import "./app/views/admin/components/index.js";
+      import "./app/views/admin/components/ui/index.js";
+      import { generatedPageMapping } from "./app/javascript/admin/generated_page_mapping.js";
+      import CatalogProductIndex from "./app/views/admin/catalog/products/index.jsx";
+
+      console.log(generatedPageMapping, CatalogProductIndex);
+    JS
+
+    expect_bundle_to_succeed("namespaced_resource_entry.jsx")
+    expect(File).to exist(File.join(destination_root, "app/views/admin/catalog/products/index.jsx"))
+    expect(File).to exist(File.join(destination_root, "app/views/admin/catalog/products/index.json.props"))
+    expect(File).to exist(File.join(destination_root, "app/views/admin/catalog/products/_collection.jsx"))
+    expect(read("app/views/admin/catalog/products/index.jsx")).to include('from "../../components"')
+    expect(read("app/views/admin/catalog/products/index.jsx")).to include('from "../../components/ui"')
+    expect(read("app/views/admin/catalog/products/_collection.jsx")).to include('from "../../components"')
+
+    manifest = read("app/javascript/admin/generated_page_mapping.js")
+    expect(manifest).to include('import CatalogProductIndex from "../../views/admin/catalog/products/index";')
+    expect(manifest).to include("'admin/catalog/products/index': CatalogProductIndex,")
+  end
+
   it "builds JavaScript after standalone resource-specific view generation" do
     run_generator(Terrazzo::Generators::Views::IndexGenerator, ["Order"])
     run_generator(Terrazzo::Generators::Views::ShowGenerator, ["Order"])

@@ -151,6 +151,7 @@ rails g terrazzo:views:show User
 rails g terrazzo:views:index Order
 rails g terrazzo:views:edit Product
 rails g terrazzo:views:new BlogPost
+rails g terrazzo:views:index Catalog::Product
 ```
 
 When ejecting for a resource, the generator creates a complete set of files:

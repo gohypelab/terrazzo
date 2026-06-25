@@ -26,6 +26,26 @@ module Terrazzo
           copy_file source, destination
         end
 
+        def copy_resource_page_file(source, destination)
+          before = read_destination(destination)
+          generated_before = before == read_template(source)
+
+          copy_file source, destination
+          after = read_destination(destination)
+          rewrite_resource_page_imports(destination) if after && (before.nil? || after != before || generated_before)
+        end
+
+        def copy_resource_page_file_unless_exists(source, destination)
+          if File.exist?(File.join(destination_root, destination))
+            rewrite_resource_page_imports(destination) if read_destination(destination) == read_template(source)
+            say_status :skip, destination, :yellow
+            return
+          end
+
+          copy_file source, destination
+          rewrite_resource_page_imports(destination)
+        end
+
         def generated_file?(destination, generated_content)
           path = File.join(destination_root, destination)
           File.exist?(path) && File.read(path) == generated_content
@@ -55,6 +75,34 @@ module Terrazzo
               end
             end
           RUBY
+        end
+
+        def rewrite_resource_page_imports(destination)
+          path = File.join(destination_root, destination)
+          source = File.read(path)
+          prefix = page_barrel_import_prefix(destination)
+          rewritten = source.gsub(/from "\.\.\/(fields|components(?:\/ui)?)"/) do
+            %(from "#{prefix}#{Regexp.last_match(1)}")
+          end
+
+          File.write(path, rewritten) if rewritten != source
+        end
+
+        def read_destination(destination)
+          path = File.join(destination_root, destination)
+          File.read(path) if File.exist?(path)
+        end
+
+        def read_template(source)
+          File.read(File.join(self.class.source_root, source))
+        end
+
+        def page_barrel_import_prefix(destination)
+          relative_path = destination.delete_prefix("app/views/#{namespace_name}/")
+          directory = File.dirname(relative_path)
+          depth = directory.split("/").reject(&:empty?).length
+
+          "../" * depth
         end
       end
     end
