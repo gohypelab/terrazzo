@@ -26,7 +26,7 @@ npm install terrazzo
 npm install @radix-ui/react-avatar @radix-ui/react-dialog @radix-ui/react-dropdown-menu \
   @radix-ui/react-label @radix-ui/react-popover @radix-ui/react-select \
   @radix-ui/react-separator @radix-ui/react-slot @radix-ui/react-tooltip \
-  class-variance-authority lucide-react tailwindcss
+  class-variance-authority lucide-react tailwindcss@latest
 npm install --save-dev @tailwindcss/cli # if your app does not already compile Tailwind
 
 # Install Terrazzo — generates admin namespace, app barrels,

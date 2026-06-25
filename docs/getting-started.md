@@ -61,16 +61,16 @@ The `terrazzo` npm package provides the default React pages/components, utilitie
 
 ## 5. Install frontend dependencies
 
-Terrazzo's default and ejected components use shadcn/ui patterns, so you'll need these packages:
+Terrazzo's default and ejected components use shadcn/ui patterns, so you'll need these packages. The generated admin CSS uses Tailwind CSS 4 syntax (`@source`, `@theme`, and `@custom-variant`), so install Tailwind 4 or newer:
 
 ```bash
 yarn add @radix-ui/react-avatar @radix-ui/react-dialog @radix-ui/react-dropdown-menu \
   @radix-ui/react-label @radix-ui/react-popover @radix-ui/react-select \
   @radix-ui/react-separator @radix-ui/react-slot @radix-ui/react-tooltip \
-  class-variance-authority lucide-react tailwindcss
+  class-variance-authority lucide-react tailwindcss@latest
 ```
 
-The install generator also checks `package.json` and prints the exact package-manager command if any required frontend packages are missing.
+The install generator also checks `package.json` and prints the exact package-manager command if any required frontend packages are missing or pinned below Terrazzo's supported versions.
 
 Terrazzo also generates `app/assets/stylesheets/admin.css`, which must be
 compiled by Tailwind before it is served. If your app does not already compile

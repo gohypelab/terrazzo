@@ -1,6 +1,7 @@
 require "json"
 require "pathname"
 require "rails/generators"
+require "terrazzo/version"
 
 module Terrazzo
   module Generators
@@ -27,6 +28,26 @@ module Terrazzo
         lucide-react
         tailwindcss
       ].freeze
+      FRONTEND_DEPENDENCY_MINIMUMS = {
+        "terrazzo" => Terrazzo::VERSION,
+        "react" => "18.0.0",
+        "react-dom" => "18.0.0",
+        "react-redux" => "8.0.0",
+        "@reduxjs/toolkit" => "1.9.0",
+        "@thoughtbot/superglue" => "1.0.0",
+        "@radix-ui/react-avatar" => "1.0.0",
+        "@radix-ui/react-dialog" => "1.0.0",
+        "@radix-ui/react-dropdown-menu" => "2.0.0",
+        "@radix-ui/react-label" => "2.0.0",
+        "@radix-ui/react-popover" => "1.0.0",
+        "@radix-ui/react-select" => "2.0.0",
+        "@radix-ui/react-separator" => "1.0.0",
+        "@radix-ui/react-slot" => "1.0.0",
+        "@radix-ui/react-tooltip" => "1.0.0",
+        "class-variance-authority" => "0.7.0",
+        "lucide-react" => "0.300.0",
+        "tailwindcss" => "4.0.0",
+      }.freeze
       VITE_FRONTEND_DEPENDENCIES = %w[
         vite
         vite-plugin-ruby
@@ -269,11 +290,21 @@ module Terrazzo
 
       def verify_frontend_dependencies
         missing = missing_frontend_dependencies
-        return if missing.empty?
+        outdated = outdated_frontend_dependencies
 
-        say_status :warning, "Missing frontend dependencies required by Terrazzo:", :yellow
-        say "  #{missing.join(" ")}"
-        say "Run: #{frontend_install_command(missing)}"
+        if missing.any?
+          say_status :warning, "Missing frontend dependencies required by Terrazzo:", :yellow
+          say "  #{missing.join(" ")}"
+          say "Run: #{frontend_install_command(missing)}"
+        end
+
+        return if outdated.empty?
+
+        say_status :warning, "Frontend dependencies below Terrazzo's supported versions:", :yellow
+        outdated.each do |dependency|
+          say "  #{dependency[:name]} #{dependency[:requirement]} (requires >= #{dependency[:minimum]})"
+        end
+        say "Run: #{frontend_install_command(outdated.map { |dependency| "#{dependency[:name]}@latest" })}"
       end
 
       def verify_tailwind_build_pipeline
@@ -455,6 +486,56 @@ module Terrazzo
       def missing_frontend_dependencies
         installed = package_json_dependencies
         FRONTEND_DEPENDENCIES.reject { |package_name| installed.key?(package_name) }
+      end
+
+      def outdated_frontend_dependencies
+        installed = package_json_dependencies
+        FRONTEND_DEPENDENCY_MINIMUMS.filter_map do |package_name, minimum|
+          requirement = installed[package_name]
+          next if requirement.nil?
+          next if dependency_requirement_satisfies_minimum?(requirement, minimum)
+
+          {
+            name: package_name,
+            requirement: requirement,
+            minimum: minimum,
+          }
+        end
+      end
+
+      def dependency_requirement_satisfies_minimum?(requirement, minimum)
+        requirement = requirement.to_s.strip
+        return true if requirement.blank? || requirement == "*" || requirement.downcase == "latest"
+        return true if non_registry_dependency_requirement?(requirement)
+
+        minimum_version = Gem::Version.new(minimum)
+        requirement.split("||").any? do |range|
+          floor = dependency_requirement_floor(range)
+          floor && Gem::Version.new(floor) >= minimum_version
+        end
+      end
+
+      def dependency_requirement_floor(range)
+        range
+          .split(/[,\s]+/)
+          .filter_map { |token| dependency_requirement_token_version(token) }
+          .first
+      end
+
+      def dependency_requirement_token_version(token)
+        return nil if token.blank? || token.start_with?("<")
+
+        match = token.match(/\A(?:>=|>|=|~>|\^|~)?v?(\d+)(?:\.(\d+|x|\*))?(?:\.(\d+|x|\*))?(?:[-+][0-9A-Za-z.-]+)?\z/i)
+        return nil unless match
+
+        [match[1], match[2], match[3]]
+          .map { |part| part.presence&.then { |value| %w[x *].include?(value.downcase) ? "0" : value } || "0" }
+          .join(".")
+      end
+
+      def non_registry_dependency_requirement?(requirement)
+        requirement.match?(/\A(?:file|link|workspace|git|github|http|https|npm):/) ||
+          requirement.match?(/\Agit\+/)
       end
 
       def missing_vite_frontend_dependencies

@@ -422,6 +422,39 @@ RSpec.describe Terrazzo::Generators::InstallGenerator do
     expect(output).not_to include("terrazzo @radix-ui/react-avatar")
   end
 
+  it "warns when frontend dependencies are pinned below supported versions" do
+    create_file "package.json", JSON.pretty_generate({
+      dependencies: described_class::FRONTEND_DEPENDENCIES.to_h { |package_name| [package_name, "*"] }.merge({
+        "terrazzo" => "^0.5.0",
+        "react" => "^17.0.0",
+        "react-dom" => "18.x",
+        "tailwindcss" => "^3.4.0",
+      }),
+    })
+    create_file "yarn.lock", ""
+
+    output = run_dependency_verifier
+
+    expect(output).to include("Frontend dependencies below Terrazzo's supported versions")
+    expect(output).to include("terrazzo ^0.5.0 (requires >= 0.6.0)")
+    expect(output).to include("react ^17.0.0 (requires >= 18.0.0)")
+    expect(output).to include("tailwindcss ^3.4.0 (requires >= 4.0.0)")
+    expect(output).not_to include("react-dom 18.x")
+    expect(output).to include("Run: yarn add terrazzo@latest react@latest tailwindcss@latest")
+  end
+
+  it "does not warn for unpinned or non-registry frontend dependency specs" do
+    create_file "package.json", JSON.pretty_generate({
+      dependencies: described_class::FRONTEND_DEPENDENCIES.to_h { |package_name| [package_name, "*"] }.merge({
+        "terrazzo" => "file:../terrazzo/npm",
+        "react" => "latest",
+        "tailwindcss" => "workspace:*",
+      }),
+    })
+
+    expect(run_dependency_verifier).to eq("")
+  end
+
   it "does not warn when package.json contains the required frontend dependencies" do
     create_file "package.json", JSON.pretty_generate({
       dependencies: described_class::FRONTEND_DEPENDENCIES.to_h { |package_name| [package_name, "*"] },
@@ -624,9 +657,13 @@ RSpec.describe Terrazzo::Generators::InstallGenerator do
   it "keeps the install verifier in sync with package peers and generated CSS dependencies" do
     package_json = JSON.parse(File.read(File.expand_path("../../../npm/package.json", __dir__)))
     expected = ["terrazzo"] + package_json.fetch("peerDependencies").keys + ["tailwindcss"]
+    minimums = package_json.fetch("peerDependencies").transform_values { |requirement| requirement.delete_prefix(">=") }
+    minimums["terrazzo"] = package_json.fetch("version")
+    minimums["tailwindcss"] = "4.0.0"
 
     expect(described_class::FRONTEND_DEPENDENCIES.first).to eq("terrazzo")
     expect(described_class::FRONTEND_DEPENDENCIES).to match_array(expected)
+    expect(described_class::FRONTEND_DEPENDENCY_MINIMUMS).to eq(minimums)
   end
 
   it "lists every package imported by generated app-owned templates" do
