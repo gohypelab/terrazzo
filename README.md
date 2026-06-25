@@ -62,21 +62,21 @@ Full docs at **[gohypelab.github.io/terrazzo](https://gohypelab.github.io/terraz
 
 Terrazzo generates Show, Edit, and Destroy action buttons for each row on index pages and has_many tables on show pages.
 
-Override `collection_item_actions` in the resource dashboard to customize actions per resource type:
+Override `collection_item_actions` in the resource dashboard to add or replace actions per resource type. Use `super` when you want to keep the default Show/Edit/Destroy actions:
 
 ```ruby
 class OrderDashboard < Terrazzo::BaseDashboard
   # ...
 
   def collection_item_actions(resource, view)
-    [
-      { label: "View Order", url: view.admin_order_path(resource) },
-      { label: "Edit", url: view.edit_admin_order_path(resource) },
+    super + [
       { label: "Invoice", url: view.invoice_admin_order_path(resource) },
     ]
   end
 end
 ```
+
+Return a new array instead when you want to fully replace the default actions.
 
 The `view` argument gives access to route helpers. Each action hash supports `label` (String), `url` (String), `method` (optional, e.g. `"delete"`), `confirm` (optional confirmation message for non-GET form actions), and `sg_visit` (set to `false` to bypass SPA navigation).
 
