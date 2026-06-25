@@ -247,6 +247,8 @@ RSpec.describe Terrazzo::Generators::EjectGenerator do
     run_generator(Terrazzo::Generators::ViewsGenerator, [])
 
     run_generator(Terrazzo::Generators::Views::IndexGenerator, ["Catalog::Product"])
+    run_generator(Terrazzo::Generators::Views::ShowGenerator, ["Catalog::Product"])
+    run_generator(Terrazzo::Generators::Views::NewGenerator, ["Catalog::Product", "--with-counterpart"])
 
     create_node_package_link
     create_file "namespaced_resource_entry.jsx", <<~JS
@@ -255,21 +257,46 @@ RSpec.describe Terrazzo::Generators::EjectGenerator do
       import "./app/views/admin/components/ui/index.js";
       import { generatedPageMapping } from "./app/javascript/admin/generated_page_mapping.js";
       import CatalogProductIndex from "./app/views/admin/catalog/products/index.jsx";
+      import CatalogProductShow from "./app/views/admin/catalog/products/show.jsx";
+      import CatalogProductNew from "./app/views/admin/catalog/products/new.jsx";
+      import CatalogProductEdit from "./app/views/admin/catalog/products/edit.jsx";
 
-      console.log(generatedPageMapping, CatalogProductIndex);
+      console.log(generatedPageMapping, CatalogProductIndex, CatalogProductShow, CatalogProductNew, CatalogProductEdit);
     JS
 
     expect_bundle_to_succeed("namespaced_resource_entry.jsx")
     expect(File).to exist(File.join(destination_root, "app/views/admin/catalog/products/index.jsx"))
+    expect(File).to exist(File.join(destination_root, "app/views/admin/catalog/products/show.jsx"))
+    expect(File).to exist(File.join(destination_root, "app/views/admin/catalog/products/new.jsx"))
+    expect(File).to exist(File.join(destination_root, "app/views/admin/catalog/products/edit.jsx"))
     expect(File).to exist(File.join(destination_root, "app/views/admin/catalog/products/index.json.props"))
+    expect(File).to exist(File.join(destination_root, "app/views/admin/catalog/products/show.json.props"))
+    expect(File).to exist(File.join(destination_root, "app/views/admin/catalog/products/new.json.props"))
+    expect(File).to exist(File.join(destination_root, "app/views/admin/catalog/products/edit.json.props"))
     expect(File).to exist(File.join(destination_root, "app/views/admin/catalog/products/_collection.jsx"))
+    expect(File).to exist(File.join(destination_root, "app/views/admin/catalog/products/_form.jsx"))
     expect(read("app/views/admin/catalog/products/index.jsx")).to include('from "../../components"')
     expect(read("app/views/admin/catalog/products/index.jsx")).to include('from "../../components/ui"')
+    expect(read("app/views/admin/catalog/products/show.jsx")).to include('from "../../fields"')
+    expect(read("app/views/admin/catalog/products/show.jsx")).to include('from "../../components"')
+    expect(read("app/views/admin/catalog/products/show.jsx")).to include('from "../../components/ui"')
+    expect(read("app/views/admin/catalog/products/new.jsx")).to include('from "../../components"')
+    expect(read("app/views/admin/catalog/products/new.jsx")).to include('from "../../components/ui"')
+    expect(read("app/views/admin/catalog/products/edit.jsx")).to include('from "../../components"')
+    expect(read("app/views/admin/catalog/products/edit.jsx")).to include('from "../../components/ui"')
     expect(read("app/views/admin/catalog/products/_collection.jsx")).to include('from "../../components"')
+    expect(read("app/views/admin/catalog/products/_form.jsx")).to include('from "../../fields"')
+    expect(read("app/views/admin/catalog/products/_form.jsx")).to include('from "../../components/ui"')
 
     manifest = read("app/javascript/admin/generated_page_mapping.js")
     expect(manifest).to include('import CatalogProductIndex from "../../views/admin/catalog/products/index";')
+    expect(manifest).to include('import CatalogProductShow from "../../views/admin/catalog/products/show";')
+    expect(manifest).to include('import CatalogProductNew from "../../views/admin/catalog/products/new";')
+    expect(manifest).to include('import CatalogProductEdit from "../../views/admin/catalog/products/edit";')
     expect(manifest).to include("'admin/catalog/products/index': CatalogProductIndex,")
+    expect(manifest).to include("'admin/catalog/products/show': CatalogProductShow,")
+    expect(manifest).to include("'admin/catalog/products/new': CatalogProductNew,")
+    expect(manifest).to include("'admin/catalog/products/edit': CatalogProductEdit,")
   end
 
   it "builds JavaScript after standalone resource-specific view generation" do
