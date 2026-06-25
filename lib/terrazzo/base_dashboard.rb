@@ -230,7 +230,7 @@ module Terrazzo
     end
 
     def csv_export_url(view)
-      query = view.request.query_parameters.except("_page")
+      query = view.request.query_parameters.except("_page", "per_page")
       view.url_for(query.merge(format: :csv, only_path: true))
     end
 

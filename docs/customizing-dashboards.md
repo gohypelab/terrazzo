@@ -278,7 +278,7 @@ Layout actions use the same action hash shape as row and toolbar actions and ren
 
 ## CSV Exports
 
-The default CSV export uses the filtered, searched, and sorted index relation, exports all matching rows, and uses `COLLECTION_ATTRIBUTES` as columns.
+The default CSV export uses the filtered, searched, and sorted index relation, exports all matching rows, and uses `COLLECTION_ATTRIBUTES` as columns. Pagination params such as `_page` and `per_page` are omitted from the export URL.
 
 Customize the export with dashboard methods:
 

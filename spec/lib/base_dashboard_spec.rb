@@ -186,7 +186,7 @@ RSpec.describe Terrazzo::BaseDashboard do
 
   describe "#collection_toolbar_actions" do
     it "includes a CSV export action by default when a view context is available" do
-      request = double("request", query_parameters: { "search" => "alice", "_page" => "2" })
+      request = double("request", query_parameters: { "search" => "alice", "_page" => "2", "per_page" => "100" })
       view = double("view", request: request)
       allow(view).to receive(:url_for)
         .with({ "search" => "alice", format: :csv, only_path: true })
