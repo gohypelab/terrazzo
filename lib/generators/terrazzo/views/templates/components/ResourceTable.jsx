@@ -1,9 +1,9 @@
 import React, { useContext } from "react";
 import { NavigationContext } from "@thoughtbot/superglue";
 
-import { SortableHeader } from "./SortableHeader";
-import { CollectionItemActions } from "./CollectionItemActions";
-import { cn } from "terrazzo";
+import { SortableHeader as DefaultSortableHeader } from "./SortableHeader";
+import { CollectionItemActions as DefaultCollectionItemActions } from "./CollectionItemActions";
+import { getComponent, cn } from "terrazzo";
 import { FieldRenderer } from "../fields";
 import {
   Table,
@@ -16,6 +16,8 @@ import {
 
 export function ResourceTable({ headers, rows, emptyState, showActions = true }) {
   const { visit } = useContext(NavigationContext);
+  const SortableHeader = getComponent("SortableHeader") || DefaultSortableHeader;
+  const CollectionItemActions = getComponent("CollectionItemActions") || DefaultCollectionItemActions;
   const columnCount = headers.length + (showActions ? 1 : 0);
 
   const handleRowClick = (e, showPath) => {

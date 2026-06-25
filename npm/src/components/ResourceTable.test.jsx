@@ -1,8 +1,15 @@
 import React from "react";
 import { render, screen } from "@testing-library/react";
 
+import { registerComponent } from "../componentRegistry";
 import { registerFieldType } from "terrazzo/fields";
 import { ResourceTable } from "./ResourceTable";
+
+function resetComponentRegistry() {
+  Object.keys(globalThis.__terrazzoComponentRegistry || {}).forEach((key) => {
+    delete globalThis.__terrazzoComponentRegistry[key];
+  });
+}
 
 function resetFieldRegistry() {
   Object.keys(globalThis.__terrazzoFieldRegistry || {}).forEach((key) => {
@@ -11,8 +18,15 @@ function resetFieldRegistry() {
 }
 
 describe("ResourceTable", () => {
-  beforeEach(resetFieldRegistry);
-  afterEach(resetFieldRegistry);
+  beforeEach(() => {
+    resetComponentRegistry();
+    resetFieldRegistry();
+  });
+
+  afterEach(() => {
+    resetComponentRegistry();
+    resetFieldRegistry();
+  });
 
   it("applies serialized row option classes while preserving row click styling", () => {
     const { container } = render(
@@ -93,5 +107,50 @@ describe("ResourceTable", () => {
     );
 
     expect(screen.getByTestId("custom-status-field")).toHaveTextContent("Overdue:danger");
+  });
+
+  it("renders registered nested table components", () => {
+    function CustomSortableHeader({ label }) {
+      return <th data-testid="custom-sortable-header">{label}</th>;
+    }
+
+    function CustomCollectionItemActions({ actions }) {
+      return (
+        <div data-testid="custom-item-actions">
+          {actions.map((action) => action.label).join(", ")}
+        </div>
+      );
+    }
+
+    registerComponent("SortableHeader", CustomSortableHeader);
+    registerComponent("CollectionItemActions", CustomCollectionItemActions);
+
+    render(
+      <ResourceTable
+        headers={[
+          {
+            attribute: "name",
+            label: "Customer",
+            sortable: false,
+          },
+        ]}
+        rows={[
+          {
+            id: "customer-1",
+            cells: [
+              {
+                attribute: "name",
+                fieldType: "string",
+                value: "Alice",
+              },
+            ],
+            collectionItemActions: [{ label: "Archive", url: "/admin/customers/1/archive" }],
+          },
+        ]}
+      />
+    );
+
+    expect(screen.getByTestId("custom-sortable-header")).toHaveTextContent("Customer");
+    expect(screen.getByTestId("custom-item-actions")).toHaveTextContent("Archive");
   });
 });

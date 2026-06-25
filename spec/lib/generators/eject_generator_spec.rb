@@ -956,6 +956,8 @@ RSpec.describe Terrazzo::Generators::EjectGenerator do
   def normalize_ejected_component_source(source)
     source
       .gsub(/import \{ getComponent \} from "\.\.\/componentRegistry";\n/, "")
+      .gsub(/import \{ getComponent \} from "terrazzo";\n/, "")
+      .gsub(/import \{ getComponent, cn \} from "terrazzo";/, 'import { cn } from "terrazzo";')
       .gsub(/ as Default([A-Za-z0-9_]+)/, "")
       .gsub(/  const [A-Za-z0-9_]+ = getComponent\("[A-Za-z0-9_]+"\) \|\| Default[A-Za-z0-9_]+;\n/, "")
       .gsub(/from "\.\.\/utils"/, 'from "terrazzo"')
