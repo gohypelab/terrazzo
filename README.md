@@ -27,7 +27,7 @@ npm install @radix-ui/react-avatar @radix-ui/react-dialog @radix-ui/react-dropdo
   @radix-ui/react-label @radix-ui/react-popover @radix-ui/react-select \
   @radix-ui/react-separator @radix-ui/react-slot @radix-ui/react-tooltip \
   class-variance-authority lucide-react tailwindcss@latest
-npm install --save-dev @tailwindcss/cli # if your app does not already compile Tailwind
+npm install --save-dev @tailwindcss/cli@latest # if your app does not already compile Tailwind
 
 # Install Terrazzo — generates admin namespace, app barrels,
 # shadcn metadata/path aliases, and dashboards.
@@ -36,7 +36,7 @@ npm install --save-dev @tailwindcss/cli # if your app does not already compile T
 rails g terrazzo:install
 
 # Make sure app/assets/stylesheets/admin.css is compiled by Tailwind.
-# The installer adds build:admin:css when @tailwindcss/cli is installed,
+# The installer adds build:admin:css when @tailwindcss/cli 4+ is installed,
 # adds a package build script when one is missing, or warns with the setup
 # command if no Tailwind build pipeline is detected.
 

@@ -8,26 +8,31 @@ module Terrazzo
     class InstallGenerator < Rails::Generators::Base
       source_root File.expand_path("templates", __dir__)
 
-      FRONTEND_DEPENDENCIES = %w[
-        terrazzo
-        react
-        react-dom
-        react-redux
-        @reduxjs/toolkit
-        @thoughtbot/superglue
-        @radix-ui/react-avatar
-        @radix-ui/react-dialog
-        @radix-ui/react-dropdown-menu
-        @radix-ui/react-label
-        @radix-ui/react-popover
-        @radix-ui/react-select
-        @radix-ui/react-separator
-        @radix-ui/react-slot
-        @radix-ui/react-tooltip
-        class-variance-authority
-        lucide-react
-        tailwindcss
-      ].freeze
+      TAILWIND_PACKAGE_NAME = "tailwindcss"
+      TAILWIND_CLI_PACKAGE_NAME = "@tailwindcss/cli"
+      TAILWIND_MINIMUM_VERSION = "4.0.0"
+
+      FRONTEND_DEPENDENCIES = (
+        %w[
+          terrazzo
+          react
+          react-dom
+          react-redux
+          @reduxjs/toolkit
+          @thoughtbot/superglue
+          @radix-ui/react-avatar
+          @radix-ui/react-dialog
+          @radix-ui/react-dropdown-menu
+          @radix-ui/react-label
+          @radix-ui/react-popover
+          @radix-ui/react-select
+          @radix-ui/react-separator
+          @radix-ui/react-slot
+          @radix-ui/react-tooltip
+          class-variance-authority
+          lucide-react
+        ] + [TAILWIND_PACKAGE_NAME]
+      ).freeze
       FRONTEND_DEPENDENCY_MINIMUMS = {
         "terrazzo" => Terrazzo::VERSION,
         "react" => "18.0.0",
@@ -46,7 +51,7 @@ module Terrazzo
         "@radix-ui/react-tooltip" => "1.0.0",
         "class-variance-authority" => "0.7.0",
         "lucide-react" => "0.300.0",
-        "tailwindcss" => "4.0.0",
+        TAILWIND_PACKAGE_NAME => TAILWIND_MINIMUM_VERSION,
       }.freeze
       VITE_FRONTEND_DEPENDENCIES = %w[
         vite
@@ -219,6 +224,7 @@ module Terrazzo
         return unless package_json_file?
         return if tailwind_build_pipeline?
         return unless tailwind_cli_package?
+        return unless tailwind_cli_supported?
 
         package_json = parsed_package_json
         return if package_json.empty?
@@ -308,12 +314,19 @@ module Terrazzo
       end
 
       def verify_tailwind_build_pipeline
+        if tailwind_cli_package? && !tailwind_cli_supported?
+          say_status :warning, "Installed #{TAILWIND_CLI_PACKAGE_NAME} is below Terrazzo's supported version.", :yellow
+          say "Terrazzo generated app/assets/stylesheets/#{namespace_name}.css with Tailwind #{TAILWIND_MINIMUM_VERSION}+ syntax."
+          say "Run: #{package_manager_add_dev_command} #{TAILWIND_CLI_PACKAGE_NAME}@latest"
+          return
+        end
+
         return if tailwind_build_pipeline?
 
         say_status :warning, "Terrazzo generated app/assets/stylesheets/#{namespace_name}.css but no Tailwind build pipeline was detected.", :yellow
         say "Make sure your app compiles that file with Tailwind before serving the admin UI."
         say "For package.json scripts, install the Tailwind CLI and add a build script:"
-        say "  #{package_manager_add_dev_command} @tailwindcss/cli"
+        say "  #{package_manager_add_dev_command} #{TAILWIND_CLI_PACKAGE_NAME}@latest"
         say %(  "#{tailwind_build_script_name}": "#{tailwind_build_command}")
       end
 
@@ -607,7 +620,12 @@ module Terrazzo
       end
 
       def tailwind_cli_package?
-        package_json_dependencies.key?("@tailwindcss/cli")
+        package_json_dependencies.key?(TAILWIND_CLI_PACKAGE_NAME)
+      end
+
+      def tailwind_cli_supported?
+        requirement = package_json_dependencies[TAILWIND_CLI_PACKAGE_NAME]
+        requirement.present? && dependency_requirement_satisfies_minimum?(requirement, TAILWIND_MINIMUM_VERSION)
       end
 
       def tailwind_package_script?

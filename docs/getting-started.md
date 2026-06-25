@@ -78,12 +78,12 @@ Tailwind CSS through Vite, cssbundling, or `tailwindcss-rails`, install the
 Tailwind CLI before running the Terrazzo installer:
 
 ```bash
-yarn add -D @tailwindcss/cli
+yarn add -D @tailwindcss/cli@latest
 ```
 
-When `@tailwindcss/cli` is installed and no Tailwind pipeline is detected, the
-Terrazzo installer adds this package script for you and includes it in a new
-`build` script when the app does not already define one:
+When `@tailwindcss/cli` 4 or newer is installed and no Tailwind pipeline is
+detected, the Terrazzo installer adds this package script for you and includes
+it in a new `build` script when the app does not already define one:
 
 ```json
 {
