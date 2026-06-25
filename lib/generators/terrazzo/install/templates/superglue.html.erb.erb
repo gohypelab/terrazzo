@@ -8,7 +8,7 @@
   <%%= yield :head %>
 <% if vite? -%>
   <%%= vite_client_tag %>
-  <%%= vite_javascript_tag "<%= namespace_name %>/application" %>
+  <%%= vite_javascript_tag "<%= vite_entry_point_tag_name %>" %>
 <% else -%>
   <%%= javascript_include_tag "<%= namespace_name %>", type: "module" %>
 <% end -%>

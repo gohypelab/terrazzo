@@ -188,13 +188,27 @@ RSpec.describe Terrazzo::Generators::InstallGenerator do
 
     html_layout = read("app/views/layouts/admin/application.html.erb")
     expect(html_layout).to include("vite_client_tag")
-    expect(html_layout).to include('vite_javascript_tag "admin/application"')
+    expect(html_layout).to include('vite_javascript_tag "entrypoints/admin/application.jsx"')
     expect(html_layout).not_to include("vite_react_refresh_tag")
 
     json_layout = read("app/views/layouts/admin/application.json.props")
     expect(json_layout).to include('json.navigation(partial: ["admin/application/navigation"])')
     expect(json_layout).to include("json.componentIdentifier terrazzo_page_identifier")
     expect(json_layout).to include("json.slices")
+  end
+
+  it "generates a Vite admin HTML layout for configured entrypoint directories" do
+    create_file "config/vite.json", JSON.pretty_generate({
+      "all" => {
+        "sourceCodeDir" => "app/javascript",
+        "entrypointsDir" => ".",
+      },
+    })
+
+    run_install_layout_generators
+
+    html_layout = read("app/views/layouts/admin/application.html.erb")
+    expect(html_layout).to include('vite_javascript_tag "admin/application.jsx"')
   end
 
   it "generates an esbuild admin HTML layout" do

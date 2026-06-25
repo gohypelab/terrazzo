@@ -251,6 +251,10 @@ module Terrazzo
         clean_relative_path(File.join(vite_source_code_dir, vite_entrypoints_dir, namespace_name, "application.jsx"))
       end
 
+      def vite_entry_point_tag_name
+        clean_relative_path(File.join(vite_entrypoints_dir, namespace_name, "application.jsx"))
+      end
+
       def vite_entry_point_directory
         File.dirname(vite_entry_point_path)
       end
