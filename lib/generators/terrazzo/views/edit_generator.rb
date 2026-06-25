@@ -52,6 +52,7 @@ module Terrazzo
           else
             "app/views/#{namespace_name}/application/new.jsx"
           end
+          return true if generated_file?(new_path, generated_page_stub("new"))
           return false if File.exist?(new_path)
           return options[:with_counterpart] unless options[:with_counterpart].nil?
 

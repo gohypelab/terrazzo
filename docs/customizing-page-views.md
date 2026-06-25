@@ -37,7 +37,7 @@ rails g terrazzo:views:index Product
 rails g terrazzo:views:edit Product
 ```
 
-Each generator ejects a page component and a `.json.props` that calls the gem's base partial. Index also copies `_collection.jsx`; edit and new also copy `_form.jsx`:
+Each generator ejects a page component and a `.json.props` that calls the gem's base partial. Index also copies `_collection.jsx`; edit and new also copy `_form.jsx`. When the matching form page is still Terrazzo's generated package stub, form-page ejection also replaces that counterpart so both pages use the same app-owned form:
 
 ```ruby
 # app/views/admin/products/show.json.props

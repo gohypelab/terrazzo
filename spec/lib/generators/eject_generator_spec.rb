@@ -75,6 +75,16 @@ RSpec.describe Terrazzo::Generators::EjectGenerator do
     expect(read("app/views/admin/application/edit.jsx")).to include("export default function AdminEdit")
   end
 
+  it "keeps form page ejection paired when the counterpart is still a generated stub" do
+    run_generator(Terrazzo::Generators::ViewsGenerator, [])
+
+    run_generator(described_class, ["pages/edit"])
+
+    expect(read("app/views/admin/application/edit.jsx")).to include("export default function AdminEdit")
+    expect(read("app/views/admin/application/new.jsx")).to include("export default function AdminNew")
+    expect(read("app/views/admin/application/_form.jsx")).to include("export function AdminForm")
+  end
+
   it "replaces the installed navigation partial without a conflict prompt" do
     run_generator(Terrazzo::Generators::ViewsGenerator, [])
 
@@ -101,6 +111,16 @@ RSpec.describe Terrazzo::Generators::EjectGenerator do
     expect(read("app/views/admin/application/show.jsx")).to include("export default function AdminShow")
     expect(read("app/views/admin/application/new.jsx")).to include("export default function AdminNew")
     expect(read("app/views/admin/application/edit.jsx")).to include("export default function AdminEdit")
+  end
+
+  it "keeps legacy form page generators paired over installed stubs" do
+    run_generator(Terrazzo::Generators::ViewsGenerator, [])
+
+    run_generator(Terrazzo::Generators::Views::EditGenerator, [])
+
+    expect(read("app/views/admin/application/edit.jsx")).to include("export default function AdminEdit")
+    expect(read("app/views/admin/application/new.jsx")).to include("export default function AdminNew")
+    expect(read("app/views/admin/application/_form.jsx")).to include("export function AdminForm")
   end
 
   it "fails loudly for unsupported ejection targets" do

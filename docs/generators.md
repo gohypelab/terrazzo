@@ -150,7 +150,7 @@ When ejecting for a resource, the generator creates a complete set of files:
 - `terrazzo:views:new User` → `new.jsx` + `_form.jsx` + `new.json.props`
 - `terrazzo:views:show User` → `show.jsx` + `show.json.props`
 
-Because `edit` and `new` share the same `_form.jsx` partial via a relative import, ejecting one without the other means the non-ejected view continues using the built-in form. To keep them in sync, the `edit` and `new` generators will prompt you to also eject the counterpart view if it hasn't been ejected already.
+Because `edit` and `new` share the same `_form.jsx` partial via a relative import, ejecting one without the other means the non-ejected view continues using the built-in form. If the counterpart is still Terrazzo's generated package stub, form-page ejection replaces it automatically so both pages use the same app-owned form. For missing resource-specific counterparts, the `edit` and `new` generators prompt unless you pass `--with-counterpart` or `--no-with-counterpart`.
 
 The ejected `.json.props` calls the gem's base partial and leaves room for custom props:
 
@@ -201,7 +201,7 @@ Ejected files import through app-level barrels:
 
 If one of those barrels is missing, `terrazzo:eject` creates the base package re-export before writing the ejected file. This keeps standalone ejection commands buildable, while installed apps continue using the barrels created by `terrazzo:views`.
 
-Page ejection copies required partials with the page. For example, `pages/index` also copies `_collection.jsx`, and `pages/edit` or `pages/new` also copies `_form.jsx`.
+Page ejection copies required partials with the page. For example, `pages/index` also copies `_collection.jsx`, and `pages/edit` or `pages/new` also copies `_form.jsx`. If the matching form page is still a generated package stub, ejecting `pages/edit` or `pages/new` also replaces that counterpart so both pages use the shared app-owned `_form.jsx`.
 
 UI ejection copies required local primitive dependencies with the requested file. For example, `ui/pagination` also copies `ui/button`, and `ui/sidebar` also copies the primitives it imports locally. Ejected UI primitives are consumed by app-owned pages, fields, and components that import from `../components/ui`; packaged default pages continue using the package defaults until you eject or override the relevant page, field, or component.
 

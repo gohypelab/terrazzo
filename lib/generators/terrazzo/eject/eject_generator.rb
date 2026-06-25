@@ -119,6 +119,7 @@ module Terrazzo
         page_dependencies(name).each do |dependency|
           copy_file "pages/#{dependency}.jsx", "app/views/#{namespace_name}/application/#{dependency}.jsx"
         end
+        eject_generated_form_counterpart(name)
       end
 
       def eject_navigation
@@ -205,6 +206,16 @@ module Terrazzo
 
       def copy_ui_template(name)
         copy_file "components/ui/#{name}.jsx", "app/views/#{namespace_name}/components/ui/#{name}.jsx"
+      end
+
+      def eject_generated_form_counterpart(name)
+        counterpart = { "edit" => "new", "new" => "edit" }[name]
+        return unless counterpart
+
+        destination = "app/views/#{namespace_name}/application/#{counterpart}.jsx"
+        return unless generated_file?(destination, generated_page_stub(counterpart))
+
+        copy_file "pages/#{counterpart}.jsx", destination, force: true
       end
 
       def field_shared_dependencies(field_type)

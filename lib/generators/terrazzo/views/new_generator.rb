@@ -52,6 +52,7 @@ module Terrazzo
           else
             "app/views/#{namespace_name}/application/edit.jsx"
           end
+          return true if generated_file?(edit_path, generated_page_stub("edit"))
           return false if File.exist?(edit_path)
           return options[:with_counterpart] unless options[:with_counterpart].nil?
 
