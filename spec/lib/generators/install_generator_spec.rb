@@ -406,6 +406,62 @@ RSpec.describe Terrazzo::Generators::InstallGenerator do
     expect(output).to include('"build:admin:css": "tailwindcss -i app/assets/stylesheets/admin.css')
   end
 
+  it "adds a Tailwind build script when the Tailwind CLI is installed" do
+    create_file "package.json", JSON.pretty_generate({
+      scripts: {
+        "build" => "vite build",
+      },
+      dependencies: described_class::FRONTEND_DEPENDENCIES.to_h { |package_name| [package_name, "*"] },
+      devDependencies: {
+        "@tailwindcss/cli" => "^4.0.0",
+      },
+    })
+
+    run_install_tailwind_build_script_generator
+
+    scripts = JSON.parse(read("package.json")).fetch("scripts")
+    expect(scripts.fetch("build")).to eq("vite build")
+    expect(scripts.fetch("build:admin:css"))
+      .to eq("tailwindcss -i app/assets/stylesheets/admin.css -o app/assets/builds/admin.css --minify")
+    expect(run_tailwind_pipeline_verifier).to eq("")
+  end
+
+  it "does not overwrite an existing Tailwind build script name" do
+    create_file "package.json", JSON.pretty_generate({
+      scripts: {
+        "build:admin:css" => "tailwindcss -i app/assets/stylesheets/application.css -o app/assets/builds/application.css --minify",
+      },
+      dependencies: described_class::FRONTEND_DEPENDENCIES.to_h { |package_name| [package_name, "*"] },
+      devDependencies: {
+        "@tailwindcss/cli" => "^4.0.0",
+      },
+    })
+
+    run_install_tailwind_build_script_generator
+
+    scripts = JSON.parse(read("package.json")).fetch("scripts")
+    expect(scripts.fetch("build:admin:css"))
+      .to eq("tailwindcss -i app/assets/stylesheets/application.css -o app/assets/builds/application.css --minify")
+    expect(run_tailwind_pipeline_verifier).to include("no Tailwind build pipeline was detected")
+  end
+
+  it "replaces invalid package scripts with the Tailwind build script" do
+    create_file "package.json", JSON.pretty_generate({
+      scripts: "vite build",
+      dependencies: described_class::FRONTEND_DEPENDENCIES.to_h { |package_name| [package_name, "*"] },
+      devDependencies: {
+        "@tailwindcss/cli" => "^4.0.0",
+      },
+    })
+
+    run_install_tailwind_build_script_generator
+
+    scripts = JSON.parse(read("package.json")).fetch("scripts")
+    expect(scripts).to eq({
+      "build:admin:css" => "tailwindcss -i app/assets/stylesheets/admin.css -o app/assets/builds/admin.css --minify",
+    })
+  end
+
   it "does not warn when package scripts build CSS with Tailwind" do
     create_file "package.json", JSON.pretty_generate({
       dependencies: described_class::FRONTEND_DEPENDENCIES.to_h { |package_name| [package_name, "*"] },
@@ -585,6 +641,14 @@ RSpec.describe Terrazzo::Generators::InstallGenerator do
     $stdout = StringIO.new
     described_class.new([], {}, destination_root: destination_root).verify_tailwind_build_pipeline
     $stdout.string
+  ensure
+    $stdout = original_stdout
+  end
+
+  def run_install_tailwind_build_script_generator
+    original_stdout = $stdout
+    $stdout = StringIO.new
+    described_class.new([], {}, destination_root: destination_root).create_tailwind_build_script
   ensure
     $stdout = original_stdout
   end

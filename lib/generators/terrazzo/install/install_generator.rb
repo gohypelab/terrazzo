@@ -187,6 +187,22 @@ module Terrazzo
           "app/assets/stylesheets/#{namespace_name}.css"
       end
 
+      def create_tailwind_build_script
+        return unless package_json_file?
+        return if tailwind_build_pipeline?
+        return unless tailwind_cli_package?
+
+        package_json = parsed_package_json
+        return if package_json.empty?
+
+        scripts = package_json["scripts"]
+        scripts = package_json["scripts"] = {} unless scripts.is_a?(Hash)
+        return if scripts.key?(tailwind_build_script_name)
+
+        scripts[tailwind_build_script_name] = tailwind_build_command
+        create_file "package.json", "#{JSON.pretty_generate(package_json)}\n", force: true
+      end
+
       def create_components_json
         if File.exist?(File.join(destination_root, "components.json"))
           say_status :skip, "components.json already exists", :yellow
@@ -240,7 +256,7 @@ module Terrazzo
         say "Make sure your app compiles that file with Tailwind before serving the admin UI."
         say "For package.json scripts, install the Tailwind CLI and add a build script:"
         say "  #{package_manager_add_dev_command} @tailwindcss/cli"
-        say %(  "build:#{namespace_name}:css": "tailwindcss -i app/assets/stylesheets/#{namespace_name}.css -o app/assets/builds/#{namespace_name}.css --minify")
+        say %(  "#{tailwind_build_script_name}": "#{tailwind_build_command}")
       end
 
       private
@@ -356,8 +372,7 @@ module Terrazzo
       end
 
       def package_json_dependencies
-        package_json_path = File.join(destination_root, "package.json")
-        return {} unless File.exist?(package_json_path)
+        return {} unless package_json_file?
 
         package_json = parsed_package_json
         %w[dependencies devDependencies peerDependencies optionalDependencies]
@@ -369,16 +384,26 @@ module Terrazzo
       end
 
       def package_json_scripts
-        parsed_package_json.fetch("scripts", {})
+        scripts = parsed_package_json.fetch("scripts", {})
+        scripts.is_a?(Hash) ? scripts : {}
       rescue JSON::ParserError
         {}
       end
 
       def parsed_package_json
         @package_json ||= begin
-          package_json_path = File.join(destination_root, "package.json")
-          File.exist?(package_json_path) ? JSON.parse(File.read(package_json_path)) : {}
+          package_json_file? ? JSON.parse(File.read(package_json_path)) : {}
         end
+      rescue JSON::ParserError
+        {}
+      end
+
+      def package_json_file?
+        File.exist?(package_json_path)
+      end
+
+      def package_json_path
+        File.join(destination_root, "package.json")
       end
 
       def frontend_install_command(packages)
@@ -409,11 +434,23 @@ module Terrazzo
           tailwind_rails_gem?
       end
 
+      def tailwind_cli_package?
+        package_json_dependencies.key?("@tailwindcss/cli")
+      end
+
       def tailwind_package_script?
         package_json_scripts.any? do |_name, command|
           command = command.to_s
           command.include?("tailwindcss") && command.include?(admin_stylesheet_path)
         end
+      end
+
+      def tailwind_build_script_name
+        "build:#{namespace_name}:css"
+      end
+
+      def tailwind_build_command
+        "tailwindcss -i #{admin_stylesheet_path} -o app/assets/builds/#{namespace_name}.css --minify"
       end
 
       def tailwind_vite_plugin?

@@ -36,8 +36,8 @@ npm install --save-dev @tailwindcss/cli # if your app does not already compile T
 rails g terrazzo:install
 
 # Make sure app/assets/stylesheets/admin.css is compiled by Tailwind.
-# The installer warns if it cannot detect a Tailwind build pipeline
-# and prints a working @tailwindcss/cli setup command.
+# The installer adds build:admin:css when @tailwindcss/cli is installed,
+# or warns with the setup command if no Tailwind build pipeline is detected.
 
 # Start the server
 bin/dev

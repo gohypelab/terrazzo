@@ -43,7 +43,7 @@ Creates:
 - App-level component, field, and UI barrels that fall back to the `terrazzo` package
 
 When `--bundler=vite`, the installer requires `vite_rails` because the generated admin layout uses Vite Rails asset helpers. Add `gem "vite_rails"` and run `bundle exec vite install` first so `config/vite.json`, `vite`, and `vite-plugin-ruby` are present, or pass `--bundler=esbuild`.
-The generator checks `package.json` for the required Terrazzo frontend packages and prints the package-manager command to install anything missing. It also warns when `app/assets/stylesheets/admin.css` has no detectable Tailwind build pipeline; package.json script users should install `@tailwindcss/cli` and add a script that compiles the generated admin stylesheet.
+The generator checks `package.json` for the required Terrazzo frontend packages and prints the package-manager command to install anything missing. It also adds a `build:admin:css` package script when `@tailwindcss/cli` is installed and no Tailwind build pipeline is detected. If the CLI is missing, it warns with the matching install command and script.
 When `components.json` does not exist, the install generator creates one that points shadcn CLI output at `app/views/admin/components` and `app/views/admin/components/ui` (or the matching custom namespace). Existing `components.json` files are left untouched.
 When neither `jsconfig.json` nor `tsconfig.json` exists, the installer also creates a small `jsconfig.json` so editor tooling and shadcn-style generators can resolve root `@/*` imports. Existing JS/TS configs are left untouched.
 The installer also verifies that at least one concrete `ApplicationRecord` model exists and
