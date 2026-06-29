@@ -46,6 +46,17 @@ RSpec.describe Terrazzo::CollectionActionsHelper do
       expect(actions.find { |action| action[:label] == "Destroy" }).to include(url: "/admin/products/123")
     end
 
+    it "routes row actions by terrazzo_resource_param when a host app overrides it" do
+      product = Product.new(id: 123, slug: "widget-pro")
+      allow(self).to receive(:terrazzo_resource_param) { |resource| resource.to_param }
+
+      actions = collection_item_actions(product)
+
+      expect(actions).to include(label: "Show", url: "/admin/products/widget-pro")
+      expect(actions).to include(label: "Edit", url: "/admin/products/widget-pro/edit")
+      expect(actions.find { |action| action[:label] == "Destroy" }).to include(url: "/admin/products/widget-pro")
+    end
+
     it "omits default actions denied by authorized_action?" do
       country = Country.new(id: 123, code: "US", name: "United States")
 

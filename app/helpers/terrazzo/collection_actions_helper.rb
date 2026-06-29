@@ -27,7 +27,7 @@ module Terrazzo
         only_path: true,
         controller: controller_path,
         action: :show,
-        id: resource.id,
+        id: terrazzo_resource_param(resource),
         format: nil,
         props_at: "data.attributes.#{field.attribute}"
       )

@@ -29,12 +29,20 @@ module Terrazzo
       url_for(
         controller: terrazzo_resource_controller_path(resource),
         action: route_action,
-        id: resource.id,
+        id: terrazzo_resource_param(resource),
         only_path: true,
         format: nil
       )
     rescue ActionController::UrlGenerationError
       nil
+    end
+
+    # The URL parameter used to identify a member resource. Defaults to the
+    # record id. Override in a host app (e.g. to `resource.to_param`) to route
+    # members by slug or another identifier; the matching lookup belongs in the
+    # controller's #find_resource.
+    def terrazzo_resource_param(resource)
+      resource.id
     end
 
     def terrazzo_resource_controller_path(resource_or_class)

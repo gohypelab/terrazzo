@@ -17,6 +17,15 @@ RSpec.describe Terrazzo::ResourcePathsHelper do
       expect(terrazzo_resource_member_path(product, action: :destroy)).to eq("/admin/products/123")
     end
 
+    it "routes by terrazzo_resource_param when a host app overrides it" do
+      product = Product.new(id: 123, slug: "widget-pro")
+      allow(self).to receive(:terrazzo_resource_param) { |resource| resource.to_param }
+
+      expect(terrazzo_resource_member_path(product)).to eq("/admin/products/widget-pro")
+      expect(terrazzo_resource_member_path(product, action: :edit)).to eq("/admin/products/widget-pro/edit")
+      expect(terrazzo_resource_member_path(product, action: :destroy)).to eq("/admin/products/widget-pro")
+    end
+
     it "builds nested resource paths from the model namespace" do
       post = Blog::Post.new(id: 456)
 
