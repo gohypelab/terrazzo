@@ -521,7 +521,7 @@ RSpec.describe Terrazzo::Generators::InstallGenerator do
     output = run_dependency_verifier
 
     expect(output).to include("Frontend dependencies below Terrazzo's supported versions")
-    expect(output).to include("terrazzo ^0.5.0 (requires >= 0.6.0)")
+    expect(output).to include("terrazzo ^0.5.0 (requires >= #{Terrazzo::VERSION})")
     expect(output).to include("react ^17.0.0 (requires >= 18.0.0)")
     expect(output).to include("tailwindcss ^3.4.0 (requires >= 4.0.0)")
     expect(output).not_to include("react-dom 18.x")
