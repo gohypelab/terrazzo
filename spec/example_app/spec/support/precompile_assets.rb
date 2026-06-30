@@ -1,14 +1,19 @@
 RSpec.configure do |config|
   config.before(:suite) do
-    # Build JS and CSS assets before running system specs.
-    # Skip if assets are already built (e.g., in CI where a prior step handles it).
-    build_dir = Rails.root.join("app/assets/builds")
-    js_built = Dir.glob(build_dir.join("*.js")).any?
-    css_built = Dir.glob(build_dir.join("*.css")).any?
+    # The admin panel is a build artifact (script/build_example_admin) — generated
+    # from the Terrazzo generators + overlay/ and compiled to app/assets/builds.
+    # It must be built BEFORE the app boots, because Rails autoloads the admin
+    # controllers and dashboards at boot — so it cannot be generated from this
+    # hook. Guard with a clear message instead.
+    unless File.exist?(Rails.root.join("app/assets/builds/admin.js"))
+      raise <<~MSG
 
-    unless js_built && css_built
-      puts "\n== Building assets for system specs =="
-      system("npm run build", chdir: Rails.root.to_s, exception: true)
+        Admin panel not built. Run the recipe before the system specs:
+
+            script/build_example_admin
+
+        (The admin is generated from the Terrazzo generators + overlay/, not committed.)
+      MSG
     end
   end
 end

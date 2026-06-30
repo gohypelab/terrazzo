@@ -16,6 +16,16 @@ npm/dist/
 spec/example_app/node_modules/
 spec/example_app/.git/
 spec/example_app/package-lock.json
+
+# Generated Terrazzo admin panel — rebuilt by spec/example_app/script/build_example_admin.
+# Customizations live in spec/example_app/overlay/; everything below is generated output.
+spec/example_app/app/dashboards/
+spec/example_app/app/controllers/admin/
+spec/example_app/app/views/admin/
+spec/example_app/app/views/layouts/admin/
+spec/example_app/app/javascript/admin/
+spec/example_app/app/javascript/admin.js
+spec/example_app/app/assets/stylesheets/admin.css
 docs/node_modules/
 docs/.vitepress/dist/
 docs/.vitepress/cache/

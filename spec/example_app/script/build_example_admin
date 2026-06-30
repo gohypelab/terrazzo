@@ -1,0 +1,70 @@
+#!/usr/bin/env bash
+#
+# Build the example app's admin panel from scratch.
+#
+# This is the example app's "customize recipe". It runs the real Terrazzo
+# generators (install + ejects + page-view overrides) to produce the current
+# default scaffold, then drops the authored overlay files (overlay/) on top.
+# Every customization is therefore regenerated against the CURRENT generator
+# output — the system specs run a freshly-built admin panel, not committed
+# scaffolding that can silently drift from the gem.
+#
+# What is generated vs. overlaid:
+#   - generated: layout, JS entry/store/mappings, barrels, every default
+#     dashboard/controller, the default pages (thin re-exports), admin.css
+#   - overlaid (overlay/): the field/component/page/dashboard/controller
+#     customizations the system specs exercise
+#   - owned/committed (not regenerated): config/routes.rb (the Administrate model —
+#     you own your routes file; terrazzo:routes only seeds it once)
+#
+# Usage:  script/build_example_admin
+# Then:   npm run build && bin/rails db:test:prepare && bundle exec rspec
+set -euo pipefail
+
+APP_ROOT="$(cd "$(dirname "$0")/.." && pwd)"
+cd "$APP_ROOT"
+
+NAMESPACE=admin
+BUNDLER=esbuild
+
+gen() { bin/rails generate "$@" --namespace="${NAMESPACE}"; }
+
+echo "==> Removing previously generated admin paths"
+rm -rf \
+  app/dashboards \
+  app/controllers/admin \
+  app/views/admin \
+  app/views/layouts/admin \
+  "app/javascript/${NAMESPACE}" \
+  "app/javascript/${NAMESPACE}.js" \
+  "app/assets/stylesheets/${NAMESPACE}.css"
+
+echo "==> Preparing database (install needs the model tables)"
+bin/rails db:prepare >/dev/null
+
+echo "==> terrazzo:install"
+bin/rails generate terrazzo:install --namespace="${NAMESPACE}" --bundler="${BUNDLER}"
+
+echo "==> Ejecting customized fields"
+gen terrazzo:eject fields/boolean
+gen terrazzo:eject fields/email
+gen terrazzo:eject fields/string
+
+echo "==> Ejecting customized components"
+gen terrazzo:eject components/Layout   # also brings app-sidebar, site-header, FlashMessages
+gen terrazzo:eject components/SearchBar
+
+echo "==> Ejecting customized page views"
+gen terrazzo:views:index Customer
+gen terrazzo:views:show Order
+
+echo "==> Applying overlay (authored customizations)"
+# Portable recursive merge of overlay/ into the app root (overlay/app -> app, etc.)
+tar -C overlay -cf - . | tar -C "$APP_ROOT" -xf -
+
+echo "==> Building admin assets (esbuild + Tailwind)"
+# Requires the terrazzo npm package to be built first (cd ../../npm && npm run build).
+npm run build
+
+echo "==> Admin panel built and assets compiled (namespace: ${NAMESPACE})."
+echo "    Run specs: bin/rails db:test:prepare && bundle exec rspec"

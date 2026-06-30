@@ -1,52 +1,62 @@
 # Terrazzo Example App
 
-A Rails 8 app used for integration and system testing of the Terrazzo gem. The repo includes a **fully built, customized admin panel** that the system specs run against — you don't generate anything to run them.
+A Rails 8 app used for integration and system testing of the Terrazzo gem.
 
-A separate, **inner** git repo (`spec/example_app/.git`) tracks a stripped **base state** with no admin panel. It exists only so `script/reset_example_app` can test the `terrazzo:install` generator from a clean slate.
+The admin panel here is a **build artifact**, not committed source. It's produced by
+`script/build_example_admin` — the "customize recipe": run the real Terrazzo generators
+(`terrazzo:install` + ejects + page-view overrides) to scaffold the *current* defaults, then
+drop the authored customizations from `overlay/` on top. The system specs run against that
+freshly-built panel, so they always exercise the current generator output rather than
+committed scaffolding that can silently drift from the gem.
+
+## What's committed vs. generated
+
+**Committed** (present on a normal checkout):
+- Models (`app/models/`), schema, seeds, factories, and the system specs
+- Build tooling (`package.json`, `esbuild.config.mjs`, `components.json`, `jsconfig.json`) and `Gemfile`
+- `config/routes.rb` — you own your routes (the Administrate model)
+- `overlay/` — the authored customizations the specs exercise
+- `script/build_example_admin` — the recipe
+
+**Generated** (gitignored — built by the recipe):
+- `app/dashboards/`, `app/controllers/admin/`, `app/views/admin/`, `app/views/layouts/admin/`
+- `app/javascript/admin/`, `app/javascript/admin.js`, `app/assets/stylesheets/admin.css`
 
 ## Running the system specs
 
 ```bash
-# from the repo root
-cd npm && npm run build              # build the terrazzo npm package
+# from the repo root — one-time / after dependency or gem changes
+cd npm && npm run build              # build the terrazzo npm package (dist/)
 cd ../spec/example_app
-npm install                          # first time / after dependency changes
-npm run build                        # build admin assets (esbuild + Tailwind)
+npm install                          # link terrazzo (file:../../npm) + install deps
+bundle install
+
+# build the admin panel, then run the specs
+script/build_example_admin           # generate the admin from the generators + overlay/
 bin/rails db:test:prepare            # first time / after schema changes
-bundle exec rspec                    # system specs (requires headless Chrome)
+bundle exec rspec                    # system specs (headless Chrome; HEADED=1 to watch)
 ```
 
-## What's committed vs the base state
+Run `script/build_example_admin` before `bundle exec rspec` — it generates the admin and
+compiles assets. (If you forget, the specs stop with a reminder.) Re-run it after you change
+the gem (`lib/`, generators) or anything in `overlay/`. CI always rebuilds from scratch.
 
-**Committed admin panel** (already present; what the specs use):
-- `app/dashboards/`, `app/controllers/admin/`, `app/views/admin/`, `app/views/layouts/admin/`
-- `app/javascript/admin/`, `app/javascript/admin.js`, `app/assets/stylesheets/admin.css`
-- Admin routes + customizations in `config/routes.rb`
+## The customizations (`overlay/`)
 
-**Base state** (inner repo; the app *without* the admin panel):
-- Models (`app/models/`), schema & seeds (`db/`)
-- Build tooling (`package.json`, `esbuild.config.mjs`, `components.json`, `jsconfig.json`)
-- `Gemfile` (loads `terrazzo` from `../..`) and `spec/` (factories + system specs)
+`overlay/` holds only the irreducible, hand-authored customizations — the parts a generator
+can't produce. Everything else (default pages, barrels, JS entry/store, every default
+dashboard/controller, and roughly half the resources) is generated, so the specs test the
+generators against the real schema. Highlights:
 
-## Testing the install generator
+- **Fields** — boolean/email icons, string test hooks
+- **Components** — custom `Layout` (`setLayout`) and `SearchBar`
+- **Pages** — customers card-grid index, orders show with a `totalPrice` prop
+- **Dashboards** — collection/bulk actions, filters, `with_options`, display hooks
+- **Controller** — orders `bulk_ship` / `invoice`
 
-```bash
-script/reset_example_app             # strip back to base state
-cd spec/example_app
-bin/rails generate terrazzo:install --namespace=admin --bundler=esbuild
-npm install && npm run build
-bin/dev                              # visit http://localhost:3000/admin
-```
-
-This produces a **default** admin panel. The hand-written customizations the system specs exercise are not reproduced by the generator. To return to the curated, suite-passing state, restore from the outer repo:
+## Running unit specs
 
 ```bash
-git -C ../.. checkout HEAD -- spec/example_app/app spec/example_app/config/routes.rb
-```
-
-## Running unit tests
-
-```bash
-# from the repo root — these work without the example app's admin panel
+# from the repo root — these don't need the example app's admin panel
 bundle exec rspec spec/lib/
 ```

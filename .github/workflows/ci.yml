@@ -79,3 +79,44 @@ jobs:
 
       - name: Run docs checks
         run: npm run check
+
+  system:
+    name: Example app system specs
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - uses: browser-actions/setup-chrome@v1
+
+      - uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: "3.4"
+          bundler-cache: true
+          working-directory: spec/example_app
+
+      - name: Build the terrazzo npm package
+        working-directory: npm
+        run: |
+          npm ci
+          npm run build
+
+      - name: Install example app JavaScript dependencies
+        working-directory: spec/example_app
+        run: npm install
+
+      - name: Build the admin panel from the recipe (also compiles assets)
+        working-directory: spec/example_app
+        run: script/build_example_admin
+
+      - name: Prepare the test database
+        working-directory: spec/example_app
+        run: bin/rails db:test:prepare
+
+      - name: Run system specs
+        working-directory: spec/example_app
+        run: bundle exec rspec
