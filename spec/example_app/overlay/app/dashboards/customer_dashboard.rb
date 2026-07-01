@@ -3,8 +3,8 @@ require "terrazzo/base_dashboard"
 class CustomerDashboard < Terrazzo::BaseDashboard
   ATTRIBUTE_TYPES = {
     id: Field::String,
-    name: Field::String,
-    email: Field::Email,
+    name: Field::String.with_options(searchable: true),
+    email: Field::Email.with_options(searchable: true),
     created_at: Field::DateTime,
     updated_at: Field::DateTime,
     email_subscriber: Field::Boolean,

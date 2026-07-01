@@ -13,6 +13,45 @@ RSpec.describe "Admin Customers", type: :system do
     end
   end
 
+  describe "search" do
+    let!(:other_customer) { create(:customer, name: "Bob Smith", email: "bob@example.com", territory: country) }
+
+    it "filters customers by name" do
+      visit admin_customers_path
+
+      expect(page).to have_content("Alice Johnson")
+      expect(page).to have_content("Bob Smith")
+
+      fill_in "search", with: "Alice"
+      find("input[name='search']").send_keys(:enter)
+
+      expect(page).to have_current_path(/search=Alice/)
+      expect(page).to have_content("Alice Johnson")
+      expect(page).not_to have_content("Bob Smith")
+    end
+
+    it "filters customers by email" do
+      visit admin_customers_path
+
+      fill_in "search", with: "bob@example.com"
+      find("input[name='search']").send_keys(:enter)
+
+      expect(page).to have_content("Bob Smith")
+      expect(page).not_to have_content("Alice Johnson")
+    end
+
+    it "shows no results for a non-matching term" do
+      visit admin_customers_path
+
+      fill_in "search", with: "no matching customer"
+      find("input[name='search']").send_keys(:enter)
+
+      expect(page).to have_current_path(/search=no\+matching\+customer/)
+      expect(page).not_to have_content("Alice Johnson")
+      expect(page).not_to have_content("Bob Smith")
+    end
+  end
+
   describe "show" do
     it "renders the customer details" do
       visit admin_customer_path(customer)
