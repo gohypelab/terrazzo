@@ -37,12 +37,16 @@ module Terrazzo
       nil
     end
 
-    # The URL parameter used to identify a member resource. Defaults to the
-    # record id. Override in a host app (e.g. to `resource.to_param`) to route
-    # members by slug or another identifier; the matching lookup belongs in the
-    # controller's #find_resource.
+    # The URL parameter used to identify a member resource in generated
+    # show/edit/destroy links. Defaults to `to_param` so host apps that route
+    # members by slug (or any other `to_param` scheme) get correct links without
+    # overriding this hook, mirroring the `polymorphic_path` behavior Terrazzo
+    # relied on before it built these paths manually. When `to_param` returns
+    # something other than the primary key, `#find_resource` (default:
+    # `scoped_resource.find(id)`) must be overridden in tandem or the generated
+    # links will 404.
     def terrazzo_resource_param(resource)
-      resource.id
+      resource.to_param
     end
 
     def terrazzo_resource_controller_path(resource_or_class)

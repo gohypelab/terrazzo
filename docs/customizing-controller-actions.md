@@ -33,7 +33,7 @@ end
 
 ## Customizing `find_resource`
 
-Terrazzo's generated admin links use database ids, even when a model overrides `to_param` for public slug URLs. Override `find_resource` only when your admin routes intentionally use a non-id key, such as a custom slug route:
+Terrazzo's generated admin links use each record's `to_param`, so a model that overrides `to_param` (for example, to expose a slug) automatically gets slug-based admin URLs. When `to_param` returns something other than the primary key, you must override `find_resource` to match, or those generated links will 404:
 
 ```ruby
 class Admin::ProductsController < Admin::ApplicationController
@@ -44,6 +44,8 @@ class Admin::ProductsController < Admin::ApplicationController
   end
 end
 ```
+
+`find_resource` defaults to a primary-key lookup (`scoped_resource.find(id)`), so no override is needed when `to_param` returns the id.
 
 ## Pagination Limits
 

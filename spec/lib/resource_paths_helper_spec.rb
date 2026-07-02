@@ -9,21 +9,29 @@ RSpec.describe Terrazzo::ResourcePathsHelper do
   end
 
   describe "#terrazzo_resource_member_path" do
-    it "uses ids instead of model to_param values" do
+    it "routes by the record's to_param, honoring models that override it" do
       product = Product.new(id: 123, slug: "widget-pro")
-
-      expect(terrazzo_resource_member_path(product)).to eq("/admin/products/123")
-      expect(terrazzo_resource_member_path(product, action: :edit)).to eq("/admin/products/123/edit")
-      expect(terrazzo_resource_member_path(product, action: :destroy)).to eq("/admin/products/123")
-    end
-
-    it "routes by terrazzo_resource_param when a host app overrides it" do
-      product = Product.new(id: 123, slug: "widget-pro")
-      allow(self).to receive(:terrazzo_resource_param) { |resource| resource.to_param }
 
       expect(terrazzo_resource_member_path(product)).to eq("/admin/products/widget-pro")
       expect(terrazzo_resource_member_path(product, action: :edit)).to eq("/admin/products/widget-pro/edit")
       expect(terrazzo_resource_member_path(product, action: :destroy)).to eq("/admin/products/widget-pro")
+    end
+
+    it "falls back to the id for models that do not override to_param" do
+      customer = Customer.new(id: 789)
+
+      expect(terrazzo_resource_member_path(customer)).to eq("/admin/customers/789")
+      expect(terrazzo_resource_member_path(customer, action: :edit)).to eq("/admin/customers/789/edit")
+      expect(terrazzo_resource_member_path(customer, action: :destroy)).to eq("/admin/customers/789")
+    end
+
+    it "routes by terrazzo_resource_param when a host app overrides it" do
+      product = Product.new(id: 123, slug: "widget-pro")
+      allow(self).to receive(:terrazzo_resource_param) { |resource| resource.id }
+
+      expect(terrazzo_resource_member_path(product)).to eq("/admin/products/123")
+      expect(terrazzo_resource_member_path(product, action: :edit)).to eq("/admin/products/123/edit")
+      expect(terrazzo_resource_member_path(product, action: :destroy)).to eq("/admin/products/123")
     end
 
     it "builds nested resource paths from the model namespace" do
