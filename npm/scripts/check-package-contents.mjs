@@ -1,9 +1,9 @@
 import { execFileSync } from "node:child_process";
-import { readFileSync } from "node:fs";
+import { readFileSync, writeFileSync } from "node:fs";
 
-const packageJson = JSON.parse(
-  readFileSync(new URL("../package.json", import.meta.url), "utf8")
-);
+const packageJsonPath = new URL("../package.json", import.meta.url);
+const packageJsonRaw = readFileSync(packageJsonPath, "utf8");
+const packageJson = JSON.parse(packageJsonRaw);
 
 const expectedMetadata = {
   name: "terrazzo",
@@ -37,9 +37,22 @@ for (const keyword of ["rails", "react", "superglue", "administrate"]) {
   }
 }
 
-const output = execFileSync("npm", ["pack", "--dry-run", "--json", "--ignore-scripts"], {
-  encoding: "utf8",
-});
+// npm 10 runs "prepare" during `pack` even with --ignore-scripts (fixed in npm 11),
+// which pollutes the captured stdout with tsup's banner ahead of the JSON. dist/ is
+// already built by this point, so drop "prepare" from the on-disk package.json before
+// packing and restore it afterward.
+const packageJsonWithoutPrepare = { ...packageJson, scripts: { ...packageJson.scripts } };
+delete packageJsonWithoutPrepare.scripts.prepare;
+writeFileSync(packageJsonPath, JSON.stringify(packageJsonWithoutPrepare, null, 2) + "\n");
+
+let output;
+try {
+  output = execFileSync("npm", ["pack", "--dry-run", "--json", "--ignore-scripts"], {
+    encoding: "utf8",
+  });
+} finally {
+  writeFileSync(packageJsonPath, packageJsonRaw);
+}
 const [{ files }] = JSON.parse(output);
 const paths = new Set(files.map((file) => file.path));
 
