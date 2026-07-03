@@ -14,7 +14,7 @@ RSpec.describe "Admin Products", type: :system do
 
   describe "show" do
     it "renders the product details" do
-      visit admin_product_path(product.id)
+      visit admin_product_path(product)
 
       expect(page).to have_content("Widget Pro")
       expect(page).to have_content("29.99")
@@ -48,7 +48,7 @@ RSpec.describe "Admin Products", type: :system do
 
   describe "file upload" do
     it "uploads a document and displays the filename" do
-      visit edit_admin_product_path(product.id)
+      visit edit_admin_product_path(product)
 
       attach_file "Document", Rails.root.join("spec/fixtures/files/test_document.txt")
       click_button "Save"
@@ -59,13 +59,13 @@ RSpec.describe "Admin Products", type: :system do
 
   describe "edit" do
     it "renders the edit product form" do
-      visit edit_admin_product_path(product.id)
+      visit edit_admin_product_path(product)
 
       expect(page).to have_field("Name", with: "Widget Pro")
     end
 
     it "updates the product" do
-      visit edit_admin_product_path(product.id)
+      visit edit_admin_product_path(product)
 
       fill_in "Name", with: "Widget Pro Updated"
       fill_in "Slug", with: "widget-pro-updated"
@@ -77,7 +77,7 @@ RSpec.describe "Admin Products", type: :system do
 
   describe "destroy" do
     it "deletes the product from the show page" do
-      visit admin_product_path(product.id)
+      visit admin_product_path(product)
 
       accept_confirm { click_button "Delete" }
 
