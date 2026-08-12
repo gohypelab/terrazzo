@@ -74,7 +74,7 @@ active: Field::Boolean
 ```
 
 - **Index/Show**: Check or X badge
-- **Form**: Checkbox
+- **Form**: Checkbox that submits `"1"` when checked and `"0"` when unchecked
 
 ### **Field::Date** / **Field::DateTime** / **Field::Time**
 

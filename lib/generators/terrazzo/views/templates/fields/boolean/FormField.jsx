@@ -6,7 +6,14 @@ export function FormField({ value, label, input, required }) {
   return (
     <div className="flex items-center space-x-2">
       <input
+        type="hidden"
+        name={input?.name}
+        value="0"
+        disabled={input?.disabled} />
+
+      <input
         type="checkbox"
+        value="1"
         defaultChecked={!!value}
         className="h-4 w-4 rounded border-gray-300"
         {...input} />
