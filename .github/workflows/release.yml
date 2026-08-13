@@ -80,6 +80,10 @@ jobs:
         working-directory: spec/example_app
         run: npm install
 
+      - name: Audit example app JavaScript dependencies
+        working-directory: spec/example_app
+        run: npm run audit
+
       - name: Build the admin panel from the recipe (also compiles assets)
         working-directory: spec/example_app
         run: script/build_example_admin

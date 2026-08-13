@@ -26,11 +26,13 @@ bundle exec vite install
 
 # Add the npm package and frontend dependencies
 npm install terrazzo
-npm install @radix-ui/react-avatar @radix-ui/react-dialog @radix-ui/react-dropdown-menu \
-  @radix-ui/react-label @radix-ui/react-popover @radix-ui/react-select \
-  @radix-ui/react-separator @radix-ui/react-slot @radix-ui/react-tooltip \
-  class-variance-authority lucide-react tailwindcss@latest
-npm install --save-dev @tailwindcss/cli@latest # if your app does not already compile Tailwind
+npm install @radix-ui/react-avatar@1.1.11 @radix-ui/react-dialog@1.1.15 \
+  @radix-ui/react-dropdown-menu@2.1.16 @radix-ui/react-label@2.1.8 \
+  @radix-ui/react-popover@1.1.15 @radix-ui/react-select@2.2.6 \
+  @radix-ui/react-separator@1.1.8 @radix-ui/react-slot@1.2.4 \
+  @radix-ui/react-tooltip@1.2.8 class-variance-authority@0.7.1 \
+  lucide-react@0.344.0 tailwindcss@4.2.1
+npm install --save-dev @tailwindcss/cli@4.2.1 # if your app does not already compile Tailwind
 
 # Install Terrazzo — generates admin namespace, app barrels,
 # shadcn metadata/path aliases, and dashboards.
@@ -65,6 +67,12 @@ Full docs at **[gohypelab.github.io/terrazzo](https://gohypelab.github.io/terraz
 
 Pull requests and pushes to `main` run the Ruby unit specs, npm package checks,
 documentation build, and example app system specs through GitHub Actions.
+
+Repository npm projects pin direct dependencies and use a seven-day minimum
+release age when resolving updates. The published package and documentation
+projects also commit their lockfiles. Use npm 11.10 or newer when changing
+dependencies; project `.npmrc` files save new dependencies with exact versions
+automatically.
 
 Terrazzo releases the Ruby gem and npm package from the same version tag. After
 updating `lib/terrazzo/version.rb` and `npm/package.json` to matching versions,

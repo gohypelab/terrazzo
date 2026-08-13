@@ -64,10 +64,12 @@ The `terrazzo` npm package provides the default React pages/components, utilitie
 Terrazzo's default and ejected components use shadcn/ui patterns, so you'll need these packages. The generated admin CSS uses Tailwind CSS 4 syntax (`@source`, `@theme`, and `@custom-variant`), so install Tailwind 4 or newer:
 
 ```bash
-yarn add @radix-ui/react-avatar @radix-ui/react-dialog @radix-ui/react-dropdown-menu \
-  @radix-ui/react-label @radix-ui/react-popover @radix-ui/react-select \
-  @radix-ui/react-separator @radix-ui/react-slot @radix-ui/react-tooltip \
-  class-variance-authority lucide-react tailwindcss@latest
+yarn add @radix-ui/react-avatar@1.1.11 @radix-ui/react-dialog@1.1.15 \
+  @radix-ui/react-dropdown-menu@2.1.16 @radix-ui/react-label@2.1.8 \
+  @radix-ui/react-popover@1.1.15 @radix-ui/react-select@2.2.6 \
+  @radix-ui/react-separator@1.1.8 @radix-ui/react-slot@1.2.4 \
+  @radix-ui/react-tooltip@1.2.8 class-variance-authority@0.7.1 \
+  lucide-react@0.344.0 tailwindcss@4.2.1
 ```
 
 The install generator also checks `package.json` and prints the exact package-manager command if any required frontend packages are missing or pinned below Terrazzo's supported versions.
@@ -79,7 +81,7 @@ a package script or Tailwind 4-compatible `tailwindcss-rails`, install the
 Tailwind CLI before running the Terrazzo installer:
 
 ```bash
-yarn add -D @tailwindcss/cli@latest
+yarn add -D @tailwindcss/cli@4.2.1
 ```
 
 When `@tailwindcss/cli` 4 or newer is installed and no Tailwind pipeline is

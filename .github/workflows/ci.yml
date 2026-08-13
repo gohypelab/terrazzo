@@ -18,7 +18,7 @@ jobs:
 
       - uses: actions/setup-node@v4
         with:
-          node-version: 22
+          node-version: 24
           cache: npm
           cache-dependency-path: npm/package-lock.json
 
@@ -42,6 +42,10 @@ jobs:
       - name: Install example app JavaScript dependencies
         working-directory: spec/example_app
         run: npm install
+
+      - name: Audit example app JavaScript dependencies
+        working-directory: spec/example_app
+        run: npm run audit
 
       - name: Build the admin panel from the recipe (also compiles assets)
         working-directory: spec/example_app
@@ -67,7 +71,7 @@ jobs:
 
       - uses: actions/setup-node@v4
         with:
-          node-version: 22
+          node-version: 24
           cache: npm
           cache-dependency-path: npm/package-lock.json
 
@@ -90,7 +94,7 @@ jobs:
 
       - uses: actions/setup-node@v4
         with:
-          node-version: 22
+          node-version: 24
           cache: npm
           cache-dependency-path: docs/package-lock.json
 
@@ -109,7 +113,7 @@ jobs:
 
       - uses: actions/setup-node@v4
         with:
-          node-version: 22
+          node-version: 24
 
       - uses: browser-actions/setup-chrome@v1
 
@@ -128,6 +132,10 @@ jobs:
       - name: Install example app JavaScript dependencies
         working-directory: spec/example_app
         run: npm install
+
+      - name: Audit example app JavaScript dependencies
+        working-directory: spec/example_app
+        run: npm run audit
 
       - name: Build the admin panel from the recipe (also compiles assets)
         working-directory: spec/example_app
