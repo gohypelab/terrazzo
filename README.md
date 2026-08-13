@@ -2,6 +2,9 @@
 
 A drop-in admin panel for Rails apps. Uses the [Administrate](https://github.com/thoughtbot/administrate) dashboard DSL with a React SPA frontend powered by [Superglue](https://github.com/thoughtbot/superglue).
 
+[![CI](https://github.com/gohypelab/terrazzo/actions/workflows/ci.yml/badge.svg)](https://github.com/gohypelab/terrazzo/actions/workflows/ci.yml)
+[![Release](https://github.com/gohypelab/terrazzo/actions/workflows/release.yml/badge.svg)](https://github.com/gohypelab/terrazzo/actions/workflows/release.yml)
+
 - **Familiar DSL** — same `ATTRIBUTE_TYPES`, `COLLECTION_ATTRIBUTES`, `FORM_ATTRIBUTES` you already know
 - **React SPA** — search, sort, and paginate without full page reloads, no separate API needed
 - **shadcn/ui + Tailwind** — polished defaults with supported ejection when you want app-owned source
@@ -57,6 +60,22 @@ Full docs at **[gohypelab.github.io/terrazzo](https://gohypelab.github.io/terraz
 - Rails 7.1+
 - Node.js 18+
 - A JS bundler (Vite recommended, esbuild also supported)
+
+## Development and releases
+
+Pull requests and pushes to `main` run the Ruby unit specs, npm package checks,
+documentation build, and example app system specs through GitHub Actions.
+
+Terrazzo releases the Ruby gem and npm package from the same version tag. After
+updating `lib/terrazzo/version.rb` and `npm/package.json` to matching versions,
+push an annotated `v*` tag. The release workflow validates both packages,
+publishes missing versions to RubyGems and npm through OIDC trusted publishing,
+and creates a GitHub Release with generated notes. Existing registry versions
+are skipped, so a partially completed or manually published release can be
+retried safely.
+
+See [RELEASING.md](RELEASING.md) for trusted publisher setup, release commands,
+and retry instructions.
 
 ## Customizing Per-Row Actions
 
