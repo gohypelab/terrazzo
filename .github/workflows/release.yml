@@ -1,0 +1,185 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - "v*"
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: Existing version tag to release (for example, v0.7.2)
+        required: true
+        type: string
+
+permissions:
+  contents: read
+
+concurrency:
+  group: release-${{ inputs.tag || github.ref_name }}
+  cancel-in-progress: false
+
+env:
+  RELEASE_TAG: ${{ inputs.tag || github.ref_name }}
+
+jobs:
+  verify:
+    name: Verify release
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          ref: ${{ env.RELEASE_TAG }}
+          persist-credentials: false
+
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 24
+          package-manager-cache: false
+
+      - uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: "3.4"
+          bundler-cache: true
+
+      - name: Validate tag and package versions
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          version="${RELEASE_TAG#v}"
+          gem_version="$(ruby -Ilib -rterrazzo/version -e 'print Terrazzo::VERSION')"
+          npm_version="$(node -p "require('./npm/package.json').version")"
+
+          if [[ "$RELEASE_TAG" != "v$version" || -z "$version" ]]; then
+            echo "Release tags must start with v." >&2
+            exit 1
+          fi
+
+          if [[ "$gem_version" != "$version" || "$npm_version" != "$version" ]]; then
+            echo "Tag: $version; gem: $gem_version; npm: $npm_version" >&2
+            echo "The tag and package versions must match." >&2
+            exit 1
+          fi
+
+      - name: Install npm dependencies
+        working-directory: npm
+        run: npm ci
+
+      - name: Run npm package checks
+        working-directory: npm
+        run: npm run check
+
+      - name: Run Ruby package checks
+        run: bundle exec rake check
+
+  publish-gem:
+    name: Publish gem
+    needs: verify
+    runs-on: ubuntu-latest
+    environment: release
+    permissions:
+      contents: read
+      id-token: write
+
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          ref: ${{ env.RELEASE_TAG }}
+          persist-credentials: false
+
+      - uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: "3.4"
+          bundler-cache: true
+
+      - name: Check whether the gem version already exists
+        id: gem
+        shell: bash
+        run: |
+          set -euo pipefail
+          version="${RELEASE_TAG#v}"
+
+          if gem info terrazzo --remote --version "$version" | grep -Fq "terrazzo ($version)"; then
+            echo "published=true" >> "$GITHUB_OUTPUT"
+            echo "terrazzo $version is already on RubyGems; skipping publish."
+          else
+            echo "published=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Publish to RubyGems
+        if: steps.gem.outputs.published != 'true'
+        uses: rubygems/release-gem@v1
+
+  publish-npm:
+    name: Publish npm package
+    needs: verify
+    runs-on: ubuntu-latest
+    environment: release
+    permissions:
+      contents: read
+      id-token: write
+
+    defaults:
+      run:
+        working-directory: npm
+
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          ref: ${{ env.RELEASE_TAG }}
+          persist-credentials: false
+
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 24
+          registry-url: https://registry.npmjs.org
+          package-manager-cache: false
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Check whether the npm version already exists
+        id: npm
+        shell: bash
+        run: |
+          set -euo pipefail
+          version="${RELEASE_TAG#v}"
+
+          if npm view "terrazzo@$version" version >/dev/null 2>&1; then
+            echo "published=true" >> "$GITHUB_OUTPUT"
+            echo "terrazzo $version is already on npm; skipping publish."
+          else
+            echo "published=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Publish to npm
+        if: steps.npm.outputs.published != 'true'
+        run: npm publish
+
+  github-release:
+    name: Create GitHub Release
+    needs:
+      - publish-gem
+      - publish-npm
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - name: Create release with generated notes
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          if gh release view "$RELEASE_TAG" --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
+            echo "$RELEASE_TAG already has a GitHub Release; skipping creation."
+          else
+            gh release create "$RELEASE_TAG" \
+              --repo "$GITHUB_REPOSITORY" \
+              --verify-tag \
+              --generate-notes \
+              --title "$RELEASE_TAG"
+          fi
