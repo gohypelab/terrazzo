@@ -11,6 +11,9 @@ gem "terrazzo"
 bundle install
 ```
 
+Bundler selects JSON 2.x for compatibility with current Rails releases.
+JSON 3 requires the [Rails compatibility fix](https://github.com/rails/rails/pull/58601).
+
 ## 2. Install Superglue (if you haven't already)
 
 Terrazzo is built on top of [Superglue](https://github.com/thoughtbot/superglue).

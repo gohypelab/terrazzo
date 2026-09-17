@@ -63,6 +63,9 @@ Full docs at **[gohypelab.github.io/terrazzo](https://gohypelab.github.io/terraz
 - Node.js 18+
 - A JS bundler (Vite recommended, esbuild also supported)
 
+Terrazzo selects JSON 2.x because current Rails releases do not support the
+JSON 3 argument format. See [the Rails compatibility fix](https://github.com/rails/rails/pull/58601).
+
 ## Development and releases
 
 Pull requests and pushes to `main` run the Ruby unit specs, npm package checks,
