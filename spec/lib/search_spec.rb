@@ -120,6 +120,36 @@ RSpec.describe Terrazzo::Search do
 
       expect(results).to contain_exactly(*@customers)
     end
+
+    it "keeps an explicit removal of the parent default scope" do
+      stub_const("ScopedSearchCustomer", Class.new(Customer) do
+        default_scope { where(name: "Not visible") }
+      end)
+      dashboard = association_search_dashboard(territory: Terrazzo::Field::BelongsTo.with_options(searchable: true))
+      scoped = ScopedSearchCustomer.unscoped.where(id: @customers.first.id)
+
+      results = described_class.new(scoped, dashboard, "United States").run
+
+      expect(results.map(&:id)).to eq([@customers.first.id])
+    end
+
+    it "keeps the outer default scope and selects only IDs in the subquery" do
+      stub_const("SelectedSearchCustomer", Class.new(Customer) do
+        default_scope { where(name: "Alice Smith").select(:id, :name) }
+      end)
+      dashboard = association_search_dashboard(territory: Terrazzo::Field::BelongsTo.with_options(searchable: true))
+      scoped = SelectedSearchCustomer.where(id: @customers.map(&:id))
+
+      results = described_class.new(scoped, dashboard, "United States").run
+
+      expect(results.map(&:id)).to eq([@customers.first.id])
+    end
+
+    it "searches text beyond the first 256 characters" do
+      customer = create_customer(name: "x" * 300 + "Needle")
+
+      expect(described_class.new(Customer.all, dashboard, "Needle").run).to contain_exactly(customer)
+    end
   end
 
   describe "JSON and numeric fields" do
@@ -185,6 +215,21 @@ RSpec.describe Terrazzo::Search do
       scoped = SearchCustomer.where(id: @customers.first.id)
 
       expect(described_class.new(scoped, fields, "report").run.map(&:id)).to eq([@customers.first.id])
+    end
+
+    %w[Mysql2 Trilogy].each do |adapter|
+      it "uses MySQL cast types and JSON paths with #{adapter}" do
+        allow(SearchDocument.connection).to receive(:adapter_name).and_return(adapter)
+        fields = document_dashboard(
+          filename: Terrazzo::Field::String.with_options(searchable: true),
+          id: Terrazzo::Field::Number.with_options(searchable: true)
+        )
+
+        sql = described_class.new(SearchDocument.all, fields, "report").run.to_sql
+
+        expect(sql).to include('CAST(JSON_UNQUOTE(JSON_EXTRACT("search_documents"."metadata", \'$."filename"\')) AS CHAR)')
+        expect(sql).to include('CAST("search_documents"."id" AS CHAR)')
+      end
     end
   end
 

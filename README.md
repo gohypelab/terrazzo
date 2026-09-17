@@ -85,6 +85,14 @@ retried safely.
 See [RELEASING.md](RELEASING.md) for trusted publisher setup, release commands,
 and retry instructions.
 
+## Customizing search
+
+Enable search with `searchable: true` in a dashboard field's options. Search supports
+numeric columns, JSON store accessors, and associated records. Override the
+controller's `search_resources` method to add custom search syntax.
+See [search fields](docs/customizing-dashboards.md#search-fields) and
+[custom search](docs/customizing-controller-actions.md#customizing-search).
+
 ## Customizing Per-Row Actions
 
 Terrazzo generates Show, Edit, and Destroy action buttons for each row on index pages and has_many tables on show pages.

@@ -220,9 +220,11 @@ ATTRIBUTE_TYPES = {
 }
 ```
 
-For association fields, `searchable_fields` lists columns on the associated table. If you omit it, Terrazzo searches the first conventional display column it finds: `name`, `title`, or `email`.
+Search converts numeric and JSON values to text. You can also search `store_accessor` fields in JSON columns.
+For association fields, `searchable_fields` lists columns or store accessors on the associated model. If you omit it, Terrazzo searches all available conventional display columns: `name`, `title`, and `email`.
 Association searches return unique parent records even when multiple associated rows match.
 Search treats `%`, `_`, and backslashes as literal characters, not SQL wildcards.
+Search keeps the controller's resource scope, including explicit removal of a model's default scope.
 
 > **Note:** Unlike Administrate, Terrazzo does not auto-enable search on String/Text/Email fields. This avoids accidentally exposing sensitive data in search queries. Always opt in explicitly.
 

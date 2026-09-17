@@ -54,7 +54,7 @@ module Terrazzo
       # Match IDs so association joins do not duplicate rows or compare JSON columns.
       model = scoped_resource.model
       primary_key = model.arel_table[model.primary_key]
-      ids = model.joins(attr).where(condition).select(primary_key)
+      ids = model.unscoped.joins(attr).where(condition).reselect(primary_key)
       primary_key.in(ids.arel)
     end
 
@@ -67,18 +67,22 @@ module Terrazzo
     end
 
     def text_attribute(model, attribute)
+      mysql = %w[Mysql2 Trilogy].include?(model.connection.adapter_name)
       store = model.stored_attributes.find { |_column, fields| fields.include?(attribute.to_sym) }
       expression =
         if store
-          Arel::Nodes::InfixOperation.new(
-            "->>",
-            model.arel_table[store.first],
-            Arel::Nodes.build_quoted(attribute.to_s)
-          )
+          column = model.arel_table[store.first]
+          if mysql
+            path = Arel::Nodes.build_quoted("$.#{attribute.to_s.to_json}")
+            value = Arel::Nodes::NamedFunction.new("JSON_EXTRACT", [column, path])
+            Arel::Nodes::NamedFunction.new("JSON_UNQUOTE", [value])
+          else
+            Arel::Nodes::InfixOperation.new("->>", column, Arel::Nodes.build_quoted(attribute.to_s))
+          end
         else
           model.arel_table[attribute]
         end
-      Arel::Nodes::NamedFunction.new("CAST", [expression.as("text")])
+      model.arel_table.cast(expression, mysql ? "CHAR" : "text")
     end
 
     def search_pattern
