@@ -205,14 +205,14 @@ end
 
 The `view` parameter provides access to route helpers. Each action hash supports:
 
-| Key | Required | Description |
-|-----|----------|-------------|
-| `label` | Yes | Button text |
-| `url` | Yes | Link URL |
-| `method` | No | HTTP method (e.g. `"delete"` or `:delete`; normalized case-insensitively) — renders as a form instead of a link |
-| `confirm` | No | Confirmation message shown before submitting non-GET form actions |
-| `sg_visit` | No | Set to `false` to bypass SPA navigation and perform a standard browser request (useful for actions that redirect outside the admin) |
-| `variant` | No | Button variant for toolbar and page header actions (for example `"default"`, `"outline"`, or `"destructive"`). Row dropdown actions ignore this key; `delete` row actions are styled as destructive automatically. |
+| Key        | Required | Description                                                                                                                                                                                                        |
+| ---------- | -------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `label`    | Yes      | Button text                                                                                                                                                                                                        |
+| `url`      | Yes      | Link URL                                                                                                                                                                                                           |
+| `method`   | No       | HTTP method (e.g. `"delete"` or `:delete`; normalized case-insensitively) — renders as a form instead of a link                                                                                                    |
+| `confirm`  | No       | Confirmation message shown before submitting non-GET form actions                                                                                                                                                  |
+| `sg_visit` | No       | Set to `false` to bypass SPA navigation and perform a standard browser request (useful for actions that redirect outside the admin)                                                                                |
+| `variant`  | No       | Button variant for toolbar and page header actions (for example `"default"`, `"outline"`, or `"destructive"`). Row dropdown actions ignore this key; `delete` row actions are styled as destructive automatically. |
 
 Custom actions also appear in has_many tables on show pages — for example, if a Customer has_many Orders, the orders table on the customer show page will use the OrderDashboard's custom actions.
 
@@ -385,34 +385,42 @@ The generator inspects your model's columns and associations to produce a reason
 
 ## All Instance Methods
 
-| Method | Description |
-|--------|-------------|
-| `#attribute_types` | Returns the `ATTRIBUTE_TYPES` hash |
-| `#attribute_type_for(attr)` | Returns the field class for a given attribute |
-| `#form_attributes(action)` | Returns form attributes — `nil` returns `FORM_ATTRIBUTES`, `"create"` returns `FORM_ATTRIBUTES_NEW` if defined, `"update"` returns `FORM_ATTRIBUTES_EDIT` if defined |
-| `#collection_attributes` | Returns `COLLECTION_ATTRIBUTES` |
-| `#show_page_attributes` | Returns `SHOW_PAGE_ATTRIBUTES` |
-| `#search_attributes` | Returns attributes where `.searchable?` is `true` |
-| `#collection_includes` | Returns eager-loadable attributes visible in collection |
-| `#permitted_attributes` | Maps form attributes through `.permitted_attribute` for strong params |
-| `#display_resource(resource)` | Display string for the resource (default: `"ClassName #id"`) |
-| `#attribute_label(attribute, context)` | Display label for an attribute on index, show, form, nested table, and CSV contexts |
-| `#attribute_hint(attribute, context)` | Supporting text for attributes on form and show contexts |
-| `#collection_cell_options(attribute, resource)` | Per-cell metadata for index and nested `has_many` tables |
-| `#collection_header_options(attribute)` | Per-header metadata for index and nested `has_many` tables |
-| `#collection_row_options(resource)` | Per-row metadata for index and nested `has_many` tables |
-| `#collection_filter_options(view)` | Index filter facets generated from `COLLECTION_FILTERS` |
-| `#collection_filter_label(filter_name)` | Label for an index filter facet |
-| `#collection_item_actions(resource, view)` | Per-row action buttons (default: Show/Edit/Destroy) |
-| `#collection_toolbar_actions(view)` | Index toolbar actions (default: Export CSV) |
-| `#layout_actions(page, view, resource:)` | Page header action slot for index, show, new, and edit pages |
-| `#csv_export_enabled?` | Whether to show the default CSV export action |
-| `#csv_attributes` | Attributes exported to CSV (default: `COLLECTION_ATTRIBUTES`) |
-| `#csv_filename` | Download filename for CSV exports |
-| `#csv_value(attribute, value, resource)` | Converts a serialized field value for CSV output |
-| `#empty_collection_message` | Index empty-state description |
-| `#navigation_label` | Sidebar link label (default: plural resource name) |
-| `#navigation_group` | Sidebar group label (default: model namespace or `Resources`) |
-| `#navigation_group_order` | Sort key for sidebar groups |
-| `#navigation_order` | Sort key within a sidebar group |
-| `#show_in_navigation?` | Whether the resource appears in the generated sidebar |
+| Method                                          | Description                                                                                                                                                          |
+| ----------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `#attribute_types`                              | Returns the `ATTRIBUTE_TYPES` hash                                                                                                                                   |
+| `#attribute_type_for(attr)`                     | Returns the field class for a given attribute                                                                                                                        |
+| `#form_attributes(action)`                      | Returns form attributes — `nil` returns `FORM_ATTRIBUTES`, `"create"` returns `FORM_ATTRIBUTES_NEW` if defined, `"update"` returns `FORM_ATTRIBUTES_EDIT` if defined |
+| `#collection_attributes`                        | Returns `COLLECTION_ATTRIBUTES`                                                                                                                                      |
+| `#show_page_attributes`                         | Returns `SHOW_PAGE_ATTRIBUTES`                                                                                                                                       |
+| `#search_attributes`                            | Returns attributes where `.searchable?` is `true`                                                                                                                    |
+| `#collection_includes`                          | Returns eager-loadable attributes visible in collection                                                                                                              |
+| `#permitted_attributes`                         | Maps form attributes through `.permitted_attribute` for strong params                                                                                                |
+| `#display_resource(resource)`                   | Display string for the resource (default: `"ClassName #id"`)                                                                                                         |
+| `#attribute_label(attribute, context)`          | Display label for an attribute on index, show, form, nested table, and CSV contexts                                                                                  |
+| `#attribute_hint(attribute, context)`           | Supporting text for attributes on form and show contexts                                                                                                             |
+| `#collection_cell_options(attribute, resource)` | Per-cell metadata for index and nested `has_many` tables                                                                                                             |
+| `#collection_header_options(attribute)`         | Per-header metadata for index and nested `has_many` tables                                                                                                           |
+| `#collection_row_options(resource)`             | Per-row metadata for index and nested `has_many` tables                                                                                                              |
+| `#collection_filter_options(view)`              | Index filter facets generated from `COLLECTION_FILTERS`                                                                                                              |
+| `#collection_filter_label(filter_name)`         | Label for an index filter facet                                                                                                                                      |
+| `#collection_item_actions(resource, view)`      | Per-row action buttons (default: Show/Edit/Destroy)                                                                                                                  |
+| `#collection_toolbar_actions(view)`             | Index toolbar actions (default: Export CSV)                                                                                                                          |
+| `#layout_actions(page, view, resource:)`        | Page header action slot for index, show, new, and edit pages                                                                                                         |
+| `#csv_export_enabled?`                          | Whether to show the default CSV export action                                                                                                                        |
+| `#csv_attributes`                               | Attributes exported to CSV (default: `COLLECTION_ATTRIBUTES`)                                                                                                        |
+| `#csv_filename`                                 | Download filename for CSV exports                                                                                                                                    |
+| `#csv_value(attribute, value, resource)`        | Converts a serialized field value for CSV output                                                                                                                     |
+| `#empty_collection_message`                     | Index empty-state description                                                                                                                                        |
+| `#navigation_label`                             | Sidebar link label (default: plural resource name)                                                                                                                   |
+| `#navigation_group`                             | Sidebar group label (default: model namespace or `Resources`)                                                                                                        |
+| `#navigation_group_order`                       | Sort key for sidebar groups                                                                                                                                          |
+| `#navigation_order`                             | Sort key within a sidebar group                                                                                                                                      |
+| `#show_in_navigation?`                          | Whether the resource appears in the generated sidebar                                                                                                                |
+
+## Search fields
+
+Set `searchable: true` on each field that the index search must use. Search is case-insensitive and treats SQL wildcard characters as literal text. Blank search terms return the current scope.
+
+Search reads `store_accessor` fields from their JSON columns and casts numeric and JSON values to text. For associations, set `searchable_fields` to the target model's columns or store accessors. If this option is absent, search uses the available `name`, `title`, and `email` columns. Association searches use ID subqueries, so multiple matching children do not duplicate parent rows and JSON columns do not require `DISTINCT`.
+
+For custom syntax, override the controller's [`search_resources`](./customizing-controller-actions#customizing-search) method.

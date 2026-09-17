@@ -158,9 +158,12 @@ module Terrazzo
       resource_class.all
     end
 
+    def search_resources
+      Terrazzo::Search.new(scoped_resource, dashboard, params[:search]).run
+    end
+
     def index_resources_and_order
-      search = Terrazzo::Search.new(scoped_resource, dashboard, params[:search])
-      resources = search.run
+      resources = search_resources
 
       filter = Terrazzo::Filter.new(resources, dashboard, params[:filter], params[:filter_value])
       resources = filter.run

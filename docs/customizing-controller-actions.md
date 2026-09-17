@@ -47,6 +47,25 @@ end
 
 `find_resource` defaults to a primary-key lookup (`scoped_resource.find(id)`), so no override is needed when `to_param` returns the id.
 
+## Customizing search
+
+Override `search_resources` to add custom search syntax. Return an Active Record relation based on `scoped_resource` to keep access restrictions. Call `super` to use the standard dashboard search.
+
+```ruby
+class Admin::ProductsController < Admin::ApplicationController
+  private
+
+  def search_resources
+    term = params[:search].to_s
+    return super unless term.start_with?("sku:")
+
+    scoped_resource.where(sku: term.delete_prefix("sku:"))
+  end
+end
+```
+
+Terrazzo applies filters and sorting after this hook. Index pagination and CSV export use the resulting relation. You do not need to override `index_resources_and_order`. The `filter_resources` hook from Administrate is not called.
+
 ## Pagination Limits
 
 Index pages show 25 rows by default and clamp `per_page` query params to 100 rows. Override `default_per_page` or `max_per_page` in an admin controller when a resource needs a different limit:

@@ -9,11 +9,7 @@ module Terrazzo
     end
 
     def run
-      if term.blank?
-        scoped_resource
-      else
-        search_results
-      end
+      term.blank? ? scoped_resource : search_results
     end
 
     private
@@ -21,52 +17,68 @@ module Terrazzo
     LIKE_ESCAPE = "\\"
 
     def search_results
-      @association_search_joined = false
       searchable_attributes = dashboard.search_attributes
       return scoped_resource if searchable_attributes.empty?
 
-      conditions = searchable_attributes.map do |attr|
-        type = dashboard.attribute_type_for(attr)
+      conditions =
+        searchable_attributes
+          .map do |attr|
+            type = dashboard.attribute_type_for(attr)
 
-        if type.respond_to?(:associative?) && type.associative?
-          build_association_search(attr, type)
-        else
-          table = scoped_resource.model.arel_table
-          table[attr].matches(search_pattern, LIKE_ESCAPE)
-        end
-      end.compact
+            if type.respond_to?(:associative?) && type.associative?
+              build_association_search(attr, type)
+            else
+              text_attribute(scoped_resource.model, attr).matches(search_pattern, LIKE_ESCAPE)
+            end
+          end
+          .compact
 
       return scoped_resource if conditions.empty?
 
       combined = conditions.reduce(:or)
-      results = scoped_resource.where(combined)
-      @association_search_joined ? results.distinct : results
+      scoped_resource.where(combined)
     end
 
     def build_association_search(attr, type)
       reflection = scoped_resource.model.reflect_on_association(attr)
       return nil unless reflection
 
-      assoc_table = reflection.klass.arel_table
       columns = association_search_columns(type, reflection.klass)
       return nil if columns.empty?
 
-      @scoped_resource = scoped_resource.left_joins(attr)
-      @association_search_joined = true
-      columns
-        .map { |column| assoc_table[column].matches(search_pattern, LIKE_ESCAPE) }
-        .reduce(:or)
+      condition =
+        columns
+          .map { |column| text_attribute(reflection.klass, column).matches(search_pattern, LIKE_ESCAPE) }
+          .reduce(:or)
+
+      # Match IDs so association joins do not duplicate rows or compare JSON columns.
+      model = scoped_resource.model
+      primary_key = model.arel_table[model.primary_key]
+      ids = model.joins(attr).where(condition).select(primary_key)
+      primary_key.in(ids.arel)
     end
 
     def association_search_columns(type, associated_class)
       configured = type.respond_to?(:options) ? Array(type.options[:searchable_fields]) : []
-      candidates = configured.presence || [:name, :title, :email]
-      column_names = associated_class.column_names
+      candidates = configured.presence || %i[name title email]
+      column_names = associated_class.column_names + associated_class.stored_attributes.values.flatten.map(&:to_s)
 
-      candidates
-        .map(&:to_s)
-        .select { |column| column_names.include?(column) }
-        .map(&:to_sym)
+      candidates.map(&:to_s).select { |column| column_names.include?(column) }.map(&:to_sym)
+    end
+
+    def text_attribute(model, attribute)
+      store = model.stored_attributes.find { |_column, fields| fields.include?(attribute.to_sym) }
+      expression =
+        if store
+          Arel::Nodes::InfixOperation.new(
+            "->>",
+            model.arel_table[store.first],
+            Arel::Nodes.build_quoted(attribute.to_s)
+          )
+        else
+          model.arel_table[attribute]
+        end
+      Arel::Nodes::NamedFunction.new("CAST", [expression.as("text")])
     end
 
     def search_pattern

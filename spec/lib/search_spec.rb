@@ -55,12 +55,10 @@ RSpec.describe Terrazzo::Search do
     end
 
     it "searches explicit searchable_fields on associations" do
-      dashboard = association_search_dashboard(
-        territory: Terrazzo::Field::BelongsTo.with_options(
-          searchable: true,
-          searchable_fields: ["code"]
+      dashboard =
+        association_search_dashboard(
+          territory: Terrazzo::Field::BelongsTo.with_options(searchable: true, searchable_fields: ["code"])
         )
-      )
       country = create_country(code: "NLD", name: "Netherlands")
       customer = create_customer(name: "Country Code Customer", email: "country-code@example.com", country: country)
       scoped = Customer.where(id: @customers.map(&:id) + [customer.id])
@@ -71,14 +69,13 @@ RSpec.describe Terrazzo::Search do
     end
 
     it "treats SQL wildcard characters as literal text in association search" do
-      dashboard = association_search_dashboard(
-        territory: Terrazzo::Field::BelongsTo.with_options(
-          searchable: true,
-          searchable_fields: ["code"]
+      dashboard =
+        association_search_dashboard(
+          territory: Terrazzo::Field::BelongsTo.with_options(searchable: true, searchable_fields: ["code"])
         )
-      )
       country = create_country(code: "A_B", name: "Underscore Country")
-      customer = create_customer(name: "Association Wildcard Customer", email: "assoc-wildcard@example.com", country: country)
+      customer =
+        create_customer(name: "Association Wildcard Customer", email: "assoc-wildcard@example.com", country: country)
       scoped = Customer.where(id: @customers.map(&:id) + [customer.id])
 
       results = described_class.new(scoped, dashboard, "A_B").run
@@ -87,9 +84,7 @@ RSpec.describe Terrazzo::Search do
     end
 
     it "uses conventional display columns for searchable associations by default" do
-      dashboard = association_search_dashboard(
-        territory: Terrazzo::Field::BelongsTo.with_options(searchable: true)
-      )
+      dashboard = association_search_dashboard(territory: Terrazzo::Field::BelongsTo.with_options(searchable: true))
       country = create_country(code: "DE", name: "Germany")
       customer = create_customer(name: "Fallback Customer", email: "fallback@example.com", country: country)
       scoped = Customer.where(id: @customers.map(&:id) + [customer.id])
@@ -100,12 +95,10 @@ RSpec.describe Terrazzo::Search do
     end
 
     it "deduplicates parent records when has_many association search matches multiple children" do
-      dashboard = association_search_dashboard(
-        orders: Terrazzo::Field::HasMany.with_options(
-          searchable: true,
-          searchable_fields: ["address_city"]
+      dashboard =
+        association_search_dashboard(
+          orders: Terrazzo::Field::HasMany.with_options(searchable: true, searchable_fields: ["address_city"])
         )
-      )
       customer = create_customer(name: "Has Many Search", email: "has-many-search@example.com")
       2.times { create_order(customer: customer, address_city: "Needle City") }
       scoped = Customer.where(id: @customers.map(&:id) + [customer.id])
@@ -114,15 +107,14 @@ RSpec.describe Terrazzo::Search do
 
       expect(results.to_a).to contain_exactly(customer)
       expect(results.count).to eq(1)
+      expect(results.distinct_value).to be_falsey
     end
 
     it "ignores association searchable_fields that are not real columns" do
-      dashboard = association_search_dashboard(
-        territory: Terrazzo::Field::BelongsTo.with_options(
-          searchable: true,
-          searchable_fields: ["missing_column"]
+      dashboard =
+        association_search_dashboard(
+          territory: Terrazzo::Field::BelongsTo.with_options(searchable: true, searchable_fields: ["missing_column"])
         )
-      )
 
       results = described_class.new(scope, dashboard, "anything").run
 
@@ -130,14 +122,75 @@ RSpec.describe Terrazzo::Search do
     end
   end
 
-  def association_search_dashboard(attribute_overrides)
-    base_types = CustomerDashboard::ATTRIBUTE_TYPES.merge(
-      name: Terrazzo::Field::String,
-      email: Terrazzo::Field::Email
-    )
+  describe "JSON and numeric fields" do
+    before do
+      ActiveRecord::Base
+        .connection
+        .create_table(:search_documents, temporary: true) do |table|
+          table.json :metadata
+          table.integer :customer_id
+        end
+      stub_const(
+        "SearchDocument",
+        Class.new(ActiveRecord::Base) do
+          store_accessor :metadata, :filename
+          belongs_to :customer
+        end
+      )
+      stub_const(
+        "SearchCustomer",
+        Class.new(ActiveRecord::Base) do
+          self.table_name = "customers"
+          has_many :search_documents, foreign_key: :customer_id
+        end
+      )
+    end
 
-    Class.new(CustomerDashboard) do
-      const_set(:ATTRIBUTE_TYPES, base_types.merge(attribute_overrides).freeze)
-    end.new
+    after { ActiveRecord::Base.connection.drop_table(:search_documents) }
+
+    def document_dashboard(types)
+      Class.new(Terrazzo::BaseDashboard) { const_set(:ATTRIBUTE_TYPES, types.freeze) }.new
+    end
+
+    it "searches JSON store accessors with literal wildcard characters" do
+      match = SearchDocument.create!(customer: @customers.first, filename: "Report_100%.pdf")
+      SearchDocument.create!(customer: @customers.first, filename: "ReportX1000.pdf")
+      fields = document_dashboard(filename: Terrazzo::Field::String.with_options(searchable: true))
+
+      expect(described_class.new(SearchDocument.all, fields, "report_100%").run).to contain_exactly(match)
+    end
+
+    it "searches a numeric column as text" do
+      document = SearchDocument.create!(customer: @customers.first)
+      fields = document_dashboard(id: Terrazzo::Field::String.with_options(searchable: true))
+
+      expect(described_class.new(SearchDocument.all, fields, document.id.to_s).run).to contain_exactly(document)
+      expect(described_class.new(SearchDocument.all, fields, "missing").run).to be_empty
+    end
+
+    it "searches an association when the parent has a JSON column" do
+      document = SearchDocument.create!(customer: @customers.first, filename: "report.pdf")
+      fields = document_dashboard(customer: Terrazzo::Field::BelongsTo.with_options(searchable: true))
+
+      expect(described_class.new(SearchDocument.all, fields, "Alice").run).to contain_exactly(document)
+    end
+
+    it "searches store accessors on associations without duplicate parents" do
+      2.times { SearchDocument.create!(customer: @customers.first, filename: "report.pdf") }
+      SearchDocument.create!(customer: @customers.last, filename: "report.pdf")
+      fields =
+        document_dashboard(
+          search_documents: Terrazzo::Field::HasMany.with_options(searchable: true, searchable_fields: [:filename])
+        )
+      scoped = SearchCustomer.where(id: @customers.first.id)
+
+      expect(described_class.new(scoped, fields, "report").run.map(&:id)).to eq([@customers.first.id])
+    end
+  end
+
+  def association_search_dashboard(attribute_overrides)
+    base_types = CustomerDashboard::ATTRIBUTE_TYPES.merge(name: Terrazzo::Field::String, email: Terrazzo::Field::Email)
+
+    Class.new(CustomerDashboard) { const_set(:ATTRIBUTE_TYPES, base_types.merge(attribute_overrides).freeze) }.new
   end
 end
