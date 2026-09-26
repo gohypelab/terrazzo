@@ -61,6 +61,7 @@ RSpec.describe "Admin Products", type: :system do
     it "renders the edit product form" do
       visit edit_admin_product_path(product)
 
+      expect(page).to have_css("h1", text: "Edit Product — Widget Pro", count: 1)
       expect(page).to have_field("Name", with: "Widget Pro")
     end
 
