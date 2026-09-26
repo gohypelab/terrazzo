@@ -1,6 +1,6 @@
 param_key = resource_class.model_name.param_key
 
-json.pageTitle t("terrazzo.actions.edit", resource_name: resource_name)
+json.pageTitle "#{t("terrazzo.actions.edit", resource_name: resource_name)} — #{dashboard.display_resource(@resource)}"
 
 json.form do
   json.props({
