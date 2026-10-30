@@ -1,0 +1,39 @@
+version: 2
+updates:
+  - package-ecosystem: npm
+    directories:
+      - /docs
+      - /npm
+      - /spec/example_app
+    schedule:
+      interval: weekly
+    groups:
+      compatible:
+        patterns: ["*"]
+        update-types: [minor, patch]
+      security:
+        applies-to: security-updates
+        patterns: ["*"]
+
+  - package-ecosystem: bundler
+    directories:
+      - /
+      - /spec/example_app
+    schedule:
+      interval: weekly
+    groups:
+      compatible:
+        patterns: ["*"]
+        update-types: [minor, patch]
+      security:
+        applies-to: security-updates
+        patterns: ["*"]
+
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly
+    groups:
+      compatible:
+        patterns: ["*"]
+        update-types: [minor, patch]
