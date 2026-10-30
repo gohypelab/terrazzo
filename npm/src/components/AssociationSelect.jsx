@@ -24,8 +24,7 @@ export function AssociationSelect({
   );
   const [open, setOpen] = useState(false);
   const [search, setSearch] = useState("");
-  const [page, setPage] = useState(1);
-  const [result, setResult] = useState({ resourceOptions: [], hasMore: false });
+  const [result, setResult] = useState({ resourceOptions: [] });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [retry, setRetry] = useState(0);
@@ -40,7 +39,6 @@ export function AssociationSelect({
       try {
         const url = new URL(options.optionsUrl, window.location.origin);
         url.searchParams.set("search", search);
-        url.searchParams.set("page", String(page));
         const response = await window.fetch(url, {
           headers: { Accept: "application/json" },
           signal: controller.signal,
@@ -61,7 +59,7 @@ export function AssociationSelect({
       clearTimeout(timer);
       controller.abort();
     };
-  }, [open, search, page, options.optionsUrl, retry]);
+  }, [open, search, options.optionsUrl, retry]);
 
   const select = (option) => {
     const id = option[1];
@@ -150,7 +148,6 @@ export function AssociationSelect({
             className="w-full rounded border px-2 py-1"
             onChange={(event) => {
               setSearch(event.target.value);
-              setPage(1);
               setLoading(true);
             }}
           />
@@ -187,29 +184,6 @@ export function AssociationSelect({
               ))}
             </div>
           )}
-          <div className="flex items-center justify-between">
-            <button
-              type="button"
-              disabled={loading || page === 1}
-              onClick={() => {
-                setPage(page - 1);
-                setLoading(true);
-              }}
-            >
-              Previous
-            </button>
-            <span>Page {page}</span>
-            <button
-              type="button"
-              disabled={loading || !!error || !result.hasMore}
-              onClick={() => {
-                setPage(page + 1);
-                setLoading(true);
-              }}
-            >
-              Next
-            </button>
-          </div>
         </PopoverContent>
       </Popover>
       {!multiple && selectedIds.length > 0 && (

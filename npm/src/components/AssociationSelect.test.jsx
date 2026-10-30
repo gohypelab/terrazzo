@@ -10,9 +10,9 @@ import { AssociationSelect } from "./AssociationSelect";
 
 const initial = ["Existing", "9007199254740993"];
 const next = ["Next result", "9007199254740994"];
-const response = (items, hasMore = false) => ({
+const response = (items) => ({
   ok: true,
-  json: async () => ({ resourceOptions: items, hasMore }),
+  json: async () => ({ resourceOptions: items }),
 });
 const props = {
   multiple: true,
@@ -28,25 +28,24 @@ const props = {
 describe("AssociationSelect", () => {
   afterEach(() => vi.unstubAllGlobals());
 
-  it("loads on open and preserves selections through paging, searching, and clearing", async () => {
+  it("searches without pagination and preserves selections through searching and clearing", async () => {
     const fetch = vi
       .fn()
-      .mockResolvedValueOnce(response([next], true))
-      .mockResolvedValueOnce(response([["Page two", "3"]]))
+      .mockResolvedValueOnce(response([next]))
       .mockResolvedValueOnce(response([]));
     vi.stubGlobal("fetch", fetch);
     const { container } = render(<AssociationSelect {...props} />);
     expect(fetch).not.toHaveBeenCalled();
     fireEvent.click(screen.getByRole("combobox"));
     fireEvent.click(await screen.findByRole("button", { name: "Next result" }));
-    fireEvent.click(screen.getByRole("button", { name: "Next", exact: true }));
-    await screen.findByRole("button", { name: "Page two" });
-    expect(fetch.mock.calls[1][0].searchParams.get("page")).toBe("2");
+    expect(screen.queryByRole("button", { name: "Next", exact: true })).not.toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: "Previous", exact: true })).not.toBeInTheDocument();
     fireEvent.change(screen.getByRole("textbox"), {
       target: { value: "missing" },
     });
     await screen.findByText("No results found.");
-    expect(fetch.mock.calls[2][0].searchParams.get("page")).toBe("1");
+    expect(fetch.mock.calls[1][0].searchParams.get("search")).toBe("missing");
+    expect(fetch.mock.calls[1][0].searchParams.has("page")).toBe(false);
     const values = () =>
       [...container.querySelectorAll('input[type="hidden"]')].map(
         (node) => node.value,

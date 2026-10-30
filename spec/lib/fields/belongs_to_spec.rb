@@ -93,7 +93,7 @@ RSpec.describe Terrazzo::Field::BelongsTo do
       field = described_class.new(:customer, nil, :form, resource: order, options: {
         order: :name
       })
-      opts = field.association_options(search: "", page: 1)
+      opts = field.association_options(search: "")
       names = opts[:resourceOptions].map(&:first)
       expect(names).to eq(names.sort)
     end

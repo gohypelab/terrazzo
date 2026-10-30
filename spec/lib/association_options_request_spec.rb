@@ -32,24 +32,21 @@ RSpec.describe "association option loading", type: :request do
     expect(counts.sum).to eq(0)
   end
 
-  it "limits database materialization and returns disjoint pages without rendering a form" do
-    31.times { |i| create_customer(name: "Candidate #{i}") }
+  it "loads only the first ten matches and finds records beyond that limit through search" do
+    candidates = 31.times.map { |i| create_customer(name: "Candidate #{i}") }
     counts = []
     subscriber = ->(*args) { counts << args.last[:record_count] if args.last[:class_name] == "Customer" }
     ActiveSupport::Notifications.subscribed(subscriber, "instantiation.active_record") do
       get "/admin/orders/new", params: { association: "customer", search: "Candidate", per_page: 10_000 }, headers: headers
     end
     first = response.parsed_body
-    expect(first.fetch("resourceOptions").length).to eq(25)
-    expect(first.fetch("hasMore")).to be(true)
-    expect(first).not_to have_key("data")
-    expect(counts.sum).to eq(26)
+    expect(first.fetch("resourceOptions").map(&:last)).to eq(candidates.first(10).map { |record| record.id.to_s })
+    expect(first.keys).to eq(["resourceOptions"])
+    expect(counts.sum).to eq(10)
     expect(response.headers["Cache-Control"]).to include("no-store")
-    get "/admin/orders/new", params: { association: "customer", search: "Candidate", page: 2 }, headers: headers
+    get "/admin/orders/new", params: { association: "customer", search: "Candidate 30" }, headers: headers
     second = response.parsed_body
-    expect(second.fetch("resourceOptions").length).to eq(6)
-    expect(second.fetch("hasMore")).to be(false)
-    expect(first.fetch("resourceOptions") & second.fetch("resourceOptions")).to be_empty
+    expect(second.fetch("resourceOptions")).to eq([[candidates.last.name, candidates.last.id.to_s]])
   end
 
   it "searches in SQL, escapes wildcards, and supports empty results" do
@@ -80,7 +77,7 @@ RSpec.describe "association option loading", type: :request do
     customer = create_customer(country: country)
     field = Terrazzo::Field::BelongsTo.new(:territory, nil, :form, resource: customer)
     expect(field.serializable_options(:form)[:resourceOptions]).to eq([["Canada", "CA"]])
-    expect(field.association_options(search: "Canada", page: 1)[:resourceOptions]).to eq([["Canada", "CA"]])
+    expect(field.association_options(search: "Canada")[:resourceOptions]).to eq([["Canada", "CA"]])
   end
 
   it "returns only selected has-many records and bounds candidate loading" do
@@ -93,9 +90,9 @@ RSpec.describe "association option loading", type: :request do
     counts = []
     subscriber = ->(*args) { counts << args.last[:record_count] if args.last[:class_name] == "Order" }
     ActiveSupport::Notifications.subscribed(subscriber, "instantiation.active_record") do
-      expect(field.association_options(search: "", page: 1)[:resourceOptions].length).to eq(25)
+      expect(field.association_options(search: "")[:resourceOptions].length).to eq(10)
     end
-    expect(counts.sum).to eq(26)
+    expect(counts.sum).to eq(10)
   end
 
   it "retains a submitted selection after validation fails" do
@@ -113,6 +110,6 @@ RSpec.describe "association option loading", type: :request do
     field = Terrazzo::Field::BelongsTo.new(:customer, nil, :form,
       resource: Order.new(customer: selected), options: { scope: ->(model) { model.where(id: candidate.id) } })
     expect(field.serializable_options(:form)[:resourceOptions]).to eq([[selected.name, selected.id.to_s]])
-    expect(field.association_options(search: "", page: 1)[:resourceOptions]).to eq([[candidate.name, candidate.id.to_s]])
+    expect(field.association_options(search: "")[:resourceOptions]).to eq([[candidate.name, candidate.id.to_s]])
   end
 end

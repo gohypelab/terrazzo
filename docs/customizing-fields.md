@@ -366,7 +366,7 @@ All field types inherit from `Field::Base`.
 
 ## Association option queries
 
-`HasMany` and `BelongsTo` form options contain only selected records. Each form field also receives `optionsUrl`. A GET request to this URL accepts `search` and `page` and returns `resourceOptions`, `page`, and `hasMore`. Pages contain at most 25 options. The query loads at most 26 candidates and does not count the full result set.
+`HasMany` and `BelongsTo` form options contain only selected records. Each form field also receives `optionsUrl`. A GET request to this URL accepts `search` and returns `resourceOptions` with the first 10 matches. The query loads at most 10 candidates. Type a more specific query to find other records; there are no page controls or total counts.
 
 The URL uses the parent resource's `new` or `edit` action. The controller checks the same parent authorization as the form and permits only fields in that action's form attributes. The response contains no form data. If a host controller overrides `new` or `edit`, call `render_association_options("create")` or `render_association_options("update")` after setting `@resource` and checking authorization when `params[:association].present?`.
 
@@ -374,6 +374,6 @@ The `scope` option still accepts a relation method or a lambda that receives the
 
 Use `searchable_fields` to specify database columns or store accessors. Without this option, search uses available `name`, `title`, `email`, `slug`, `code`, `original_filename`, and `id` fields. Search escapes SQL wildcard characters. Set `order` to control the result order; the association key breaks ties. `includes` preloads associations needed by custom labels. Selected records remain visible even if the candidate scope no longer includes them.
 
-Custom form components can import `AssociationSelect` from `terrazzo/components`. Pass `value`, `options`, `input`, `label`, and `required`; add `multiple` for a collection. `onChange(value, option)` receives the selected key or key list and the chosen option, or `null` when a selection is removed. The component preserves selections across searches and pages, cancels stale requests, and provides retry controls. Hidden inputs keep the existing Rails parameter names and empty-value behavior.
+Custom form components can import `AssociationSelect` from `terrazzo/components`. Pass `value`, `options`, `input`, `label`, and `required`; add `multiple` for a collection. `onChange(value, option)` receives the selected key or key list and the chosen option, or `null` when a selection is removed. The component preserves selections across searches, cancels stale requests, and provides retry controls. Hidden inputs keep the existing Rails parameter names and empty-value behavior.
 
 Upgrade the gem and npm package together. Replace custom association dropdowns that expect a complete `resourceOptions` list. Regenerate or update ejected form fields and the `AssociationSelect` component.

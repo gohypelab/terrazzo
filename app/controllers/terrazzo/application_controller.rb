@@ -282,7 +282,7 @@ module Terrazzo
       return head :not_found unless field.association_options?
 
       response.headers["Cache-Control"] = "no-store"
-      render json: field.association_options(search: params[:search], page: params[:page])
+      render json: field.association_options(search: params[:search])
     end
 
     def resolver

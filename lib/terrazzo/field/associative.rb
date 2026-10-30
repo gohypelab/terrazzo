@@ -1,20 +1,17 @@
 module Terrazzo
   module Field
     class Associative < Base
-      OPTION_PAGE_SIZE = 25
+      OPTION_LIMIT = 10
 
-      def association_options(search:, page:)
-        page = [page.to_i, 1].max
+      def association_options(search:)
         scope = candidate_scope
         columns = options[:searchable_fields] || (%w[name title email slug code original_filename id] &
           (associated_class.column_names + associated_class.stored_attributes.values.flatten.map(&:to_s)))
         scope = Terrazzo::Search.new(scope, nil, search).run_for_columns(columns)
         scope = scope.reorder(options[:order] || association_primary_key).order(association_primary_key)
-        records = scope.offset((page - 1) * OPTION_PAGE_SIZE).limit(OPTION_PAGE_SIZE + 1).to_a
+        records = scope.limit(OPTION_LIMIT).to_a
         {
-          resourceOptions: records.first(OPTION_PAGE_SIZE).map { |record| option_for(record) },
-          page: page,
-          hasMore: records.length > OPTION_PAGE_SIZE
+          resourceOptions: records.map { |record| option_for(record) }
         }
       end
 

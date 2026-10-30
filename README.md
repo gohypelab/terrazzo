@@ -1,6 +1,6 @@
 # Terrazzo
 
-Association forms load selected values first. `HasMany` and `BelongsTo` use server search with pages of 25 options. Upgrade the gem and npm package together. Custom association form components must use the new option query contract; see [custom fields](docs/customizing-fields.md).
+Association forms load selected values first. `HasMany` and `BelongsTo` use typeahead search with at most 10 matches. Upgrade the gem and npm package together. Custom association form components must use the new option query contract; see [custom fields](docs/customizing-fields.md).
 
 A drop-in admin panel for Rails apps. Uses the [Administrate](https://github.com/thoughtbot/administrate) dashboard DSL with a React SPA frontend powered by [Superglue](https://github.com/thoughtbot/superglue).
 
