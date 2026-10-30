@@ -27,6 +27,7 @@
     "@reduxjs/toolkit": "2.11.2",
     "@thoughtbot/superglue": "1.0.3",
     "class-variance-authority": "0.7.1",
+    "cmdk": "1.1.1",
     "clsx": "2.1.1",
     "lucide-react": "0.344.0",
     "react": "18.3.1",

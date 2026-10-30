@@ -35,7 +35,7 @@ RSpec.describe "Admin Pages", type: :system do
       fill_in "Body", with: "New page content"
       find("#page_product_id").click
       find("input[aria-label=\'Search Product\']").set(product.name)
-      click_button product.name, exact: true
+      find("[role='option'][aria-disabled='false']", text: product.name, exact_text: true).click
       click_button "Save"
 
       expect(page).to have_content("New Page")

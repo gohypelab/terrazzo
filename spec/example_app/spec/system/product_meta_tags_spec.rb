@@ -34,7 +34,7 @@ RSpec.describe "Admin Product Meta Tags", type: :system do
 
       find("#product_meta_tag_product_id").click
       find("input[aria-label=\'Search Product\']").set("Unlinked Product")
-      click_button "Unlinked Product", exact: true
+      find("[role='option'][aria-disabled='false']", text: "Unlinked Product", exact_text: true).click
       fill_in "Meta title", with: "New Meta Title"
       fill_in "Meta description", with: "New meta description"
       click_button "Save"

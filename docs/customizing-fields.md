@@ -376,4 +376,8 @@ Use `searchable_fields` to specify database columns or store accessors. Without 
 
 Custom form components can import `AssociationSelect` from `terrazzo/components`. Pass `value`, `options`, `input`, `label`, and `required`; add `multiple` for a collection. `onChange(value, option)` receives the selected key or key list and the chosen option, or `null` when a selection is removed. The component preserves selections across searches, cancels stale requests, and provides retry controls. Hidden inputs keep the existing Rails parameter names and empty-value behavior.
 
+The combobox uses a Radix popover and `cmdk` with Tailwind styles. The search panel matches the field width. Multiple selections appear as removable chips inside the field. Arrow keys move through the matches, Enter selects a match, and Escape closes the panel. Server results are not filtered again in the browser. The field, panel, selected rows, and chips use semantic color tokens for light and dark modes. Install `cmdk` 1.1.1 or newer with the other frontend peer dependencies.
+
+During a search, the previous result rows stay in place and cannot be selected. The list has a minimum height for its initial and empty states. The search icon changes to a spinner in the same fixed-width slot while input is debounced for 200 ms and the request runs. The search icon returns when the request completes. Loading announcements use a screen-reader status region. The panel changes height only when actual results or an error replace its contents; loading text does not replace the list.
+
 Upgrade the gem and npm package together. Replace custom association dropdowns that expect a complete `resourceOptions` list. Regenerate or update ejected form fields and the `AssociationSelect` component.

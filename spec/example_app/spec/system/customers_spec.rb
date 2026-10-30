@@ -78,7 +78,7 @@ RSpec.describe "Admin Customers", type: :system do
       find("label", text: /\AKind/).find(:xpath, "..").find("select").select("Standard")
       find("#customer_country_code").click
       find("input[aria-label=\'Search Territory\']").set("United States")
-      click_button "United States", exact: true
+      find("[role='option'][aria-disabled='false']", text: "United States", exact_text: true).click
       click_button "Save"
 
       expect(page).to have_content("New Customer")

@@ -72,7 +72,7 @@ yarn add @radix-ui/react-avatar@1.1.11 @radix-ui/react-dialog@1.1.15 \
   @radix-ui/react-popover@1.1.15 @radix-ui/react-select@2.2.6 \
   @radix-ui/react-separator@1.1.8 @radix-ui/react-slot@1.2.4 \
   @radix-ui/react-tooltip@1.2.8 class-variance-authority@0.7.1 \
-  lucide-react@0.344.0 tailwindcss@4.2.1
+  cmdk@1.1.1 lucide-react@0.344.0 tailwindcss@4.2.1
 ```
 
 The install generator also checks `package.json` and prints the exact package-manager command if any required frontend packages are missing or pinned below Terrazzo's supported versions.

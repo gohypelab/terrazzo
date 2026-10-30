@@ -25,6 +25,19 @@ for (const [specifier, names] of Object.entries(expectedExports)) {
 assertTemplatePackageImports(expectedExports);
 
 const components = await import("terrazzo/components");
+for (const module of [components, require("terrazzo/components")]) {
+  const associationMarkup = renderToStaticMarkup(
+    React.createElement(module.AssociationSelect, {
+      label: "Owner",
+      value: "1",
+      input: { id: "owner_id", name: "resource[owner_id]" },
+      options: { resourceOptions: [["Selected owner", "1"]], optionsUrl: "/admin/resources/new.json?association=owner" }
+    })
+  );
+  if (!associationMarkup.includes("Selected owner")) {
+    throw new Error("The packaged association selector did not render its selected value");
+  }
+}
 const fields = await import("terrazzo/fields");
 const pages = await import("terrazzo/pages");
 const root = await import("terrazzo");

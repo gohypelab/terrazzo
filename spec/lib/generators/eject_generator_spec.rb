@@ -963,6 +963,7 @@ RSpec.describe Terrazzo::Generators::EjectGenerator do
       "--external:@thoughtbot/superglue",
       "--external:@radix-ui/*",
       "--external:class-variance-authority",
+      "--external:cmdk",
       "--external:lucide-react",
       "--external:clsx",
       "--external:tailwind-merge",

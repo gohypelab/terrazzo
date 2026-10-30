@@ -32,6 +32,7 @@ module Terrazzo
           @radix-ui/react-slot
           @radix-ui/react-tooltip
           class-variance-authority
+          cmdk
           lucide-react
         ] + [TAILWIND_PACKAGE_NAME]
       ).freeze
@@ -52,6 +53,7 @@ module Terrazzo
         "@radix-ui/react-slot" => "1.0.0",
         "@radix-ui/react-tooltip" => "1.0.0",
         "class-variance-authority" => "0.7.0",
+        "cmdk" => "1.1.1",
         "lucide-react" => "0.300.0",
         TAILWIND_PACKAGE_NAME => TAILWIND_MINIMUM_VERSION,
       }.freeze
