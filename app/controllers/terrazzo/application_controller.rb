@@ -58,12 +58,14 @@ module Terrazzo
     def new
       @resource = resource_class.new
       authorize_action!(@resource, :new)
+      return render_association_options("create") if params[:association].present?
       @page = Terrazzo::Page::Form.new(dashboard, @resource)
     end
 
     def edit
       @resource = find_resource(params[:id])
       authorize_action!(@resource, :edit)
+      return render_association_options("update") if params[:association].present?
       @page = Terrazzo::Page::Form.new(dashboard, @resource)
     end
 
@@ -270,6 +272,18 @@ module Terrazzo
     end
 
     private
+
+    def render_association_options(action)
+      attribute = params[:association].to_s
+      attributes = dashboard.flatten_attributes(dashboard.form_attributes(action))
+      return head :not_found unless attributes.map(&:to_s).include?(attribute)
+
+      field = dashboard.attribute_type_for(attribute.to_sym).new(attribute.to_sym, nil, :form, resource: @resource)
+      return head :not_found unless field.association_options?
+
+      response.headers["Cache-Control"] = "no-store"
+      render json: field.association_options(search: params[:search], page: params[:page])
+    end
 
     def resolver
       @_resolver ||= Terrazzo::ResourceResolver.new(controller_path)

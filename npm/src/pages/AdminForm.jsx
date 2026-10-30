@@ -7,6 +7,7 @@ export function AdminForm({ form = {}, errors = [] }) {
   const { props: formProps = {}, extras = {}, fieldGroups = [], fields = [] } = form;
   const groups = Array.isArray(fieldGroups) ? fieldGroups : [];
   const hasFieldGroups = groups.length > 0;
+  const fieldsByAttribute = new Map(fields.map((field) => [field.attribute, field]));
 
   const renderField = (field) => {
     const hintId = field.hint && field.input?.id ? `${field.input.id}_hint` : null;
@@ -15,7 +16,7 @@ export function AdminForm({ form = {}, errors = [] }) {
       field.input;
 
     return (
-      <div key={field.attribute} className="space-y-2">
+      <div key={`${field.attribute}:${JSON.stringify(field.value)}`} className="space-y-2">
         <FieldRenderer
           mode="form"
           fieldType={field.fieldType}
@@ -63,7 +64,7 @@ export function AdminForm({ form = {}, errors = [] }) {
                   <legend className="text-lg font-semibold">{group.name}</legend>
                 )}
                 <div className="space-y-6">
-                  {(group.fields || []).map((field) => renderField(field))}
+                  {group.attributes.map((attribute) => renderField(fieldsByAttribute.get(attribute)))}
                 </div>
               </fieldset>
             )}

@@ -1,5 +1,16 @@
 module Terrazzo
   module ResourcePathsHelper
+    def association_options_path(field)
+      url_for(
+        controller: controller_path,
+        action: field.resource.persisted? ? :edit : :new,
+        id: field.resource.persisted? ? terrazzo_resource_param(field.resource) : nil,
+        association: field.attribute,
+        only_path: true,
+        format: :json
+      )
+    end
+
     def terrazzo_resource_collection_path(resource_or_class = resource_class)
       url_for(
         controller: terrazzo_resource_controller_path(resource_or_class),

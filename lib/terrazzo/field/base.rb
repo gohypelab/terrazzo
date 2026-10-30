@@ -24,6 +24,10 @@ module Terrazzo
         {}
       end
 
+      def association_options?
+        false
+      end
+
       def required?
         return false unless resource
 

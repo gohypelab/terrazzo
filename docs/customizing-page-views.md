@@ -1,5 +1,7 @@
 # Customizing Page Views
 
+Form props contain one `fields` array. Each `fieldGroups` entry contains `name` and an `attributes` array of field names. Resolve those names through `fields`; groups do not contain duplicate field values or options. Update ejected `_form.jsx` files with the gem and npm package.
+
 The install generator creates shared page stubs, navigation props, and app-level barrels under `app/views/admin/`. Default React pages, components, fields, and UI primitives come from the `terrazzo` package until you eject the files you want to own.
 
 ## File Structure

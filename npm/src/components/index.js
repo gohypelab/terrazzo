@@ -11,3 +11,4 @@ export { CollectionItemActions } from "./CollectionItemActions";
 export { CollectionToolbarActions } from "./CollectionToolbarActions";
 export { ResourceTable } from "./ResourceTable";
 export { HasManyPagination } from "./HasManyPagination";
+export { AssociationSelect } from "./AssociationSelect";

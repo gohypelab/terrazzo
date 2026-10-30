@@ -3,6 +3,10 @@ module Terrazzo
     class HasMany < Associative
       DEFAULT_PER_PAGE = 5
 
+      def association_options?
+        true
+      end
+
       def serialize_value(mode)
         return nil if data.nil?
 
@@ -13,7 +17,7 @@ module Terrazzo
           label = label.singularize if count == 1
           { count: count, label: label }
         when :form
-          data.map { |r| r.id.to_s }
+          data.map { |r| r.public_send(association_primary_key).to_s }
         when :show
           serialize_show_value
         else
@@ -24,7 +28,7 @@ module Terrazzo
       def serializable_options(page = nil)
         opts = {}
         if page == :form && resource
-          opts[:resourceOptions] = resource_options
+          opts[:resourceOptions] = selected_resource_options
         end
         if options.key?(:render_actions)
           opts[:renderActions] = options[:render_actions]
@@ -185,20 +189,6 @@ module Terrazzo
           className: class_name,
           meta: options.presence,
         }.compact
-      end
-
-      def resource_options
-        return [] unless associated_class
-        scope = if options[:scope].is_a?(Proc)
-          options[:scope].call(associated_class)
-        elsif options[:scope]
-          associated_class.public_send(options[:scope])
-        else
-          associated_class.all
-        end
-        scope = scope.includes(*options[:includes]) if options.key?(:includes)
-        pk = association_primary_key
-        scope.map { |r| [display_name(r), r.public_send(pk).to_s] }
       end
 
       def apply_sorting(records)

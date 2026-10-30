@@ -12,6 +12,16 @@ module Terrazzo
       term.blank? ? scoped_resource : search_results
     end
 
+    def run_for_columns(columns)
+      return scoped_resource if term.blank?
+      return scoped_resource.none if columns.empty?
+
+      conditions = columns.map do |column|
+        text_attribute(scoped_resource.model, column).matches(search_pattern, LIKE_ESCAPE)
+      end
+      scoped_resource.where(conditions.reduce(:or))
+    end
+
     private
 
     LIKE_ESCAPE = "\\"

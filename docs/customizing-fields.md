@@ -11,7 +11,7 @@ ATTRIBUTE_TYPES = {
   name: Field::String.with_options(truncate: 30),
   price: Field::Number.with_options(prefix: "$", decimals: 2),
   status: Field::Select.with_options(collection: -> { MyModel.statuses.keys }),
-  author: Field::BelongsTo.with_options(scope: -> { User.where(role: :author) }),
+  author: Field::BelongsTo.with_options(scope: ->(users) { users.where(role: :author) }),
 }
 ```
 
@@ -139,7 +139,7 @@ customer: Field::BelongsTo
 - **Index/Show**: Link to the associated record
 - **Form**: Select dropdown with all available records
 
-Options: `scope` (proc to filter records), `include_blank`, `order` (e.g., `order: :name` to sort dropdown options)
+Options: `scope` (proc to filter records), `order` (e.g., `order: :name` to sort dropdown options), `searchable_fields`, `includes`. Use the clear-selection button to submit an empty value.
 
 ### **Field::HasMany**
 
@@ -363,3 +363,17 @@ All field types inherit from `Field::Base`.
 | `.eager_load?` | Whether to eager-load this association (default: `false`) |
 | `.with_options(opts)` | Returns a deferred field with merged options |
 | `.permitted_attribute` | Returns the attribute name for strong parameters |
+
+## Association option queries
+
+`HasMany` and `BelongsTo` form options contain only selected records. Each form field also receives `optionsUrl`. A GET request to this URL accepts `search` and `page` and returns `resourceOptions`, `page`, and `hasMore`. Pages contain at most 25 options. The query loads at most 26 candidates and does not count the full result set.
+
+The URL uses the parent resource's `new` or `edit` action. The controller checks the same parent authorization as the form and permits only fields in that action's form attributes. The response contains no form data. If a host controller overrides `new` or `edit`, call `render_association_options("create")` or `render_association_options("update")` after setting `@resource` and checking authorization when `params[:association].present?`.
+
+The `scope` option still accepts a relation method or a lambda that receives the associated class. For a scope that depends on the parent record, override `candidate_scope` and return an Active Record relation. Do not convert that relation to an array. Override `option_for(record)` to change the option label or add metadata. Each option starts with `[label, key_as_string]`. The query preserves the association primary key.
+
+Use `searchable_fields` to specify database columns or store accessors. Without this option, search uses available `name`, `title`, `email`, `slug`, `code`, `original_filename`, and `id` fields. Search escapes SQL wildcard characters. Set `order` to control the result order; the association key breaks ties. `includes` preloads associations needed by custom labels. Selected records remain visible even if the candidate scope no longer includes them.
+
+Custom form components can import `AssociationSelect` from `terrazzo/components`. Pass `value`, `options`, `input`, `label`, and `required`; add `multiple` for a collection. `onChange(value, option)` receives the selected key or key list and the chosen option, or `null` when a selection is removed. The component preserves selections across searches and pages, cancels stale requests, and provides retry controls. Hidden inputs keep the existing Rails parameter names and empty-value behavior.
+
+Upgrade the gem and npm package together. Replace custom association dropdowns that expect a complete `resourceOptions` list. Regenerate or update ejected form fields and the `AssociationSelect` component.

@@ -66,12 +66,12 @@ RSpec.describe "dashboard field metadata", type: :request do
     expect(response).to have_http_status(:ok)
     data = JSON.parse(response.body).fetch("data")
     field = data.dig("form", "fields").find { |item| item.fetch("attribute") == "name" }
-    grouped_field = data.dig("form", "fieldGroups", 0, "fields").find { |item| item.fetch("attribute") == "name" }
+    group = data.dig("form", "fieldGroups", 0)
 
     expect(field.fetch("label")).to eq("Full name")
     expect(field.fetch("hint")).to eq("Use the customer's legal name.")
-    expect(grouped_field.fetch("label")).to eq("Full name")
-    expect(grouped_field.fetch("hint")).to eq("Use the customer's legal name.")
+    expect(group.fetch("attributes")).to include("name")
+    expect(group).not_to have_key("fields")
   end
 
   it "serializes show labels and hints from the dashboard" do

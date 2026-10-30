@@ -1,6 +1,43 @@
 module Terrazzo
   module Field
     class Associative < Base
+      OPTION_PAGE_SIZE = 25
+
+      def association_options(search:, page:)
+        page = [page.to_i, 1].max
+        scope = candidate_scope
+        columns = options[:searchable_fields] || (%w[name title email slug code original_filename id] &
+          (associated_class.column_names + associated_class.stored_attributes.values.flatten.map(&:to_s)))
+        scope = Terrazzo::Search.new(scope, nil, search).run_for_columns(columns)
+        scope = scope.reorder(options[:order] || association_primary_key).order(association_primary_key)
+        records = scope.offset((page - 1) * OPTION_PAGE_SIZE).limit(OPTION_PAGE_SIZE + 1).to_a
+        {
+          resourceOptions: records.first(OPTION_PAGE_SIZE).map { |record| option_for(record) },
+          page: page,
+          hasMore: records.length > OPTION_PAGE_SIZE
+        }
+      end
+
+      def selected_resource_options
+        records = data.nil? ? [] : (data.respond_to?(:to_ary) ? data.to_ary : [data])
+        records.map { |record| option_for(record) }
+      end
+
+      def candidate_scope
+        scope = if options[:scope].is_a?(Proc)
+          options[:scope].call(associated_class)
+        elsif options[:scope]
+          associated_class.public_send(options[:scope])
+        else
+          associated_class.all
+        end
+        options.key?(:includes) ? scope.includes(*options[:includes]) : scope
+      end
+
+      def option_for(record)
+        [display_name(record), record.public_send(association_primary_key).to_s]
+      end
+
       class << self
         def associative?
           true

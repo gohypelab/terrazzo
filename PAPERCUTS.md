@@ -1,5 +1,7 @@
 # Papercuts
 
+- [ ] 2026-10-29 | Generator tests | While testing a new npm component, generator tests used an existing `npm/dist` build and reported a missing export. Possible improvement: rebuild the package when source files change before generator tests run.
+
 - [x] 2026-09-17 | Release dependencies | While validating a release, CI resolved JSON 3 and failed in Rails JSON parsing, although local tests passed with JSON 2. Resolution: restrict the JSON dependency to version 2 until released Rails versions support JSON 3.
 
 - [ ] 2026-09-17 | Release workflow | While preparing a release, the release skill required cleanup in an example app inner Git repository that no longer exists. Git resolves that directory to the parent repository. Possible improvement: use the current generated-file layout and verify the Git root before cleanup.

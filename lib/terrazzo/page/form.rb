@@ -13,6 +13,12 @@ module Terrazzo
         normalize_groups(attrs, :form)
       end
 
+      def attribute_groups(action = nil)
+        attrs = dashboard.form_attributes(action)
+        groups = attrs.is_a?(Hash) ? attrs : { "" => attrs }
+        groups.map { |name, fields| { name: name, attributes: fields.map(&:to_s) } }
+      end
+
       def attributes(action = nil)
         attrs = dashboard.form_attributes(action)
         dashboard.flatten_attributes(attrs).map do |attr|

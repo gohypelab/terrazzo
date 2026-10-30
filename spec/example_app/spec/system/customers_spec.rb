@@ -76,7 +76,9 @@ RSpec.describe "Admin Customers", type: :system do
       fill_in "Name", with: "New Customer"
       fill_in "Email", with: "new@example.com"
       find("label", text: /\AKind/).find(:xpath, "..").find("select").select("Standard")
-      find("label", text: /Territory/).find(:xpath, "..").find("select").select("United States")
+      find("#customer_country_code").click
+      find("input[aria-label=\'Search Territory\']").set("United States")
+      click_button "United States", exact: true
       click_button "Save"
 
       expect(page).to have_content("New Customer")

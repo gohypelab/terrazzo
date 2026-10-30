@@ -32,7 +32,9 @@ RSpec.describe "Admin Product Meta Tags", type: :system do
       other_product = create(:product, name: "Unlinked Product")
       visit new_admin_product_meta_tag_path
 
-      select "Unlinked Product", from: "Product"
+      find("#product_meta_tag_product_id").click
+      find("input[aria-label=\'Search Product\']").set("Unlinked Product")
+      click_button "Unlinked Product", exact: true
       fill_in "Meta title", with: "New Meta Title"
       fill_in "Meta description", with: "New meta description"
       click_button "Save"

@@ -1,6 +1,10 @@
 module Terrazzo
   module Field
     class BelongsTo < Associative
+      def association_options?
+        true
+      end
+
       def serialize_value(mode)
         case mode
         when :form
@@ -13,11 +17,7 @@ module Terrazzo
 
       def serializable_options(page = nil)
         return {} unless page == :form && resource
-        collection = ordered_resource_options
-        if options[:include_blank]
-          collection = [["", nil]] + collection
-        end
-        { resourceOptions: collection }
+        { resourceOptions: selected_resource_options }
       end
 
       class << self
@@ -34,20 +34,6 @@ module Terrazzo
       end
 
       private
-
-      def ordered_resource_options
-        return [] unless associated_class
-        scope = if options[:scope].is_a?(Proc)
-          options[:scope].call(associated_class)
-        elsif options[:scope]
-          associated_class.public_send(options[:scope])
-        else
-          associated_class.all
-        end
-        scope = scope.reorder(options[:order]) if options[:order]
-        pk = association_primary_key
-        scope.map { |r| [display_name(r), r.public_send(pk).to_s] }
-      end
 
       def foreign_key_value
         return nil unless resource
