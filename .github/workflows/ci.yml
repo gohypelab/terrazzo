@@ -134,7 +134,7 @@ jobs:
         with:
           node-version: 24
 
-      - uses: browser-actions/setup-chrome@v1
+      - uses: browser-actions/setup-chrome@v2
 
       - uses: ruby/setup-ruby@v1
         with:
