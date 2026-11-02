@@ -33,7 +33,7 @@ Gem::Specification.new do |spec|
   spec.add_dependency "rails", ">= 7.1"
   # Current Rails releases require the JSON 2 argument format.
   # Remove this limit after released Rails versions include rails/rails#58601.
-  spec.add_dependency "json", "~> 2.0"
+  spec.add_dependency "json", ">= 2", "< 4"
   spec.add_dependency "kaminari", "~> 1.2"
   spec.add_dependency "superglue", "~> 1.1"
   spec.add_dependency "form_props", ">= 0.0.6"
