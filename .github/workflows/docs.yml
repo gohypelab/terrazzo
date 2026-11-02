@@ -34,9 +34,9 @@ jobs:
         working-directory: docs
         run: npm ci
 
-      - name: Build docs
+      - name: Run docs checks
         working-directory: docs
-        run: npm run docs:build
+        run: npm run check
 
       - uses: actions/configure-pages@v4
 

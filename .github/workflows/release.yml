@@ -22,14 +22,16 @@ env:
   RELEASE_TAG: ${{ inputs.tag || github.ref_name }}
 
 jobs:
-  verify:
-    name: Verify release
+  resolve:
+    name: Resolve release commit
     runs-on: ubuntu-latest
+    outputs:
+      sha: ${{ steps.release.outputs.sha }}
 
     steps:
       - uses: actions/checkout@v6
         with:
-          ref: ${{ env.RELEASE_TAG }}
+          ref: refs/tags/${{ env.RELEASE_TAG }}
           persist-credentials: false
 
       - uses: actions/setup-node@v6
@@ -40,15 +42,9 @@ jobs:
       - uses: ruby/setup-ruby@v1
         with:
           ruby-version: "3.4"
-          bundler-cache: true
-
-      - uses: ruby/setup-ruby@v1
-        with:
-          ruby-version: "3.4"
-          bundler-cache: true
-          working-directory: spec/example_app
 
       - name: Validate tag and package versions
+        id: release
         shell: bash
         run: |
           set -euo pipefail
@@ -68,36 +64,18 @@ jobs:
             exit 1
           fi
 
-      - name: Install npm dependencies
-        working-directory: npm
-        run: npm ci
+          echo "sha=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
 
-      - name: Run npm package checks
-        working-directory: npm
-        run: npm run check
-
-      - name: Install example app JavaScript dependencies
-        working-directory: spec/example_app
-        run: npm install
-
-      - name: Audit example app JavaScript dependencies
-        working-directory: spec/example_app
-        run: npm run audit
-
-      - name: Build the admin panel from the recipe (also compiles assets)
-        working-directory: spec/example_app
-        run: script/build_example_admin
-
-      - name: Prepare the test database
-        working-directory: spec/example_app
-        run: bin/rails db:test:prepare
-
-      - name: Run Ruby package checks
-        run: bundle exec rake check
+  verify:
+    name: Verify release
+    needs: resolve
+    uses: ./.github/workflows/ci.yml
+    with:
+      ref: ${{ needs.resolve.outputs.sha }}
 
   publish-gem:
     name: Publish gem
-    needs: verify
+    needs: [resolve, verify]
     runs-on: ubuntu-latest
     environment: release
     permissions:
@@ -107,7 +85,7 @@ jobs:
     steps:
       - uses: actions/checkout@v6
         with:
-          ref: ${{ env.RELEASE_TAG }}
+          ref: ${{ needs.resolve.outputs.sha }}
           persist-credentials: false
 
       - uses: ruby/setup-ruby@v1
@@ -135,7 +113,7 @@ jobs:
 
   publish-npm:
     name: Publish npm package
-    needs: verify
+    needs: [resolve, verify]
     runs-on: ubuntu-latest
     environment: release
     permissions:
@@ -149,7 +127,7 @@ jobs:
     steps:
       - uses: actions/checkout@v6
         with:
-          ref: ${{ env.RELEASE_TAG }}
+          ref: ${{ needs.resolve.outputs.sha }}
           persist-credentials: false
 
       - uses: actions/setup-node@v6

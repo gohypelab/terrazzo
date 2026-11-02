@@ -1,5 +1,7 @@
 # Papercuts
 
+- [x] 2026-10-30 | release verification | While checking a failed main CI run after publication, the docs dependency audit failed although the release passed. Resolution: releases call the complete reusable CI workflow and publish from its verified commit SHA.
+
 - [ ] 2026-10-29 | Generator tests | While testing a new npm component, generator tests used an existing `npm/dist` build and reported a missing export. Possible improvement: rebuild the package when source files change before generator tests run.
 
 - [x] 2026-09-17 | Release dependencies | While validating a release, CI resolved JSON 3 and failed in Rails JSON parsing, although local tests passed with JSON 2. Resolution: restrict the JSON dependency to version 2 until released Rails versions support JSON 3.

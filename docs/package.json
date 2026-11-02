@@ -15,9 +15,10 @@
     "docs:preview": "vitepress preview"
   },
   "overrides": {
-    "vite": "7.3.6"
+    "vite": "$vite"
   },
   "devDependencies": {
+    "vite": "7.3.7",
     "vitepress": "1.6.4"
   }
 }

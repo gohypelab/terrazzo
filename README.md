@@ -70,8 +70,10 @@ JSON 3 argument format. See [the Rails compatibility fix](https://github.com/rai
 
 ## Development and releases
 
-Pull requests and pushes to `main` run the Ruby unit specs, npm package checks,
-documentation build, and example app system specs through GitHub Actions.
+Pull requests, pushes to `main`, and releases use the same reusable CI workflow.
+It runs the Ruby unit specs, npm package checks, documentation audit and build,
+and example app system specs. Releases resolve the tag to a commit SHA, verify
+that commit, and publish from the same SHA only after every check passes.
 
 Repository npm projects pin direct dependencies and use a seven-day minimum
 release age when resolving updates. The published package and documentation
@@ -79,9 +81,15 @@ projects also commit their lockfiles. Use npm 11.10 or newer when changing
 dependencies; project `.npmrc` files save new dependencies with exact versions
 automatically.
 
+Dependabot checks the npm projects, Ruby bundles, and GitHub Actions weekly.
+Patch and minor version updates are grouped; major updates remain separate.
+Security-update PRs are enabled. Maintainers review and merge these PRs; the
+repository does not auto-merge dependency updates. The docs Vite override refers
+to its direct dependency so an update does not leave a separate version pin behind.
+
 Terrazzo releases the Ruby gem and npm package from the same version tag. After
 updating `lib/terrazzo/version.rb` and `npm/package.json` to matching versions,
-push an annotated `v*` tag. The release workflow validates both packages,
+push an annotated `v*` tag. The release workflow runs the complete verification,
 publishes missing versions to RubyGems and npm through OIDC trusted publishing,
 and creates a GitHub Release with generated notes. Existing registry versions
 are skipped, so a partially completed or manually published release can be
